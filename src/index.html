@@ -1,14 +1,123 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>LazorBlog</title>
-  <base href="/">
 
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+<head>
+    <meta charset="utf-8">
+    <title>Lazor Blog</title>
+    <base href="/">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Raleway:400,300,700" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Inconsolata:400,300,700" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <style>
+        @keyframes site-logo {
+            0% {
+                transform: scale3d(1, 1, 1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale3d(1.3, 1.3, 1);
+                opacity: 0;
+            }
+        }
+        
+        .site-load {
+            fill: none;
+            stroke: #335577;
+            stroke-width: 10px;
+        }
+        
+        .inner {
+            stroke-width: 0px;
+            fill: #00796b;
+            opacity: 0;
+            transform-origin: 100px 100px;
+            animation-timing-function: ease-out;
+            animation: site-logo 1s;
+            animation-iteration-count: infinite;
+        }
+        
+        .inner-circle-1 {
+            animation-delay: 0.083s;
+        }
+        
+        .inner-circle-2 {
+            animation-delay: 0.167s;
+        }
+        
+        .inner-circle-3 {
+            animation-delay: 0.25s;
+        }
+        
+        .inner-circle-4 {
+            animation-delay: 0.333s;
+        }
+        
+        .inner-circle-5 {
+            animation-delay: 0.417s;
+        }
+        
+        .inner-circle-6 {
+            animation-delay: 0.5s;
+        }
+        
+        .inner-circle-7 {
+            animation-delay: 0.583s;
+        }
+        
+        .inner-circle-8 {
+            animation-delay: 0.667s;
+        }
+        
+        .inner-circle-9 {
+            animation-delay: 0.75s;
+        }
+        
+        .inner-circle-10 {
+            animation-delay: 0.833s;
+        }
+        
+        .inner-circle-11 {
+            animation-delay: 0.917s;
+        }
+        
+        .inner-circle-12 {
+            animation-delay: 1s;
+        }
+    </style>
 </head>
+
 <body>
-  <app-root></app-root>
+    <la-root>
+        <div style="text-align: center;">
+            <p style="color: #666; font-size: 20px">
+                Wait a few second, site is loading...
+            </p>
+            <svg class="site-load" width="200" height="200">
+                <circle class="inner inner-circle-1" cx="39.37822173508929" cy="65.0" r="9" />
+                <circle class="inner inner-circle-2" cx="65.0" cy="39.3782217350893" r="9" />
+                <circle class="inner inner-circle-3" cx="100.0" cy="30.0" r="9" />
+                <circle class="inner inner-circle-4" cx="135.0" cy="39.37822173508929" r="9" />
+                <circle class="inner inner-circle-5" cx="160.62177826491072" cy="65.0" r="9" />
+                <circle class="inner inner-circle-6" cx="170.0" cy="99.99999999999999" r="9" />
+                <circle class="inner inner-circle-7" cx="160.62177826491072" cy="134.99999999999997" r="9" />
+                <circle class="inner inner-circle-8" cx="135.00000000000003" cy="160.6217782649107" r="9" />
+                <circle class="inner inner-circle-9" cx="100.00000000000001" cy="170.0" r="9" />
+                <circle class="inner inner-circle-10" cx="65.0" cy="160.6217782649107" r="9" />
+                <circle class="inner inner-circle-11" cx="39.37822173508931" cy="135.00000000000003" r="9" />
+                <circle class="inner inner-circle-12" cx="30.0" cy="100.00000000000001" r="9" />
+            </svg>
+        </div>
+    </la-root>
+    <!--<script src="assets/particles.min.js"></script>-->
+    <!--<script>
+        particlesJS.load('particles-js', 'assets/particles.json', function() {
+            console.log('callback - particles.js config loaded');
+        });
+    </script>-->
 </body>
+
 </html>

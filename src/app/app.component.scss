@@ -1,0 +1,90 @@
+@import '~@angular/material/theming';
+@include mat-core();
+$primary: $mat-orange;
+.site-banner {
+    height: 340px;
+    background-color: map-get($primary, 500);
+    background-image: url(/assets/image/simple-header-blended-small.png);
+    background-clip: content-box;
+    background-size: cover;
+    background-repeat: repeat;
+    text-align: center;
+    font-family: Raleway, Arial, Helvetica, sans-serif;
+    .site-nav {
+        background-color: transparent;
+        color: map-get($primary, 50);
+        .nav-spacer {
+            flex: 1 1 auto;
+        }
+        .nav-font {
+            font-family: Lato, Raleway, Arial, Helvetica, sans-serif;
+            font-size: 1.2em;
+            .home-button {
+                font-weight: bolder;
+                font-style: italic;
+                position: relative;
+                top: -2px;
+            }
+            .nav-button {
+                position: relative;
+                top: -2px;
+            }
+            .entry-button {
+                position: relative;
+                top: 2px;
+            }
+        }
+    }
+    h1 {
+        margin: 0;
+        padding-top: 60px;
+        color: map-get($primary, 50);
+        font-size: 5em;
+        font-weight: normal;
+    }
+}
+
+@keyframes logo {
+    0% {
+        transform: rotate3d(0, 0, 2, -900deg);
+    }
+    25% {
+        transform: rotate3d(0, 0, 2, var(--rotate-deg-25));
+    }
+    50% {
+        transform: rotate3d(0, 0, 2, var(--rotate-deg-50));
+    }
+    75% {
+        transform: rotate3d(0, 0, 2, var(--rotate-deg-75));
+    }
+    100% {
+        transform: rotate3d(0, 0, 2, 900deg);
+    }
+}
+
+.site-logo {
+    animation: logo 4s;
+    animation-direction: alternate;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in;
+    width: 30px;
+    height: 30px;
+    stroke-width: "0";
+    .inner-circle {
+        fill: map-get($primary, 50);
+    }
+    .outer-circle {
+        fill: none;
+        stroke: map-get($primary, 500);
+        stroke-width: 3px;
+    }
+    .path-1 {
+        fill: map-get($primary, 500);
+    }
+    .path-2 {
+        fill: map-get($primary, 800);
+    }
+    .path-3 {
+        fill: map-get($primary, 900);
+    }
+}

@@ -1,20 +1,43 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
-  <h1>
-    Welcome to {{title}}!
-  </h1>
-  <img width="300" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAxOS4xLjAsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeD0iMHB4IiB5PSIwcHgiDQoJIHZpZXdCb3g9IjAgMCAyNTAgMjUwIiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCAyNTAgMjUwOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KCS5zdDB7ZmlsbDojREQwMDMxO30NCgkuc3Qxe2ZpbGw6I0MzMDAyRjt9DQoJLnN0MntmaWxsOiNGRkZGRkY7fQ0KPC9zdHlsZT4NCjxnPg0KCTxwb2x5Z29uIGNsYXNzPSJzdDAiIHBvaW50cz0iMTI1LDMwIDEyNSwzMCAxMjUsMzAgMzEuOSw2My4yIDQ2LjEsMTg2LjMgMTI1LDIzMCAxMjUsMjMwIDEyNSwyMzAgMjAzLjksMTg2LjMgMjE4LjEsNjMuMiAJIi8+DQoJPHBvbHlnb24gY2xhc3M9InN0MSIgcG9pbnRzPSIxMjUsMzAgMTI1LDUyLjIgMTI1LDUyLjEgMTI1LDE1My40IDEyNSwxNTMuNCAxMjUsMjMwIDEyNSwyMzAgMjAzLjksMTg2LjMgMjE4LjEsNjMuMiAxMjUsMzAgCSIvPg0KCTxwYXRoIGNsYXNzPSJzdDIiIGQ9Ik0xMjUsNTIuMUw2Ni44LDE4Mi42aDBoMjEuN2gwbDExLjctMjkuMmg0OS40bDExLjcsMjkuMmgwaDIxLjdoMEwxMjUsNTIuMUwxMjUsNTIuMUwxMjUsNTIuMUwxMjUsNTIuMQ0KCQlMMTI1LDUyLjF6IE0xNDIsMTM1LjRIMTA4bDE3LTQwLjlMMTQyLDEzNS40eiIvPg0KPC9nPg0KPC9zdmc+DQo=">
+<div class="site-banner">
+    <md-toolbar class="site-nav">
+        <a md-button routerLink="/" class="nav-font">
+            <svg class="site-logo" style="width:30px;height:30px;position:relative;top:-2px;">
+                        <defs>
+                            <filter id="Gaussian_Blur">
+                                <feGaussianBlur in="SourceGraphic" stdDeviation="1" />
+                            </filter>
+                        </defs>
+                        <circle class="inner-circle" cx="15.0" cy="15.0" r="12.0" filter="url(#Gaussian_Blur)"/>
+                        <!-- <circle class="outer-circle" cx="15.0" cy="15.0" r="14.0"/> -->
+                        <path class="path-1" d="M12.5 16.443375672974064 L11.345299461620748 18.443375672974064 L23.273502691896258 18.443375672974064 L16.154700538379252 6.113248654051871 L13.845299461620748 6.113248654051871 L19.809401076758505 16.443375672974064 L12.5 16.443375672974064" />
+                        <path class="path-2" d="M11.345299461620748 18.443375672974064 L23.273502691896258 18.443375672974064 L22.118802153517006 20.443375672974064 L7.881197846482993 20.443375672974064 L13.845299461620748 10.113248654051871 L15.0 12.113248654051871 L11.345299461620748 18.443375672974064" />
+                        <path class="path-3" d="M7.881197846482993 20.443375672974064 L6.726497308103742 18.443375672974064 L13.845299461620748 6.113248654051871 L19.809401076758505 16.443375672974064 L17.5 16.443375672974064 L13.845299461620748 10.113248654051871 L7.881197846482993 20.443375672974064" />
+                    </svg>
+            <span class="home-button">Star-T</span>
+        </a>
+        <a md-button routerLink="/" class="nav-font">
+            <span class="nav-button">About</span>
+        </a>
+        <span class="nav-spacer"></span>
+        <button md-icon-button class="nav-font" [mdMenuTriggerFor]="menu">
+                <span class="entry-button"><md-icon>fingerprint</md-icon></span>
+            </button>
+        <md-menu #menu="mdMenu">
+            <button md-menu-item>
+                      <md-icon>dialpad</md-icon>
+                      <span>Redial</span>
+                    </button>
+            <button md-menu-item disabled>
+                      <md-icon>voicemail</md-icon>
+                      <span>Check voicemail</span>
+                    </button>
+            <button md-menu-item>
+                      <md-icon>notifications_off</md-icon>
+                      <span>Disable alerts</span>
+                    </button>
+        </md-menu>
+    </md-toolbar>
+    <h1>Chasing a Cat</h1>
 </div>
-<h2>Here are some links to help you start: </h2>
-<ul>
-  <li>
-    <h2><a target="_blank" href="https://angular.io/tutorial">Tour of Heroes</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" href="https://github.com/angular/angular-cli/wiki">CLI Documentation</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" href="https://blog.angular.io//">Angular blog</a></h2>
-  </li>
-</ul>
-
+<div class="divider"></div>
+<router-outlet></router-outlet>
