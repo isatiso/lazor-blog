@@ -1,7 +1,8 @@
-<div class="site-banner">
-    <md-toolbar class="site-nav">
-        <a md-button routerLink="/" class="nav-font">
-            <svg class="site-logo" style="width:30px;height:30px;position:relative;top:-2px;">
+<div class="app-container" (scroll)="onscroll()">
+    <md-toolbar laNavBg [background]="nav_bg" class="site-nav">
+        <div class="nav-container">
+            <a md-button routerLink="/article" class="nav-font">
+                <svg class="site-logo" style="width:30px;height:30px;position:relative;top:-2px;">
                         <defs>
                             <filter id="Gaussian_Blur">
                                 <feGaussianBlur in="SourceGraphic" stdDeviation="1" />
@@ -13,31 +14,22 @@
                         <path class="path-2" d="M11.345299461620748 18.443375672974064 L23.273502691896258 18.443375672974064 L22.118802153517006 20.443375672974064 L7.881197846482993 20.443375672974064 L13.845299461620748 10.113248654051871 L15.0 12.113248654051871 L11.345299461620748 18.443375672974064" />
                         <path class="path-3" d="M7.881197846482993 20.443375672974064 L6.726497308103742 18.443375672974064 L13.845299461620748 6.113248654051871 L19.809401076758505 16.443375672974064 L17.5 16.443375672974064 L13.845299461620748 10.113248654051871 L7.881197846482993 20.443375672974064" />
                     </svg>
-            <span class="home-button">Star-T</span>
-        </a>
-        <a md-button routerLink="/" class="nav-font">
-            <span class="nav-button">About</span>
-        </a>
-        <span class="nav-spacer"></span>
-        <button md-icon-button class="nav-font" [mdMenuTriggerFor]="menu">
+                <span class="home-button">Star-T</span>
+            </a>
+            <a md-button routerLink="/home" class="nav-font">
+                <span class="nav-button">About</span>
+            </a>
+            <span class="nav-spacer"></span>
+            <button md-button class="nav-font" [mdMenuTriggerFor]="menu">
                 <span class="entry-button"><md-icon>fingerprint</md-icon></span>
             </button>
-        <md-menu #menu="mdMenu">
-            <button md-menu-item>
-                      <md-icon>dialpad</md-icon>
-                      <span>Redial</span>
-                    </button>
-            <button md-menu-item disabled>
-                      <md-icon>voicemail</md-icon>
-                      <span>Check voicemail</span>
-                    </button>
-            <button md-menu-item>
-                      <md-icon>notifications_off</md-icon>
-                      <span>Disable alerts</span>
-                    </button>
-        </md-menu>
+            <md-menu #menu="mdMenu">
+                <button md-menu-item><span>Sign In</span></button>
+                <button md-menu-item><span>Sign Up</span></button>
+            </md-menu>
+        </div>
     </md-toolbar>
-    <h1>Chasing a Cat</h1>
+
+    <router-outlet></router-outlet>
+    <router-outlet name="footer"></router-outlet>
 </div>
-<div class="divider"></div>
-<router-outlet></router-outlet>

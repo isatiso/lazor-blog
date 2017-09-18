@@ -2,25 +2,22 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
 import { MaterialModule } from '@angular/material';
-import { RouterModule, Routes } from '@angular/router';
 
+import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { NavBgDirective } from './directive/nav-bg.directive';
 
-const la_routes: Routes = [
-    { path: '', redirectTo: 'home', pathMatch: 'full' },
-    { path: 'home', loadChildren: './modules/home/home.module#HomeModule' },
-    { path: 'article', loadChildren: './modules/article/article.module#ArticleModule' },
-];
 
 @NgModule({
     declarations: [
-        AppComponent
+        AppComponent,
+        NavBgDirective
     ],
     imports: [
         BrowserModule,
         BrowserAnimationsModule,
         MaterialModule,
-        RouterModule.forRoot(la_routes)
+        AppRoutingModule
     ],
     providers: [],
     bootstrap: [AppComponent]

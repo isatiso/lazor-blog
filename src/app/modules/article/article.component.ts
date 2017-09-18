@@ -1,15 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-    selector: 'la-article',
-    templateUrl: './article.component.html',
-    styleUrls: ['./article.component.css']
+  selector: 'la-article',
+  templateUrl: './article.component.html',
+  styleUrls: ['./article.component.scss']
 })
 export class ArticleComponent implements OnInit {
 
-    constructor() { }
+  constructor() { }
 
-    ngOnInit() {
-    }
+  ngOnInit() {
+  }
 
 }

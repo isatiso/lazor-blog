@@ -1,0 +1,26 @@
+@import '~@angular/material/theming';
+@include mat-core();
+$primary: mat-palette($mat-indigo);
+$accent: mat-palette($mat-teal, A200, A100, A400);
+$warn: mat-palette($mat-red);
+$theme: mat-light-theme($primary, $accent, $warn);
+@include angular-material-theme($theme);
+html {
+    width: 100%;
+    height: 100%;
+    body {
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+        background-color: map-get($accent, 50);
+    }
+}
+
+.divider {
+    padding: 0;
+    margin: 0;
+    height: 4px;
+    width: 100%;
+    background-color: map-get($primary, 500);
+}
