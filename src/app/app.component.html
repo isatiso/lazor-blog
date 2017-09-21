@@ -1,7 +1,7 @@
-<div class="app-container" (scroll)="onscroll()">
-    <md-toolbar laNavBg [background]="nav_bg" class="site-nav">
+<div class="app-container" (window:scroll)="onscroll($event)">
+    <md-toolbar laNavBg [scrollTop]="scroll_top" [heightLimit]="height_limit" class="site-nav">
         <div class="nav-container">
-            <a md-button routerLink="/article" class="nav-font">
+            <a md-button routerLink="/index" class="nav-font">
                 <svg class="site-logo" style="width:30px;height:30px;position:relative;top:-2px;">
                         <defs>
                             <filter id="Gaussian_Blur">
@@ -16,20 +16,126 @@
                     </svg>
                 <span class="home-button">Star-T</span>
             </a>
-            <a md-button routerLink="/home" class="nav-font">
+            <a md-button routerLink="/about" class="nav-font">
                 <span class="nav-button">About</span>
+            </a>
+            <a md-button routerLink="/editor" class="nav-font">
+                <span class="nav-button">Editor</span>
             </a>
             <span class="nav-spacer"></span>
             <button md-button class="nav-font" [mdMenuTriggerFor]="menu">
-                <span class="entry-button"><md-icon>fingerprint</md-icon></span>
+                <span class="entry-button">Menu <md-icon>fingerprint</md-icon></span>
             </button>
             <md-menu #menu="mdMenu">
                 <button md-menu-item><span>Sign In</span></button>
                 <button md-menu-item><span>Sign Up</span></button>
+                <button md-menu-item routerLink="/home"><span>Home</span></button>
+                <button md-menu-item routerLink="/auth"><span>Auth</span></button>
+                <button md-menu-item routerLink="/article"><span>Article</span></button>
             </md-menu>
         </div>
     </md-toolbar>
-
+    <div class="nav-bg"></div>
     <router-outlet></router-outlet>
     <router-outlet name="footer"></router-outlet>
+
 </div>
+<footer>
+    <div class="footer-container">
+        <md-grid-list cols="4" rowHeight="45px">
+            <!-- <md-grid-tile *ngFor="let tile of tiles" [colspan]="tile.cols" [rowspan]="tile.rows" [style.background]="tile.color">
+                {{tile.text}}
+            </md-grid-tile> -->
+            <md-grid-tile>
+                <a class="link" href="about" title="Angular 贡献者。">关于</a>
+            </md-grid-tile>
+            <md-grid-tile>
+                <a class="link" href="resources" title="网络上的 Angular 工具、培训、博客等">资源列表</a>
+            </md-grid-tile>
+            <md-grid-tile>
+                <a class="link" href="presskit" title="我们的联系方式、LOGO 和品牌">宣传资料</a>
+            </md-grid-tile>
+            <md-grid-tile>
+                <a class="link" href="https://blog.angular.io/" title="Angular 官方博客">博客</a>
+            </md-grid-tile>
+            <md-grid-tile colspan="4">
+                Powered by Google ©2010-2017. 代码授权方式：
+                <a href="license" title="License text">MIT-style License</a>. 文档授权方式：
+                <a href="http://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>
+            </md-grid-tile>
+            <md-grid-tile colspan="4">
+                <span class="text-caption">本网站由洛阳永欣维护 &nbsp;<a href="http://www.miitbeian.gov.cn/">豫ICP备16019859号-1</a></span> 当前版本：5.0.0-build.100+sha.7e9e929.
+            </md-grid-tile>
+
+        </md-grid-list>
+        <div class="grid-fluid" style="display: none">
+            <!---->
+            <div class="footer-block">
+                <h3>资源</h3>
+                <ul>
+                    <!---->
+                    <li>
+                        <a class="link" href="about" title="Angular 贡献者。">关于</a>
+                    </li>
+                    <li>
+                        <a class="link" href="resources" title="网络上的 Angular 工具、培训、博客等">资源列表</a>
+                    </li>
+                    <li>
+                        <a class="link" href="presskit" title="我们的联系方式、LOGO 和品牌">宣传资料</a>
+                    </li>
+                    <li>
+                        <a class="link" href="https://blog.angular.io/" title="Angular 官方博客">博客</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="footer-block">
+                <h3>帮助</h3>
+                <ul>
+                    <!---->
+                    <li>
+                        <a class="link" href="http://stackoverflow.com/questions/tagged/angular2" title="Stack Overflow: 这里的社区会回答你关于 Angular 的技术问题">Stack Overflow</a>
+                    </li>
+                    <li>
+                        <a class="link" href="https://gitter.im/angular/angular" title="和老鸟聊 Angular">Gitter</a>
+                    </li>
+                    <li>
+                        <a class="link" href="https://github.com/angular/angular/issues" title="在 github 上报告问题和建议。">报告问题</a>
+                    </li>
+                    <li>
+                        <a class="link" href="https://github.com/angular/code-of-conduct/blob/master/CODE_OF_CONDUCT.md" title="让我们彼此尊重">行为规范</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="footer-block">
+                <h3>社区</h3>
+                <ul>
+                    <!---->
+                    <li>
+                        <a class="link" href="events" title="Post issues and suggestions on github.">活动</a>
+                    </li>
+                    <li>
+                        <a class="link" href="http://www.meetup.com/topics/angularjs/" title="参加聚会，向别的开发人员学习">聚会</a>
+                    </li>
+                    <li>
+                        <a class="link" href="https://twitter.com/angular" title="Twitter">Twitter</a>
+                    </li>
+                    <li>
+                        <a class="link" href="https://github.com/angular/angular" title="GitHub">GitHub</a>
+                    </li>
+                    <li>
+                        <a class="link" href="contribute" title="向 Angular 做贡献">做贡献</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="footer-block">
+                <h3>多语言</h3>
+                <ul>
+                    <!---->
+                    <li>
+                        <a class="link" href="https://angular.io/" title="English Version.">English Version</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</footer>

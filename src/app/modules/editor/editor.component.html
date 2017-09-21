@@ -1,0 +1,24 @@
+<div class="container">
+    <md-card>
+        <div class="title">
+            Markdown Editor
+        </div>
+        <p class="unicorn-title">Hello there, here is a markdown editor for my new site, have a try~ </p>
+        <md-tab-group MdTabGroup [dynamicHeight]="dynamic_height" [selectedIndex]="tab_select" (selectedIndexChange)="select_change($event)" disableRipple="false" class="md-editor">
+            <md-tab label="Input">
+                <div class="input-test" id="tab1">
+                    <md-input-container class="editor-input">
+                        <textarea mdInput mdTextareaAutosize [(ngModel)]="content" [mdAutosizeMinRows]="min_rows"></textarea>
+                    </md-input-container>
+                </div>
+            </md-tab>
+            <md-tab label="Output">
+                <div id="tab2">
+                    <markdown [data]="content"></markdown>
+                </div>
+            </md-tab>
+        </md-tab-group>
+        <div class="editor-nav nav-left"><button md-fab (click)="select1()" class="markdown-editor" *ngIf="true"><md-icon class="big-icon">navigate_before</md-icon></button></div>
+        <div class="editor-nav nav-right"><button md-fab (click)="select2()" class="markdown-showup" *ngIf="true"><md-icon class="big-icon">navigate_next</md-icon></button></div>
+    </md-card>
+</div>
