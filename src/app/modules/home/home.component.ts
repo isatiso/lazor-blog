@@ -20,8 +20,9 @@ export class HomeComponent implements OnInit {
     }
 
     onscroll(event) {
-        if (document.body.scrollTop <= this.height) {
-            this.banner.nativeElement.firstElementChild.style.opacity = 1 - (document.body.scrollTop / this.height);
+        const scrollTop = event.target.scrollingElement.scrollTop;
+        if (scrollTop <= this.height) {
+            this.banner.nativeElement.firstElementChild.style.opacity = 1 - (scrollTop / this.height);
         } else {
             this.banner.nativeElement.firstElementChild.style.opacity = 0;
         }

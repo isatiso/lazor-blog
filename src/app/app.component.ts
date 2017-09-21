@@ -60,7 +60,7 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit, AfterView
     }
 
     onscroll(event) {
-        this.scroll_top = document.body.scrollTop;
+        this.scroll_top = event.target.scrollingElement.scrollTop;
         return event;
     }
 }
