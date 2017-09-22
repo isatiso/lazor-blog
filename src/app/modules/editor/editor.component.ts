@@ -36,7 +36,7 @@ int main() {
     public tab_height_1: number;
     public tab_height_2: number;
     public tab2: any;
-    public tab_select = 0;
+    public tab_select = 1;
     public show_scroll: boolean;
 
     constructor() { }

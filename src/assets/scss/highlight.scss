@@ -2,10 +2,15 @@
 $config: mat-typography-config();
 @include mat-core();
 $mycolor: map-get($mat-teal, 100);
+$code_font:Inconsolata,
+Monaco,
+Consolas,
+Andale Mono,
+monospace;
 code[class*=language-],
 pre[class*=language-] {
     text-shadow: 0 1px #fff;
-    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    font-family: $code_font;
     text-align: left;
     white-space: pre;
     word-spacing: normal;
