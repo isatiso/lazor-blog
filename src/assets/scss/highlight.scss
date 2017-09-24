@@ -2,8 +2,8 @@
 $config: mat-typography-config();
 @include mat-core();
 $mycolor: map-get($mat-teal, 100);
-$code_font:Inconsolata,
-Monaco,
+$code_font: Monaco,
+Inconsolata,
 Consolas,
 Andale Mono,
 monospace;

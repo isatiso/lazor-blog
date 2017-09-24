@@ -31,7 +31,7 @@ $config: mat-typography-config();
         display: inline-block;
         position: relative;
         transition: transform 0.2s ease;
-        transform: translateX(-130px);
+        transform: translateX(-300%);
         left: 0;
     }
 }
@@ -47,7 +47,7 @@ $config: mat-typography-config();
     .markdown-showup {
         display: inline-block;
         transition: transform 0.2s ease;
-        transform: translateX(130px);
+        transform: translateX(300%);
         position: relative;
         right: 0;
     }

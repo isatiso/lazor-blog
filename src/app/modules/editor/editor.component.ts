@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { MarkdownDirective } from 'directive/markdown.directive';
 
 declare var Prism: any;
@@ -36,12 +36,24 @@ int main() {
     public tab_height_1: number;
     public tab_height_2: number;
     public tab2: any;
-    public tab_select = 1;
+    public tab_select = 0;
     public show_scroll: boolean;
+
+    @ViewChild('navLeft') nav_left;
+    @ViewChild('navRight') nav_right;
+    @ViewChild('editorContainer') editor_container;
 
     constructor() { }
 
     ngOnInit() {
+        const total_width = document.body.clientWidth;
+        const editor_width = this.editor_container.nativeElement.clientWidth;
+        let nav_width = (total_width - editor_width) / 2;
+        nav_width = nav_width > 50 ? nav_width : 50;
+        this.nav_left.nativeElement.style.width = nav_width + 'px';
+        this.nav_right.nativeElement.style.width = nav_width + 'px';
+        // console.log(this.nav_left);
+        // this.nav_left.nativeElement.style.width
     }
 
     // scroll_top() {

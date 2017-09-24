@@ -22,6 +22,9 @@
             <a md-button routerLink="/editor" class="nav-font">
                 <span class="nav-button">Editor</span>
             </a>
+            <a md-button routerLink="/home" class="nav-font">
+                <span class="nav-button">Home</span>
+            </a>
             <span class="nav-spacer"></span>
             <button md-button class="nav-font" [mdMenuTriggerFor]="menu">
                 <span class="entry-button">Menu <md-icon>fingerprint</md-icon></span>
@@ -47,95 +50,24 @@
                 {{tile.text}}
             </md-grid-tile> -->
             <md-grid-tile>
-                <a class="link" href="about" title="Angular 贡献者。">关于</a>
+                <a routerLink="/about" title="">About</a>
             </md-grid-tile>
             <md-grid-tile>
-                <a class="link" href="resources" title="网络上的 Angular 工具、培训、博客等">资源列表</a>
+                <a routerLink="/article" title="">Articles</a>
             </md-grid-tile>
             <md-grid-tile>
-                <a class="link" href="presskit" title="我们的联系方式、LOGO 和品牌">宣传资料</a>
+                <a routerLink="/auth" title="">Auth</a>
             </md-grid-tile>
             <md-grid-tile>
-                <a class="link" href="https://blog.angular.io/" title="Angular 官方博客">博客</a>
+                <a routerLink="http://www.jianshu.com/u/10e236e2ed6b" title="我的简书">Blog</a>
             </md-grid-tile>
             <md-grid-tile colspan="4">
-                Powered by Google ©2010-2017. 代码授权方式：
-                <a href="license" title="License text">MIT-style License</a>. 文档授权方式：
+                Powered by Angular ©2010-2017. Code licensed under an &nbsp;<a href="license" title="License text">MIT-style License</a>. Documentation licensed under
                 <a href="http://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>
             </md-grid-tile>
             <md-grid-tile colspan="4">
-                <span class="text-caption">本网站由洛阳永欣维护 &nbsp;<a href="http://www.miitbeian.gov.cn/">豫ICP备16019859号-1</a></span> 当前版本：5.0.0-build.100+sha.7e9e929.
+                <span class="text-caption"> </span> Version: 0.1.0 &nbsp;<a href="http://www.miitbeian.gov.cn/">粤ICP备17088879号</a>
             </md-grid-tile>
-
         </md-grid-list>
-        <div class="grid-fluid" style="display: none">
-            <!---->
-            <div class="footer-block">
-                <h3>资源</h3>
-                <ul>
-                    <!---->
-                    <li>
-                        <a class="link" href="about" title="Angular 贡献者。">关于</a>
-                    </li>
-                    <li>
-                        <a class="link" href="resources" title="网络上的 Angular 工具、培训、博客等">资源列表</a>
-                    </li>
-                    <li>
-                        <a class="link" href="presskit" title="我们的联系方式、LOGO 和品牌">宣传资料</a>
-                    </li>
-                    <li>
-                        <a class="link" href="https://blog.angular.io/" title="Angular 官方博客">博客</a>
-                    </li>
-                </ul>
-            </div>
-            <div class="footer-block">
-                <h3>帮助</h3>
-                <ul>
-                    <!---->
-                    <li>
-                        <a class="link" href="http://stackoverflow.com/questions/tagged/angular2" title="Stack Overflow: 这里的社区会回答你关于 Angular 的技术问题">Stack Overflow</a>
-                    </li>
-                    <li>
-                        <a class="link" href="https://gitter.im/angular/angular" title="和老鸟聊 Angular">Gitter</a>
-                    </li>
-                    <li>
-                        <a class="link" href="https://github.com/angular/angular/issues" title="在 github 上报告问题和建议。">报告问题</a>
-                    </li>
-                    <li>
-                        <a class="link" href="https://github.com/angular/code-of-conduct/blob/master/CODE_OF_CONDUCT.md" title="让我们彼此尊重">行为规范</a>
-                    </li>
-                </ul>
-            </div>
-            <div class="footer-block">
-                <h3>社区</h3>
-                <ul>
-                    <!---->
-                    <li>
-                        <a class="link" href="events" title="Post issues and suggestions on github.">活动</a>
-                    </li>
-                    <li>
-                        <a class="link" href="http://www.meetup.com/topics/angularjs/" title="参加聚会，向别的开发人员学习">聚会</a>
-                    </li>
-                    <li>
-                        <a class="link" href="https://twitter.com/angular" title="Twitter">Twitter</a>
-                    </li>
-                    <li>
-                        <a class="link" href="https://github.com/angular/angular" title="GitHub">GitHub</a>
-                    </li>
-                    <li>
-                        <a class="link" href="contribute" title="向 Angular 做贡献">做贡献</a>
-                    </li>
-                </ul>
-            </div>
-            <div class="footer-block">
-                <h3>多语言</h3>
-                <ul>
-                    <!---->
-                    <li>
-                        <a class="link" href="https://angular.io/" title="English Version.">English Version</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
     </div>
 </footer>
