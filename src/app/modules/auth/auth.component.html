@@ -1,7 +1,29 @@
 <div class="container">
     <md-card>
         <p class="title">
-            auth works!
+            Welcome!
         </p>
+        <div class="big-box" (keydown)="signIn($event)">
+            <p>
+                <md-input-container class="long-input">
+                    <md-placeholder>
+                        Enter Your Email
+                        <md-icon>mode_edit</md-icon>
+                    </md-placeholder>
+                    <input mdInput [(ngModel)]="sign_in_data.email" />
+                    <!-- <input mdInput [mdTooltip]="form_data.email_tooltip" [mdTooltipPosition]="position" [(ngModel)]="sign_in_data.email" /> -->
+                </md-input-container>
+                <br/>
+                <md-input-container class="long-input ">
+                    <md-placeholder>
+                        Enter Your Password
+                        <md-icon>mode_edit</md-icon>
+                    </md-placeholder>
+                    <input mdInput [(ngModel)]="sign_in_data.password" type="password" />
+                    <!-- <input mdInput [mdTooltip]="form_data.pass_tooltip" [mdTooltipPosition]="position" [(ngModel)]="user_data.password" type="password" /> -->
+                </md-input-container>
+            </p>
+            <button md-raised-button (click)="signIn()">Submit</button>
+        </div>
     </md-card>
 </div>

@@ -1,9 +1,16 @@
 <div class="container" #editorContainer>
     <md-card>
-        <div class="title">
-            Markdown Editor
+        <div class="">
+            <!-- <md-input-container class="editor-title">
+                <md-placeholder>
+                    Title
+                    <md-icon>mode_edit</md-icon>
+                </md-placeholder>
+                <input mdInput [(ngModel)]="title" />
+            </md-input-container> -->
+            <input [(ngModel)]="title" class="editor-title" placeholder="Title" />
         </div>
-        <p class="unicorn-title">Hello there, here is a markdown editor for my new site, have a try~ </p>
+
         <md-tab-group MdTabGroup [dynamicHeight]="dynamic_height" [selectedIndex]="tab_select" (selectedIndexChange)="select_change($event)" disableRipple="false" class="md-editor">
             <md-tab label="Input">
                 <div class="input-test" id="tab1">

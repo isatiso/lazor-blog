@@ -10,7 +10,8 @@ declare var Prism: any;
 })
 export class EditorComponent implements OnInit {
 
-    content = `
+    public title = '';
+    public content = `
 # this is a title
 ## this is also a title
 > this is a quote
