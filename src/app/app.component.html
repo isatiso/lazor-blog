@@ -30,8 +30,8 @@
                 <span class="entry-button">Menu <md-icon>fingerprint</md-icon></span>
             </button>
             <md-menu #menu="mdMenu">
-                <button md-menu-item><span>Sign In</span></button>
-                <button md-menu-item><span>Sign Up</span></button>
+                <button md-menu-item routerLink="/auth"><span>Sign In</span></button>
+                <button md-menu-item routerLink="/auth"><span>Sign Up</span></button>
                 <button md-menu-item routerLink="/home"><span>Home</span></button>
                 <button md-menu-item routerLink="/auth"><span>Auth</span></button>
                 <button md-menu-item routerLink="/article"><span>Article</span></button>
@@ -62,8 +62,7 @@
                 <a routerLink="http://www.jianshu.com/u/10e236e2ed6b" title="我的简书">Blog</a>
             </md-grid-tile>
             <md-grid-tile colspan="4">
-                Powered by Angular ©2010-2017. Code licensed under an &nbsp;<a href="license" title="License text">MIT-style License</a>. Documentation licensed under
-                <a href="http://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>
+                Powered by Angular ©2010-2017. Code licensed under an &nbsp;<a href="license" title="License text">MIT-style License</a>.
             </md-grid-tile>
             <md-grid-tile colspan="4">
                 <span class="text-caption"> </span> Version: 0.1.0 &nbsp;<a href="http://www.miitbeian.gov.cn/">粤ICP备17088879号</a>
