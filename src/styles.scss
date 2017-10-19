@@ -38,6 +38,11 @@ html {
     padding-bottom: 20px;
 }
 
+.content {
+    font-family: Raleway, Arial, Helvetica, sans-serif;
+    font-size: 1.5em;
+}
+
 footer {
     background-color: map-get($primary, 500);
     background-image: url(/assets/image/abs.png);

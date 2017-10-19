@@ -19,21 +19,22 @@
             <a md-button routerLink="/about" class="nav-font">
                 <span class="nav-button">About</span>
             </a>
-            <a md-button routerLink="/editor" class="nav-font">
+            <!-- <a md-button routerLink="/editor" class="nav-font">
                 <span class="nav-button">Editor</span>
             </a>
             <a md-button routerLink="/home" class="nav-font">
                 <span class="nav-button">Home</span>
-            </a>
+            </a> -->
             <span class="nav-spacer"></span>
             <button md-button class="nav-font" [mdMenuTriggerFor]="menu">
                 <span class="entry-button">Menu <md-icon>fingerprint</md-icon></span>
             </button>
             <md-menu #menu="mdMenu">
-                <button md-menu-item routerLink="/auth"><span>Sign In</span></button>
-                <button md-menu-item routerLink="/auth"><span>Sign Up</span></button>
+                <!-- <button md-menu-item routerLink="/auth"><span>Sign In</span></button>
+                <button md-menu-item routerLink="/auth"><span>Sign Up</span></button> -->
                 <button md-menu-item routerLink="/home"><span>Home</span></button>
                 <button md-menu-item routerLink="/auth"><span>Auth</span></button>
+                <button md-menu-item routerLink="/editor"><span>Editor</span></button>
                 <button md-menu-item routerLink="/article"><span>Article</span></button>
             </md-menu>
         </div>

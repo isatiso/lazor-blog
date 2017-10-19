@@ -23,7 +23,8 @@
                     <!-- <input mdInput [mdTooltip]="form_data.pass_tooltip" [mdTooltipPosition]="position" [(ngModel)]="user_data.password" type="password" /> -->
                 </md-input-container>
             </p>
-            <button md-raised-button (click)="signIn()">Submit</button>
+            <button md-raised-button (click)="signIn($event)">Sign In</button>
+            <button md-raised-button (click)="signUp($event)">Sign Up</button>
         </div>
     </md-card>
 </div>
