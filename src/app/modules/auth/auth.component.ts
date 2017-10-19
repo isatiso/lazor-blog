@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { MdSnackBar } from '@angular/material';
+import { MatSnackBar } from '@angular/material';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 
@@ -24,7 +24,7 @@ export class AuthComponent implements OnInit {
     constructor(
         private _http: HttpClient,
         private _router: Router,
-        private snack_bar: MdSnackBar,
+        private snack_bar: MatSnackBar,
     ) { }
 
     ngOnInit() {

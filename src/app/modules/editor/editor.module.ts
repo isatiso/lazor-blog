@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MaterialModule } from '@angular/material';
+import { MatCardModule, MatTabsModule, MatButtonModule, MatInputModule, MatIconModule } from '@angular/material';
 import { FormsModule } from '@angular/forms';
 
 import { EditorRoutingModule } from './editor-routing.module';
@@ -11,7 +11,11 @@ import { MarkdownDirective } from 'directive/markdown.directive';
     imports: [
         CommonModule,
         FormsModule,
-        MaterialModule,
+        MatCardModule,
+        MatTabsModule,
+        MatButtonModule,
+        MatInputModule,
+        MatIconModule,
         EditorRoutingModule
     ],
     declarations: [EditorComponent, MarkdownDirective]

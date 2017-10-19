@@ -1,35 +1,35 @@
 <div class="container" #editorContainer>
-    <md-card>
+    <mat-card>
         <div class="">
-            <!-- <md-input-container class="editor-title">
-                <md-placeholder>
+            <!-- <mat-input-container class="editor-title">
+                <mat-placeholder>
                     Title
-                    <md-icon>mode_edit</md-icon>
-                </md-placeholder>
-                <input mdInput [(ngModel)]="title" />
-            </md-input-container> -->
+                    <mat-icon>mode_edit</mat-icon>
+                </mat-placeholder>
+                <input matInput [(ngModel)]="title" />
+            </mat-input-container> -->
             <input [(ngModel)]="title" class="editor-title" placeholder="Title" />
         </div>
 
-        <md-tab-group MdTabGroup [dynamicHeight]="dynamic_height" [selectedIndex]="tab_select" (selectedIndexChange)="select_change($event)" disableRipple="false" class="md-editor">
-            <md-tab label="Input">
+        <mat-tab-group MatTabGroup [dynamicHeight]="dynamic_height" [selectedIndex]="tab_select" (selectedIndexChange)="select_change($event)" disableRipple="false" class="mat-editor">
+            <mat-tab label="Input">
                 <div class="input-test" id="tab1">
-                    <md-input-container class="editor-input">
-                        <textarea mdInput mdTextareaAutosize [(ngModel)]="content" [mdAutosizeMinRows]="min_rows"></textarea>
-                    </md-input-container>
+                    <mat-input-container class="editor-input">
+                        <textarea matInput matTextareaAutosize [(ngModel)]="content" [matAutosizeMinRows]="min_rows"></textarea>
+                    </mat-input-container>
                 </div>
-            </md-tab>
-            <md-tab label="Output">
+            </mat-tab>
+            <mat-tab label="Output">
                 <div id="tab2">
                     <markdown [data]="content"></markdown>
                 </div>
-            </md-tab>
-        </md-tab-group>
+            </mat-tab>
+        </mat-tab-group>
         <div class="editor-nav nav-left" #navLeft>
-            <button md-fab color="primary" (click)="select1()" class="markdown-editor" *ngIf="true">
-                <md-icon class="big-icon">navigate_before</md-icon></button></div>
+            <button mat-fab color="primary" (click)="select1()" class="markdown-editor" *ngIf="true">
+                <mat-icon class="big-icon">navigate_before</mat-icon></button></div>
         <div class="editor-nav nav-right" #navRight>
-            <button md-fab color="primary" (click)="select2()" class="markdown-showup" *ngIf="true">
-                <md-icon class="big-icon">navigate_next</md-icon></button></div>
-    </md-card>
+            <button mat-fab color="primary" (click)="select2()" class="markdown-showup" *ngIf="true">
+                <mat-icon class="big-icon">navigate_next</mat-icon></button></div>
+    </mat-card>
 </div>

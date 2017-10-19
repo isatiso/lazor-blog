@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MaterialModule } from '@angular/material';
+import { MatCardModule } from '@angular/material';
 
 import { IndexRoutingModule } from './index-routing.module';
 import { IndexComponent } from './index.component';
@@ -8,7 +8,7 @@ import { IndexComponent } from './index.component';
 @NgModule({
   imports: [
     CommonModule,
-    MaterialModule,
+    MatCardModule,
     IndexRoutingModule
   ],
   declarations: [IndexComponent]
