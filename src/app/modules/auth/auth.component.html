@@ -3,28 +3,76 @@
         <p class="title">
             Welcome!
         </p>
-        <div class="big-box" (keydown)="signIn($event)">
-            <p>
-                <mat-input-container class="long-input">
-                    <mat-placeholder>
-                        Enter Your Email
-                        <mat-icon>mode_edit</mat-icon>
-                    </mat-placeholder>
-                    <input matInput [(ngModel)]="sign_in_data.email" />
-                    <!-- <input matInput [matTooltip]="form_data.email_tooltip" [matTooltipPosition]="position" [(ngModel)]="sign_in_data.email" /> -->
-                </mat-input-container>
-                <br/>
-                <mat-input-container class="long-input ">
-                    <mat-placeholder>
-                        Enter Your Password
-                        <mat-icon>mode_edit</mat-icon>
-                    </mat-placeholder>
-                    <input matInput [(ngModel)]="sign_in_data.password" type="password" />
-                    <!-- <input matInput [matTooltip]="form_data.pass_tooltip" [matTooltipPosition]="position" [(ngModel)]="user_data.password" type="password" /> -->
-                </mat-input-container>
-            </p>
-            <button mat-raised-button (click)="signIn($event)">Sign In</button>
-            <button mat-raised-button (click)="signUp($event)">Sign Up</button>
-        </div>
+        <mat-tab-group MatTabGroup [dynamicHeight]="dynamic_height" [selectedIndex]="tab_select" (selectedIndexChange)="select_change($event)" disableRipple="false" class="mat-editor">
+            <mat-tab label="Input">
+                <div class="big-box" (keydown)="signIn($event)">
+                    <p>
+                        <mat-input-container class="long-input">
+                            <mat-placeholder>
+                                Enter Your User Name
+                                <mat-icon>mode_edit</mat-icon>
+                            </mat-placeholder>
+                            <input matInput [(ngModel)]="sign_in_data.username" />
+                            <!-- <input matInput [matTooltip]="form_data.email_tooltip" [matTooltipPosition]="position" [(ngModel)]="sign_in_data.email" /> -->
+                        </mat-input-container>
+                        <br/>
+                        <mat-input-container class="long-input">
+                            <mat-placeholder>
+                                Enter Your Email
+                                <mat-icon>mode_edit</mat-icon>
+                            </mat-placeholder>
+                            <input matInput [(ngModel)]="sign_in_data.email" />
+                            <!-- <input matInput [matTooltip]="form_data.email_tooltip" [matTooltipPosition]="position" [(ngModel)]="sign_in_data.email" /> -->
+                        </mat-input-container>
+                        <br/>
+                        <mat-input-container class="long-input ">
+                            <mat-placeholder>
+                                Enter Your Password
+                                <mat-icon>mode_edit</mat-icon>
+                            </mat-placeholder>
+                            <input matInput [(ngModel)]="sign_in_data.password" type="password" />
+                            <!-- <input matInput [matTooltip]="form_data.pass_tooltip" [matTooltipPosition]="position" [(ngModel)]="user_data.password" type="password" /> -->
+                        </mat-input-container>
+                    </p>
+                    <button mat-raised-button (click)="signIn($event)">Sign In</button>
+                    <button mat-raised-button (click)="signUp($event)">Sign Up</button>
+                </div>
+            </mat-tab>
+            <mat-tab label="Output">
+                <div class="big-box" (keydown)="signIn($event)">
+                    <p>
+                        <mat-input-container class="long-input">
+                            <mat-placeholder>
+                                Enter Your User Name
+                                <mat-icon>mode_edit</mat-icon>
+                            </mat-placeholder>
+                            <input matInput [(ngModel)]="sign_in_data.username" />
+                            <!-- <input matInput [matTooltip]="form_data.email_tooltip" [matTooltipPosition]="position" [(ngModel)]="sign_in_data.email" /> -->
+                        </mat-input-container>
+                        <br/>
+                        <mat-input-container class="long-input">
+                            <mat-placeholder>
+                                Enter Your Email
+                                <mat-icon>mode_edit</mat-icon>
+                            </mat-placeholder>
+                            <input matInput [(ngModel)]="sign_in_data.email" />
+                            <!-- <input matInput [matTooltip]="form_data.email_tooltip" [matTooltipPosition]="position" [(ngModel)]="sign_in_data.email" /> -->
+                        </mat-input-container>
+                        <br/>
+                        <mat-input-container class="long-input ">
+                            <mat-placeholder>
+                                Enter Your Password
+                                <mat-icon>mode_edit</mat-icon>
+                            </mat-placeholder>
+                            <input matInput [(ngModel)]="sign_in_data.password" type="password" />
+                            <!-- <input matInput [matTooltip]="form_data.pass_tooltip" [matTooltipPosition]="position" [(ngModel)]="user_data.password" type="password" /> -->
+                        </mat-input-container>
+                    </p>
+                    <button mat-raised-button (click)="signIn($event)">Sign In</button>
+                    <button mat-raised-button (click)="signUp($event)">Sign Up</button>
+                </div>
+            </mat-tab>
+        </mat-tab-group>
+
     </mat-card>
 </div>

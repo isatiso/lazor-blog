@@ -11,6 +11,7 @@ import { HttpClient } from '@angular/common/http';
 export class AuthComponent implements OnInit {
 
     public sign_in_data = {
+        username: '',
         email: '',
         password: '',
     };
@@ -42,10 +43,10 @@ export class AuthComponent implements OnInit {
     }
 
     signIn(event) {
-        if (event && event.key !== 'Enter') {
+        if (event.type === 'keydown' && event.key !== 'Enter') {
             return event;
         }
-
+        console.log('get in sign in.');
         this.sign_in_data.email = this.sign_in_data.email.trim();
         let message = '';
         let not_regular = false;
@@ -63,7 +64,7 @@ export class AuthComponent implements OnInit {
             return false;
         }
         const result = this._http.post(
-            '/middle/account/signin',
+            '/middle/user',
             {
                 email: this.sign_in_data.email,
                 password: this.sign_in_data.password

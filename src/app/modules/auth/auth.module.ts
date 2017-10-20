@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatCardModule, MatInputModule } from '@angular/material';
+import { MatCardModule, MatInputModule, MatButtonModule, MatSnackBarModule, MatTabsModule, MatIconModule } from '@angular/material';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 
@@ -13,6 +13,10 @@ import { AuthComponent } from './auth.component';
         FormsModule,
         MatCardModule,
         MatInputModule,
+        MatButtonModule,
+        MatSnackBarModule,
+        MatTabsModule,
+        MatIconModule,
         HttpClientModule,
         AuthRoutingModule
     ],
