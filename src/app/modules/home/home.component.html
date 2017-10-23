@@ -1,8 +1,13 @@
 <div class="container">
     <mat-card>
-        <p class="title">
-            Home works!
-        </p>
+        <div class="header-area">
+            <p class="title">
+                Home works!
+            </p>
+            <p class="create-button">
+                <button mat-raised-button color="primary">Create Article</button>
+            </p>
+        </div>
         <mat-table #table [dataSource]="dataSource">
 
             <ng-container cdkColumnDef="title">

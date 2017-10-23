@@ -9,19 +9,10 @@
                     <p>
                         <mat-input-container class="long-input">
                             <mat-placeholder>
-                                Enter Your User Name
+                                Enter Your Email or Username
                                 <mat-icon>mode_edit</mat-icon>
                             </mat-placeholder>
-                            <input matInput [(ngModel)]="sign_in_data.username" />
-                            <!-- <input matInput [matTooltip]="form_data.email_tooltip" [matTooltipPosition]="position" [(ngModel)]="sign_in_data.email" /> -->
-                        </mat-input-container>
-                        <br/>
-                        <mat-input-container class="long-input">
-                            <mat-placeholder>
-                                Enter Your Email
-                                <mat-icon>mode_edit</mat-icon>
-                            </mat-placeholder>
-                            <input matInput [(ngModel)]="sign_in_data.email" />
+                            <input matInput [(ngModel)]="sign_in_data.name" />
                             <!-- <input matInput [matTooltip]="form_data.email_tooltip" [matTooltipPosition]="position" [(ngModel)]="sign_in_data.email" /> -->
                         </mat-input-container>
                         <br/>
@@ -34,19 +25,18 @@
                             <!-- <input matInput [matTooltip]="form_data.pass_tooltip" [matTooltipPosition]="position" [(ngModel)]="user_data.password" type="password" /> -->
                         </mat-input-container>
                     </p>
-                    <button mat-raised-button (click)="signIn($event)">Sign In</button>
-                    <button mat-raised-button (click)="signUp($event)">Sign Up</button>
+                    <button mat-raised-button color="primary" (click)="signIn($event)">Sign In</button>
                 </div>
             </mat-tab>
             <mat-tab label="Output">
-                <div class="big-box" (keydown)="signIn($event)">
+                <div class="big-box" (keydown)="signUp($event)">
                     <p>
                         <mat-input-container class="long-input">
                             <mat-placeholder>
                                 Enter Your User Name
                                 <mat-icon>mode_edit</mat-icon>
                             </mat-placeholder>
-                            <input matInput [(ngModel)]="sign_in_data.username" />
+                            <input matInput [(ngModel)]="sign_up_data.username" />
                             <!-- <input matInput [matTooltip]="form_data.email_tooltip" [matTooltipPosition]="position" [(ngModel)]="sign_in_data.email" /> -->
                         </mat-input-container>
                         <br/>
@@ -55,7 +45,7 @@
                                 Enter Your Email
                                 <mat-icon>mode_edit</mat-icon>
                             </mat-placeholder>
-                            <input matInput [(ngModel)]="sign_in_data.email" />
+                            <input matInput [(ngModel)]="sign_up_data.email" />
                             <!-- <input matInput [matTooltip]="form_data.email_tooltip" [matTooltipPosition]="position" [(ngModel)]="sign_in_data.email" /> -->
                         </mat-input-container>
                         <br/>
@@ -64,12 +54,11 @@
                                 Enter Your Password
                                 <mat-icon>mode_edit</mat-icon>
                             </mat-placeholder>
-                            <input matInput [(ngModel)]="sign_in_data.password" type="password" />
+                            <input matInput [(ngModel)]="sign_up_data.password" type="password" />
                             <!-- <input matInput [matTooltip]="form_data.pass_tooltip" [matTooltipPosition]="position" [(ngModel)]="user_data.password" type="password" /> -->
                         </mat-input-container>
                     </p>
-                    <button mat-raised-button (click)="signIn($event)">Sign In</button>
-                    <button mat-raised-button (click)="signUp($event)">Sign Up</button>
+                    <button mat-raised-button color="primary" (click)="signUp($event)">Sign Up</button>
                 </div>
             </mat-tab>
         </mat-tab-group>

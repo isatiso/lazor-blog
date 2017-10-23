@@ -2,7 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
 import { MatSnackBar, MatToolbarModule, MatButtonModule, MatGridListModule, MatMenuModule, MatIconModule } from '@angular/material';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from 'app-routing.module';
 import { AppComponent } from 'app.component';
@@ -19,6 +19,7 @@ import { AuthGuard } from 'guard/auth.guard';
     ],
     imports: [
         BrowserModule,
+        HttpClientModule,
         MatToolbarModule,
         MatButtonModule,
         MatGridListModule,

@@ -10,7 +10,14 @@ import { HttpClient } from '@angular/common/http';
 })
 export class AuthComponent implements OnInit {
 
+    tab_select = 0;
+    dynamic_height = true;
     public sign_in_data = {
+        name: '',
+        password: '',
+    };
+
+    public sign_up_data = {
         username: '',
         email: '',
         password: '',
@@ -42,18 +49,49 @@ export class AuthComponent implements OnInit {
         snack_ref.onAction().subscribe(action);
     }
 
+    select_change(event) {
+        this.tab_select = event;
+    }
+
     signIn(event) {
         if (event.type === 'keydown' && event.key !== 'Enter') {
             return event;
         }
         console.log('get in sign in.');
-        this.sign_in_data.email = this.sign_in_data.email.trim();
+        this.sign_in_data.name = this.sign_in_data.name.trim();
+
+        const result = this._http.post(
+            '/middle/user',
+            {
+                name: this.sign_in_data.name,
+                password: this.sign_in_data.password
+            });
+        result.subscribe(
+            data => {
+                if (data['result'] === 1) {
+                    this._router.navigate(['/home']);
+                } else {
+                    this.raiseSnackBar(data['msg'], 'OK', () => {
+                        console.log('Got it.');
+                    });
+                    console.log(data);
+                    return false;
+                }
+            });
+    }
+
+    signUp(event) {
+        if (event.type === 'keydown' && event.key !== 'Enter') {
+            return event;
+        }
+
+        this.sign_up_data.email = this.sign_up_data.email.trim();
         let message = '';
         let not_regular = false;
-        if (!this.sign_in_data.email.match(this.pattern.email)) {
+        if (!this.sign_up_data.email.match(this.pattern.email)) {
             message = 'Invalid Email.';
             not_regular = true;
-        } else if (!this.sign_in_data.password.match(this.pattern.password)) {
+        } else if (!this.sign_up_data.password.match(this.pattern.password)) {
             message = 'Invalid Password.';
             not_regular = true;
         }
@@ -63,16 +101,20 @@ export class AuthComponent implements OnInit {
             });
             return false;
         }
-        const result = this._http.post(
+        const result = this._http.put(
             '/middle/user',
             {
-                email: this.sign_in_data.email,
-                password: this.sign_in_data.password
+                username: this.sign_up_data.username,
+                email: this.sign_up_data.email,
+                password: this.sign_up_data.password
             });
         result.subscribe(
             data => {
                 if (data['result'] === 1) {
-                    this._router.navigate(['/home']);
+                    this.raiseSnackBar('Sign Up Successfully.', 'OK', () => {
+                        console.log('The snack-bar action was triggered!');
+                    });
+                    this.tab_select = 0;
                 } else {
                     this.raiseSnackBar(data['msg'], 'OK', () => {
                         console.log('Got it.');

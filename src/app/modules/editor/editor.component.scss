@@ -16,7 +16,7 @@ monospace;
 
 .editor-title {
     width: 100%;
-    font-size: 3em;
+    font-size: 4em;
     border: none;
     &:focus {
         outline: none;
@@ -86,3 +86,9 @@ monospace;
 }
 
 @keyframes nav-button {}
+
+.dash-board {
+    position: absolute;
+    right: 3%;
+    top: 56px;
+}

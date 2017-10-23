@@ -8,7 +8,11 @@
                 </mat-placeholder>
                 <input matInput [(ngModel)]="title" />
             </mat-input-container> -->
-            <input [(ngModel)]="title" class="editor-title" placeholder="Title" />
+            <input [(ngModel)]="title" class="editor-title" placeholder="Untitled" />
+        </div>
+        <div class="dash-board">
+            <button mat-raised-button>Save</button>
+            <button mat-raised-button color="primary">Publish</button>
         </div>
 
         <mat-tab-group MatTabGroup [dynamicHeight]="dynamic_height" [selectedIndex]="tab_select" (selectedIndexChange)="select_change($event)" disableRipple="false" class="mat-editor">
