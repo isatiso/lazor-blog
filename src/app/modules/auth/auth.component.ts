@@ -1,15 +1,34 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { trigger, state, style, animate, transition } from '@angular/animations';
 
 @Component({
     selector: 'la-auth',
     templateUrl: './auth.component.html',
-    styleUrls: ['./auth.component.scss']
+    styleUrls: ['./auth.component.scss'],
+    animations: [
+        trigger('tab', [
+            state('0', style({
+                color: '#000000',
+                opacity: 1,
+            })),
+            transition('void => *', animate('500ms ease-in'))
+        ]),
+        trigger('childrenAppear', [
+            state('active', style({
+                opacity: 1,
+            })),
+            state('inactive', style({
+                opacity: 0,
+            })),
+            transition('* => active', animate('300ms ease-in'))
+        ]),
+    ]
 })
-export class AuthComponent implements OnInit {
-
+export class AuthComponent implements OnInit, OnDestroy {
+    auth_exists = 'active';
     tab_select = 0;
     dynamic_height = true;
     public sign_in_data = {
@@ -36,6 +55,11 @@ export class AuthComponent implements OnInit {
     ) { }
 
     ngOnInit() {
+        this.auth_exists = 'active';
+    }
+
+    ngOnDestroy() {
+        this.auth_exists = 'inactive';
     }
 
     raiseSnackBar(message: string, action_name: string, action) {

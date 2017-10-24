@@ -6,12 +6,16 @@
     // overflow: auto;
     box-sizing: border-box;
     display: block;
+    // .children-container {
+    //     opacity: 0;
+    // }
 }
 
 // .site-nav::-webkit-scrollbar {
 //     display: none;
 // }
 .site-nav {
+    opacity: 0;
     z-index: 11;
     position: fixed;
     box-sizing: border-box;

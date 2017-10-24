@@ -1,7 +1,7 @@
-<div class="site-banner" #banner (window:scroll)="onscroll($event)">
+<div class="site-banner" #banner [@bannerAnimation]="banner_exists" (window:scroll)="onscroll($event)">
     <h1>Chasing a Cat</h1>
 </div>
-<div class="container">
+<div class="container index-container" [@childrenAppear]="index_exists">
     <mat-card>
         <p class="title">
             Home Works!

@@ -1,5 +1,6 @@
 import { Component, ElementRef, OnInit, OnChanges, AfterViewInit, AfterViewChecked, HostListener } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
+import { trigger, state, style, animate, transition } from '@angular/animations';
 
 import { NavBgDirective } from 'directive/nav-bg.directive';
 import { NavProfileService } from 'service/nav-profile/nav-profile.service';
@@ -10,9 +11,29 @@ import 'rxjs/add/operator/mergeMap';
 @Component({
     selector: 'la-root',
     templateUrl: './app.component.html',
-    styleUrls: ['./app.component.scss']
+    styleUrls: ['./app.component.scss'],
+    animations: [
+        trigger('navBarAnimation', [
+            state('active', style({
+                // color: '#000000',
+                // transform: 'translateY(0)',
+                opacity: 1,
+            })),
+            transition('void <=> active', animate('300ms ease-in'))
+        ]),
+        trigger('childrenAppear', [
+            state('active', style({
+                // color: '#000000',
+                // transform: 'translateY(0)',
+                opacity: 1,
+            })),
+            transition('void <=> active', animate('300ms ease-in'))
+        ]),
+    ]
 })
 export class AppComponent implements OnInit, OnChanges, AfterViewInit, AfterViewChecked {
+    navbar_exists = 'active';
+    children_appear = 'active';
     title = 'Lazor Blog';
     scroll_top = 0;
     height_limit = 0;

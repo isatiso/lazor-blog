@@ -1,4 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { trigger, state, style, animate, transition } from '@angular/animations';
+
 import { MarkdownDirective } from 'directive/markdown.directive';
 
 declare var Prism: any;
@@ -6,26 +8,24 @@ declare var Prism: any;
 @Component({
     selector: 'la-editor',
     templateUrl: './editor.component.html',
-    styleUrls: ['./editor.component.scss']
+    styleUrls: ['./editor.component.scss'],
+    animations: [
+        trigger('childrenAppear', [
+            state('active', style({
+                opacity: 1,
+            })),
+            state('inactive', style({
+                opacity: 0,
+            })),
+            transition('* => active', animate('300ms ease-in'))
+        ]),
+    ]
 })
-export class EditorComponent implements OnInit {
+export class EditorComponent implements OnInit, OnDestroy {
 
+    editor_exists = 'active';
     public title = '';
-    public content = `
-# this is a title
-## this is also a title
-> this is a quote
-
-\`\`\` c
-// this is some code
-
-#include <stdio.h>
-
-int main() {
-    printf("hello world!");
-}
-\`\`\`
-    `;
+    public content = '';
 
     public min_rows = 5;
     public max_rows = 20;
@@ -47,14 +47,24 @@ int main() {
     constructor() { }
 
     ngOnInit() {
+        const current_editor = JSON.parse(window.localStorage.getItem('current_editor'));
+        this.content = current_editor['content'];
+        this.title = current_editor['title'];
         const total_width = document.body.clientWidth;
         const editor_width = this.editor_container.nativeElement.clientWidth;
         let nav_width = (total_width - editor_width) / 2;
         nav_width = nav_width > 50 ? nav_width : 50;
         this.nav_left.nativeElement.style.width = nav_width + 'px';
         this.nav_right.nativeElement.style.width = nav_width + 'px';
+        this.editor_exists = 'active';
         // console.log(this.nav_left);
         // this.nav_left.nativeElement.style.width
+    }
+
+    ngOnDestroy() {
+        this.editor_exists = 'inactive';
+        const current_editor = { 'title': this.title, 'content': this.content };
+        window.localStorage.setItem('current_editor', JSON.stringify(current_editor));
     }
 
     // scroll_top() {

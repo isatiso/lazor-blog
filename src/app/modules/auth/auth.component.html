@@ -1,10 +1,12 @@
-<div class="container">
+<div class="container auth-container" [@childrenAppear]="auth_exists">
     <mat-card>
         <p class="title">
-            Welcome!
+            <span style="opacity: 0" *ngIf="tab_select" [@tab]="!tab_select">Sign Up a New Account.</span>
+            <span style="opacity: 0" *ngIf="!tab_select" [@tab]="tab_select">Sign In Your Account.</span>
         </p>
+        <div class="divider"></div>
         <mat-tab-group MatTabGroup [dynamicHeight]="dynamic_height" [selectedIndex]="tab_select" (selectedIndexChange)="select_change($event)" disableRipple="false" class="mat-editor">
-            <mat-tab label="Input">
+            <mat-tab label="Sign In">
                 <div class="big-box" (keydown)="signIn($event)">
                     <p>
                         <mat-input-container class="long-input">
@@ -25,10 +27,10 @@
                             <!-- <input matInput [matTooltip]="form_data.pass_tooltip" [matTooltipPosition]="position" [(ngModel)]="user_data.password" type="password" /> -->
                         </mat-input-container>
                     </p>
-                    <button mat-raised-button color="primary" (click)="signIn($event)">Sign In</button>
+                    <button mat-raised-button color="primary" (click)="signIn($event)">Submit</button>
                 </div>
             </mat-tab>
-            <mat-tab label="Output">
+            <mat-tab label="Sign Up">
                 <div class="big-box" (keydown)="signUp($event)">
                     <p>
                         <mat-input-container class="long-input">
@@ -58,7 +60,7 @@
                             <!-- <input matInput [matTooltip]="form_data.pass_tooltip" [matTooltipPosition]="position" [(ngModel)]="user_data.password" type="password" /> -->
                         </mat-input-container>
                     </p>
-                    <button mat-raised-button color="primary" (click)="signUp($event)">Sign Up</button>
+                    <button mat-raised-button color="primary" (click)="signUp($event)">Submit</button>
                 </div>
             </mat-tab>
         </mat-tab-group>

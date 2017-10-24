@@ -1,5 +1,5 @@
 <div class="app-container" (window:scroll)="onscroll($event)">
-    <mat-toolbar laNavBg [scrollTop]="scroll_top" [heightLimit]="height_limit" class="site-nav">
+    <mat-toolbar laNavBg [@navBarAnimation]="navbar_exists" [scrollTop]="scroll_top" [heightLimit]="height_limit" class="site-nav">
         <div class="nav-container">
             <a mat-button routerLink="/index" class="nav-font">
                 <svg class="site-logo" style="width:30px;height:30px;position:relative;top:-2px;">
@@ -19,12 +19,15 @@
             <a mat-button routerLink="/about" class="nav-font">
                 <span class="nav-button">About</span>
             </a>
-            <!-- <a mat-button routerLink="/editor" class="nav-font">
+            <a mat-button routerLink="/editor" class="nav-font">
                 <span class="nav-button">Editor</span>
             </a>
             <a mat-button routerLink="/home" class="nav-font">
                 <span class="nav-button">Home</span>
-            </a> -->
+            </a>
+            <a mat-button routerLink="/article" class="nav-font">
+                <span class="nav-button">Article</span>
+            </a>
             <span class="nav-spacer"></span>
             <button mat-button class="nav-font" [matMenuTriggerFor]="menu">
                 <span class="entry-button">Menu <mat-icon>fingerprint</mat-icon></span>

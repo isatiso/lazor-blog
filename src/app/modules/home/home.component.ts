@@ -1,6 +1,7 @@
-import { Component, OnInit, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { NavProfileService } from 'service/nav-profile/nav-profile.service';
 import { DataSource } from '@angular/cdk/table';
+import { trigger, state, style, animate, transition } from '@angular/animations';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
@@ -8,10 +9,30 @@ import { Observable } from 'rxjs/Observable';
 @Component({
     selector: 'la-home',
     templateUrl: './home.component.html',
-    styleUrls: ['./home.component.scss']
+    styleUrls: ['./home.component.scss'],
+    animations: [
+        trigger('banner', [
+            state('0', style({
+                color: '#000000',
+                opacity: 1,
+            })),
+            transition('void => 0', animate('500ms ease-in'))
+        ]),
+        trigger('childrenAppear', [
+            state('active', style({
+                opacity: 1,
+            })),
+            state('inactive', style({
+                opacity: 0,
+            })),
+            transition('void => active', animate('300ms ease-in')),
+            transition('inactive => active', animate('300ms ease-in'))
+        ]),
+    ]
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
 
+    home_exists = 'active';
     displayedColumns = [
         'title',
         'author',
@@ -22,6 +43,7 @@ export class HomeComponent implements OnInit {
     constructor() { }
 
     ngOnInit() {
+        this.home_exists = 'active';
         this.dataSource = new ArticleDataSource(this.articleDatabase);
         this.articleDatabase.dataChange.next(
             [{
@@ -68,6 +90,10 @@ export class HomeComponent implements OnInit {
                 create_time: 123123123123
             }]
         );
+    }
+
+    ngOnDestroy() {
+        this.home_exists = 'inactive';
     }
 
 
