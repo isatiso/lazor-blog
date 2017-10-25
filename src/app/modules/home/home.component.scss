@@ -1,3 +1,4 @@
+@import '../../../assets/scss/material_theming.scss';
 .header-area {
     margin: 0;
     padding: 0;
@@ -5,7 +6,10 @@
     .create-button {
         position: absolute;
         right: 3%;
-        top: 186px;
+        top: 20px;
+        button {
+            margin-left: 20px;
+        }
     }
     .home-title {
         margin: 0;
@@ -13,6 +17,37 @@
     }
 }
 
+.content-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    .category-list {
+        padding-top: 20px;
+        flex: 4;
+        width: 400px;
+        .category-item {
+            background-color: map-get($accent, 200);
+            button {
+                margin-left: 20px;
+            }
+        }
+    }
+    .spacer {
+        flex: 1;
+        width: 80px;
+    }
+    .article-list {
+        flex: 14;
+    }
+}
+
 .home-container {
+    opacity: 0;
+}
+
+.divider {
+    height: 20px;
+    width: 100%;
+    background-color: #ffffff;
     opacity: 0;
 }

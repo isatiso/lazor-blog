@@ -39,6 +39,7 @@
                 <button mat-menu-item routerLink="/auth"><span>Auth</span></button>
                 <button mat-menu-item routerLink="/editor"><span>Editor</span></button>
                 <button mat-menu-item routerLink="/article"><span>Article</span></button>
+                <button mat-menu-item (click)="log_out($event)"><span>Log Out</span></button>
             </mat-menu>
         </div>
     </mat-toolbar>

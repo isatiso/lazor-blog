@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatCardModule, MatTableModule, MatButtonModule } from '@angular/material';
+import { MatCardModule, MatTableModule, MatButtonModule, MatGridListModule, MatExpansionModule, MatInputModule } from '@angular/material';
 import { CdkTableModule } from '@angular/cdk/table';
 
 import { HomeComponent } from './home.component';
@@ -13,6 +13,9 @@ import { HomeRoutingModule } from './home-routing.module';
         MatCardModule,
         MatTableModule,
         MatButtonModule,
+        MatGridListModule,
+        MatExpansionModule,
+        MatInputModule,
         HomeRoutingModule
     ],
     declarations: [HomeComponent]

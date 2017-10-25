@@ -1,6 +1,7 @@
 import { Component, ElementRef, OnInit, OnChanges, AfterViewInit, AfterViewChecked, HostListener } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { trigger, state, style, animate, transition } from '@angular/animations';
+import { HttpClient } from '@angular/common/http';
 
 import { NavBgDirective } from 'directive/nav-bg.directive';
 import { NavProfileService } from 'service/nav-profile/nav-profile.service';
@@ -42,6 +43,7 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit, AfterView
     constructor(
         private el: ElementRef,
         private router: Router,
+        private _http: HttpClient,
         private activatedRoute: ActivatedRoute,
         public nav_profile: NavProfileService,
     ) { }
@@ -83,5 +85,10 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit, AfterView
     onscroll(event) {
         this.scroll_top = event.target.scrollingElement.scrollTop;
         return event;
+    }
+
+    log_out(event) {
+        this._http.delete('/middle/user').subscribe();
+        this.router.navigate(['/auth']);
     }
 }

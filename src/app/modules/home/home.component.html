@@ -5,35 +5,53 @@
                 Home Works!
             </p>
             <p class="create-button">
-                <button mat-raised-button color="primary">Create Article</button>
+                <button mat-raised-button color="primary">Add Category</button><button mat-raised-button color="primary">Create Article</button>
             </p>
         </div>
-        <mat-table #table [dataSource]="dataSource">
+        <div class="divider"></div>
+        <div class="content-container">
+            <div class="category-list">
+                <mat-accordion *ngIf="categories.length > 0; else emptyInfo">
+                    <mat-expansion-panel *ngFor="let category of categories; let i = index" class="category-item" [@currentCategory]="step === i" [expanded]="step === i" (opened)="setStep(i)">
+                        <mat-expansion-panel-header color="primary">
+                            <mat-panel-title>
+                                {{ category }} {{ i }}
+                            </mat-panel-title>
+                        </mat-expansion-panel-header>
+                        <mat-action-row>
+                            <button mat-raised-button color="primary">Choose</button>
+                            <button mat-raised-button color="warn">Delete</button>
+                        </mat-action-row>
+                    </mat-expansion-panel>
+                </mat-accordion>
+                <ng-template #emptyInfo>
+                    <p style="width: 100%; text-align: center;">Add a Category~<br/><br/><button mat-raised-button color="primary">Add Category</button></p>
+                </ng-template>
+            </div>
 
-            <ng-container cdkColumnDef="title">
-                <mat-header-cell *cdkHeaderCellDef> Title </mat-header-cell>
-                <mat-cell *cdkCellDef="let row"> {{row.title}} </mat-cell>
-            </ng-container>
+            <div class="spacer"></div>
 
-            <ng-container cdkColumnDef="author">
-                <mat-header-cell *cdkHeaderCellDef> Author </mat-header-cell>
-                <mat-cell *cdkCellDef="let row"> {{ row.author }} </mat-cell>
-            </ng-container>
+            <div class="article-list">
+                <mat-table #table [dataSource]="dataSource">
 
-            <ng-container cdkColumnDef="create_time">
-                <mat-header-cell *cdkHeaderCellDef> Create Time </mat-header-cell>
-                <mat-cell *cdkCellDef="let row"> {{ row.create_time * 1000 | date: 'y-MM-dd HH:mm:ss' }} </mat-cell>
-            </ng-container>
-            <!-- <ng-container cdkColumnDef="create_time">
-                <mat-header-cell *cdkHeaderCellDef> Creat Time </mat-header-cell>
-                <mat-cell *cdkCellDef="let row">
-                    <button mat-raised-button (click)="enterChat(row.chat_id)" class="action-button" color="primary">Enter</button>
-                    <button *ngIf="ownThisChat(row.creator_ip)" mat-raised-button (click)="deleteChat(row.chat_id)" class="action-button" color="warn">Delete</button>
-                </mat-cell>
-            </ng-container> -->
+                    <ng-container cdkColumnDef="title">
+                        <mat-header-cell *cdkHeaderCellDef> Title </mat-header-cell>
+                        <mat-cell *cdkCellDef="let row" style="overflow: hidden;text-overflow: ellipsis;"><a routerLink="/article/{{row.title}}">{{row.title}}</a></mat-cell>
+                    </ng-container>
 
-            <mat-header-row *cdkHeaderRowDef="displayedColumns"></mat-header-row>
-            <mat-row *cdkRowDef="let row; columns: displayedColumns;"></mat-row>
-        </mat-table>
+                    <ng-container cdkColumnDef="author">
+                        <mat-header-cell *cdkHeaderCellDef> Category </mat-header-cell>
+                        <mat-cell *cdkCellDef="let row"> {{ row.category }} </mat-cell>
+                    </ng-container>
+
+                    <ng-container cdkColumnDef="create_time">
+                        <mat-header-cell *cdkHeaderCellDef> Create Time </mat-header-cell>
+                        <mat-cell *cdkCellDef="let row"> {{ row.create_time * 1000 | date: 'y-MM-dd HH:mm:ss' }} </mat-cell>
+                    </ng-container>
+                    <mat-header-row *cdkHeaderRowDef="displayedColumns"></mat-header-row>
+                    <mat-row *cdkRowDef="let row; columns: displayedColumns;"></mat-row>
+                </mat-table>
+            </div>
+        </div>
     </mat-card>
 </div>

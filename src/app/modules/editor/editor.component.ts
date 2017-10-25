@@ -39,6 +39,9 @@ export class EditorComponent implements OnInit, OnDestroy {
     public tab2: any;
     public tab_select = 0;
     public show_scroll: boolean;
+    private nav_zone_width = 200;
+    private left_nav_show = false;
+    private right_nav_show = false;
 
     @ViewChild('navLeft') nav_left;
     @ViewChild('navRight') nav_right;
@@ -54,8 +57,8 @@ export class EditorComponent implements OnInit, OnDestroy {
         const editor_width = this.editor_container.nativeElement.clientWidth;
         let nav_width = (total_width - editor_width) / 2;
         nav_width = nav_width > 50 ? nav_width : 50;
-        this.nav_left.nativeElement.style.width = nav_width + 'px';
-        this.nav_right.nativeElement.style.width = nav_width + 'px';
+        // this.nav_left.nativeElement.style.width = nav_width + 'px';
+        // this.nav_right.nativeElement.style.width = nav_width + 'px';
         this.editor_exists = 'active';
         // console.log(this.nav_left);
         // this.nav_left.nativeElement.style.width
@@ -104,4 +107,35 @@ export class EditorComponent implements OnInit, OnDestroy {
         }
     }
 
+    show_nav_button(event) {
+        // console.log(this.nav_left);
+        // console.log(this.nav_right);
+        if (event.type !== 'mousemove') {
+            return event;
+        }
+
+        if (0 <= event.x && event.x <= this.nav_zone_width) {
+            if (!this.left_nav_show) {
+                // console.log('left');
+                this.left_nav_show = true;
+                this.nav_left._elementRef.nativeElement.style.transform = 'translateX(150%)';
+            }
+        } else if (event.view.innerWidth - this.nav_zone_width <= event.x && event.x <= event.view.innerWidth) {
+            if (!this.right_nav_show) {
+                // console.log('right');
+                this.right_nav_show = true;
+                this.nav_right._elementRef.nativeElement.style.transform = 'translateX(-150%)';
+            }
+        } else {
+            if (this.left_nav_show || this.right_nav_show) {
+                // console.log('back');
+                this.left_nav_show = false;
+                this.right_nav_show = false;
+                this.nav_left._elementRef.nativeElement.style.transform = 'translateX(-300%)';
+                this.nav_right._elementRef.nativeElement.style.transform = 'translateX(300%)';
+                // console.log(event);
+                // console.log(event.type, event.x, event.view.innerWidth);
+            }
+        }
+    }
 }

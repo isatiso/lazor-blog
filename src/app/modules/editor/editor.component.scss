@@ -23,62 +23,22 @@ monospace;
     }
 }
 
-.editor-nav {
+.markdown-editor {
+    z-index: 10;
     position: fixed;
-    width: 200px;
-    height: 100%;
-    z-index: 2;
-    top: 0;
-    // text-align: center;
-    mat-icon.big-icon {
-        font-size: 30px;
-        position: relative;
-        left: -2px;
-        top: -2px;
-    }
-    text-align: center;
-}
-
-.nav-left {
+    transition: transform 0.2s ease;
+    transform: translateX(-300%);
+    top: 48%;
     left: 0;
-    .markdown-editor {
-        display: inline-block;
-        position: relative;
-        transition: transform 0.2s ease;
-        transform: translateX(-300%);
-        left: 0;
-    }
 }
 
-.nav-left:hover {
-    .markdown-editor {
-        transform: translateX(0);
-    }
-}
-
-.nav-right {
+.markdown-showup {
+    z-index: 10;
+    position: fixed;
+    transition: transform 0.2s ease;
+    transform: translateX(300%);
+    top: 48%;
     right: 0;
-    .markdown-showup {
-        display: inline-block;
-        transition: transform 0.2s ease;
-        transform: translateX(300%);
-        position: relative;
-        right: 0;
-    }
-}
-
-.nav-right:hover {
-    .markdown-showup {
-        transform: translateX(0);
-    }
-}
-
-.editor-nav:before {
-    content: '';
-    font-size: 0;
-    display: inline-block;
-    height: 100%;
-    vertical-align: middle;
 }
 
 .input-test textarea {
@@ -94,5 +54,12 @@ monospace;
 }
 
 .editor-container {
+    opacity: 0;
+}
+
+.divider {
+    height: 20px;
+    width: 100%;
+    background-color: #ffffff;
     opacity: 0;
 }

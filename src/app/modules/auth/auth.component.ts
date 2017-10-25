@@ -84,13 +84,12 @@ export class AuthComponent implements OnInit, OnDestroy {
         console.log('get in sign in.');
         this.sign_in_data.name = this.sign_in_data.name.trim();
 
-        const result = this._http.post(
+        this._http.post(
             '/middle/user',
             {
                 name: this.sign_in_data.name,
                 password: this.sign_in_data.password
-            });
-        result.subscribe(
+            }).subscribe(
             data => {
                 if (data['result'] === 1) {
                     this._router.navigate(['/home']);
@@ -125,14 +124,13 @@ export class AuthComponent implements OnInit, OnDestroy {
             });
             return false;
         }
-        const result = this._http.put(
+        this._http.put(
             '/middle/user',
             {
                 username: this.sign_up_data.username,
                 email: this.sign_up_data.email,
                 password: this.sign_up_data.password
-            });
-        result.subscribe(
+            }).subscribe(
             data => {
                 if (data['result'] === 1) {
                     this.raiseSnackBar('Sign Up Successfully.', 'OK', () => {
