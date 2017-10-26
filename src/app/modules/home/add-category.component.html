@@ -1,0 +1,16 @@
+<div style="width: 100%;text-align: center">
+    <h2 mat-dialog-title>Add a new category</h2>
+    <mat-dialog-content>
+        <mat-input-container>
+            <mat-placeholder>
+                name
+                <mat-icon>mode_edit</mat-icon>
+            </mat-placeholder>
+            <input matInput [(ngModel)]="name" />
+        </mat-input-container>
+    </mat-dialog-content>
+    <mat-dialog-actions style="text-align: center">
+        <button mat-button [mat-dialog-close]="false">Cancel</button>
+        <button mat-button [mat-dialog-close]="name">Submit</button>
+    </mat-dialog-actions>
+</div>

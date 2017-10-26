@@ -24,6 +24,7 @@ export class AboutComponent implements OnInit, OnDestroy {
     constructor() { }
 
     ngOnInit() {
+        document.body.scrollTop = 0;
         this.about_exists = 'active';
     }
 

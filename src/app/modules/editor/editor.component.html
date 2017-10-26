@@ -4,8 +4,8 @@
             <input [(ngModel)]="title" class="editor-title" placeholder="Untitled" />
         </div>
         <div class="dash-board">
-            <button mat-raised-button>Save</button>
-            <button mat-raised-button color="primary">Publish</button>
+            <button mat-raised-button (click)="save_article()">Save</button>
+            <button mat-raised-button color="primary" (click)="publish_article()">Publish</button>
         </div>
         <div class="divider"></div>
         <mat-tab-group MatTabGroup [dynamicHeight]="dynamic_height" [selectedIndex]="tab_select" (selectedIndexChange)="select_change($event)" disableRipple="false" class="mat-editor">
@@ -23,11 +23,11 @@
             </mat-tab>
         </mat-tab-group>
         <!-- <div class="editor-nav nav-left"> -->
-        <button #navLeft mat-fab color="primary" (click)="select1($event)" class="markdown-editor" *ngIf="true">
+        <button #navLeft mat-fab color="primary" (click)="select1($event)" class="markdown-editor" *ngIf="true" [@navAppear]="active">
                 <mat-icon class="big-icon">navigate_before</mat-icon></button>
         <!-- </div> -->
         <!-- <div class="editor-nav nav-right"> -->
-        <button #navRight mat-fab color="primary" (click)="select2($event)" class="markdown-showup" *ngIf="true">
+        <button #navRight mat-fab color="primary" (click)="select2($event)" class="markdown-showup" *ngIf="true" [@navAppear]="active">
                 <mat-icon class="big-icon">navigate_next</mat-icon></button>
         <!-- </div> -->
     </mat-card>

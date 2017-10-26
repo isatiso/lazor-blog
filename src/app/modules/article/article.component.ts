@@ -24,6 +24,7 @@ export class ArticleComponent implements OnInit, OnDestroy {
     constructor() { }
 
     ngOnInit() {
+        document.body.scrollTop = 0;
         this.article_exists = 'active';
     }
 

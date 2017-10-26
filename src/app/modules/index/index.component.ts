@@ -39,6 +39,7 @@ export class IndexComponent implements OnInit, OnDestroy {
     ) { }
 
     ngOnInit() {
+        document.body.scrollTop = 0;
         this.index_exists = 'active';
         this.nav_profile.navbarWidth = this.el.nativeElement.firstChild.clientWidth;
     }

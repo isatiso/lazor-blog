@@ -1,4 +1,6 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 
 import { MarkdownDirective } from 'directive/markdown.directive';
@@ -19,6 +21,12 @@ declare var Prism: any;
             })),
             transition('* => active', animate('300ms ease-in'))
         ]),
+        trigger('navAppear', [
+            state('active', style({
+                opacity: 1
+            })),
+            transition('* => active', animate('300ms ease-in'))
+        ])
     ]
 })
 export class EditorComponent implements OnInit, OnDestroy {
@@ -26,7 +34,7 @@ export class EditorComponent implements OnInit, OnDestroy {
     editor_exists = 'active';
     public title = '';
     public content = '';
-
+    public article_id = '';
     public min_rows = 5;
     public max_rows = 20;
     public dynamic_height = true;
@@ -39,7 +47,8 @@ export class EditorComponent implements OnInit, OnDestroy {
     public tab2: any;
     public tab_select = 0;
     public show_scroll: boolean;
-    private nav_zone_width = 200;
+    public current_article_id = '';
+    private nav_zone_width = 100;
     private left_nav_show = false;
     private right_nav_show = false;
 
@@ -47,12 +56,28 @@ export class EditorComponent implements OnInit, OnDestroy {
     @ViewChild('navRight') nav_right;
     @ViewChild('editorContainer') editor_container;
 
-    constructor() { }
+    constructor(
+        private _http: HttpClient,
+        private _router: Router,
+        private _activate_route: ActivatedRoute,
+    ) { }
 
     ngOnInit() {
-        const current_editor = JSON.parse(window.localStorage.getItem('current_editor'));
-        this.content = current_editor['content'];
-        this.title = current_editor['title'];
+        document.body.scrollTop = 0;
+        this.article_id = this._activate_route.params['value']['id'];
+        if (this.article_id === 'new-article') {
+            const current_editor = JSON.parse(window.localStorage.getItem('current_editor'));
+            this.content = current_editor['content'];
+            this.title = current_editor['title'];
+        } else {
+            this._http.get('/middle/article').subscribe(
+                res => {
+                    console.log(res);
+                }
+            );
+        }
+
+
         const total_width = document.body.clientWidth;
         const editor_width = this.editor_container.nativeElement.clientWidth;
         let nav_width = (total_width - editor_width) / 2;
@@ -118,24 +143,32 @@ export class EditorComponent implements OnInit, OnDestroy {
             if (!this.left_nav_show) {
                 // console.log('left');
                 this.left_nav_show = true;
-                this.nav_left._elementRef.nativeElement.style.transform = 'translateX(150%)';
+                this.nav_left._elementRef.nativeElement.style.transform = 'translateX(30%) scale(2)';
             }
         } else if (event.view.innerWidth - this.nav_zone_width <= event.x && event.x <= event.view.innerWidth) {
             if (!this.right_nav_show) {
                 // console.log('right');
                 this.right_nav_show = true;
-                this.nav_right._elementRef.nativeElement.style.transform = 'translateX(-150%)';
+                this.nav_right._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(2)';
             }
         } else {
             if (this.left_nav_show || this.right_nav_show) {
                 // console.log('back');
                 this.left_nav_show = false;
                 this.right_nav_show = false;
-                this.nav_left._elementRef.nativeElement.style.transform = 'translateX(-300%)';
-                this.nav_right._elementRef.nativeElement.style.transform = 'translateX(300%)';
+                this.nav_left._elementRef.nativeElement.style.transform = 'translateX(-80%)';
+                this.nav_right._elementRef.nativeElement.style.transform = 'translateX(80%)';
                 // console.log(event);
                 // console.log(event.type, event.x, event.view.innerWidth);
             }
         }
+    }
+
+    save_article() {
+
+    }
+
+    publish_article() {
+
     }
 }

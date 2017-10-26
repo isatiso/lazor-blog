@@ -5,7 +5,7 @@
                 Home Works!
             </p>
             <p class="create-button">
-                <button mat-raised-button color="primary">Add Category</button><button mat-raised-button color="primary">Create Article</button>
+                <button mat-raised-button color="primary" (click)="add_category()">Add Category</button><button mat-raised-button color="primary" routerLink="/editor/new-article">Create Article</button>
             </p>
         </div>
         <div class="divider"></div>
@@ -15,17 +15,17 @@
                     <mat-expansion-panel *ngFor="let category of categories; let i = index" class="category-item" [@currentCategory]="step === i" [expanded]="step === i" (opened)="setStep(i)">
                         <mat-expansion-panel-header color="primary">
                             <mat-panel-title>
-                                {{ category }} {{ i }}
+                                {{ category.name }} {{ i }}
                             </mat-panel-title>
                         </mat-expansion-panel-header>
                         <mat-action-row>
                             <button mat-raised-button color="primary">Choose</button>
-                            <button mat-raised-button color="warn">Delete</button>
+                            <button mat-raised-button color="warn" (click)="delete_category(category.category_id)">Delete</button>
                         </mat-action-row>
                     </mat-expansion-panel>
                 </mat-accordion>
                 <ng-template #emptyInfo>
-                    <p style="width: 100%; text-align: center;">Add a Category~<br/><br/><button mat-raised-button color="primary">Add Category</button></p>
+                    <p style="width: 100%; text-align: center;">Add a Category~<br/><br/><button mat-raised-button color="primary" (click)="add_category()">Add Category</button></p>
                 </ng-template>
             </div>
 

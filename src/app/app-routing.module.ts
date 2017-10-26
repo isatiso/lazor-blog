@@ -15,7 +15,7 @@ const routes: Routes = [
         data: { title: 'auth', scrollLimit: 0 }
     },
     {
-        path: 'editor',
+        path: 'editor/:id',
         loadChildren: './modules/editor/editor.module#EditorModule',
         canActivate: [AuthGuard],
         data: { title: 'editor', scrollLimit: 0 }

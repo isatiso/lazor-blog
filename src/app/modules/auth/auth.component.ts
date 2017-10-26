@@ -55,6 +55,7 @@ export class AuthComponent implements OnInit, OnDestroy {
     ) { }
 
     ngOnInit() {
+        document.body.scrollTop = 0;
         this.auth_exists = 'active';
     }
 
