@@ -7,6 +7,7 @@ const routes: Routes = [
     {
         path: 'home',
         loadChildren: './modules/home/home.module#HomeModule',
+        canActivate: [AuthGuard],
         data: { title: 'home', scrollLimit: 0 }
     },
     {

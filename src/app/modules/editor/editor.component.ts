@@ -34,6 +34,7 @@ export class EditorComponent implements OnInit, OnDestroy {
     editor_exists = 'active';
     public title = '';
     public content = '';
+    public current_category = '';
     public article_id = '';
     public min_rows = 5;
     public max_rows = 20;
@@ -69,10 +70,14 @@ export class EditorComponent implements OnInit, OnDestroy {
             const current_editor = JSON.parse(window.localStorage.getItem('current_editor'));
             this.content = current_editor['content'];
             this.title = current_editor['title'];
+            this.current_category = JSON.parse(window.localStorage.getItem('current_category'));
         } else {
-            this._http.get('/middle/article').subscribe(
+            this._http.get('/middle/article?article_id=' + this.article_id).subscribe(
                 res => {
                     console.log(res);
+                    this.content = res['data']['content'];
+                    this.title = res['data']['title'];
+                    this.current_category = JSON.parse(window.localStorage.getItem('current_category'));
                 }
             );
         }
@@ -91,8 +96,10 @@ export class EditorComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         this.editor_exists = 'inactive';
-        const current_editor = { 'title': this.title, 'content': this.content };
-        window.localStorage.setItem('current_editor', JSON.stringify(current_editor));
+        if (this.article_id === 'new-article') {
+            const current_editor = { 'title': this.title, 'content': this.content };
+            window.localStorage.setItem('current_editor', JSON.stringify(current_editor));
+        }
     }
 
     // scroll_top() {
@@ -133,42 +140,74 @@ export class EditorComponent implements OnInit, OnDestroy {
     }
 
     show_nav_button(event) {
-        // console.log(this.nav_left);
-        // console.log(this.nav_right);
         if (event.type !== 'mousemove') {
             return event;
         }
 
         if (0 <= event.x && event.x <= this.nav_zone_width) {
             if (!this.left_nav_show) {
-                // console.log('left');
                 this.left_nav_show = true;
                 this.nav_left._elementRef.nativeElement.style.transform = 'translateX(30%) scale(2)';
             }
         } else if (event.view.innerWidth - this.nav_zone_width <= event.x && event.x <= event.view.innerWidth) {
             if (!this.right_nav_show) {
-                // console.log('right');
                 this.right_nav_show = true;
                 this.nav_right._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(2)';
             }
         } else {
             if (this.left_nav_show || this.right_nav_show) {
-                // console.log('back');
                 this.left_nav_show = false;
                 this.right_nav_show = false;
                 this.nav_left._elementRef.nativeElement.style.transform = 'translateX(-80%)';
                 this.nav_right._elementRef.nativeElement.style.transform = 'translateX(80%)';
-                // console.log(event);
-                // console.log(event.type, event.x, event.view.innerWidth);
             }
         }
     }
 
     save_article() {
+        if (this.article_id === 'new-article') {
+            this._http.put('/middle/article', {
+                title: this.title,
+                content: this.content,
+                category_id: this.current_category['category_id'],
+            }).subscribe(
+                res => {
+                    console.log(res);
+                    this.article_id = res['data']['article_id'];
+
+                    window.localStorage.setItem('current_editor', JSON.stringify({}));
+
+                    this._router.navigate(['/editor/' + res['data']['article_id']]);
+                });
+        } else {
+            this._http.post('/middle/article', {
+                article_id: this.article_id,
+                title: this.title,
+                content: this.content,
+                category_id: this.current_category['category_id'],
+            }).subscribe(
+                res => {
+                    console.log(res);
+                });
+        }
 
     }
 
     publish_article() {
-
+        this._http.put('/middle/article', {
+            title: this.title,
+            content: this.content,
+            category_id: this.current_category['category_id'],
+        }).subscribe(
+            res => {
+                this._http.post('/middle/article/publish-state', {
+                    title: this.title,
+                    content: this.content,
+                    category_id: this.current_category['category_id'],
+                }).subscribe(
+                    udpate_publish_state_res => {
+                        console.log(res);
+                    });
+            });
     }
 }

@@ -111,7 +111,7 @@ export class AuthComponent implements OnInit, OnDestroy {
 
         this.sign_up_data.email = this.sign_up_data.email.trim();
         let message = '';
-        let not_regular = false;
+        let not_regular = null;
         if (!this.sign_up_data.email.match(this.pattern.email)) {
             message = 'Invalid Email.';
             not_regular = true;

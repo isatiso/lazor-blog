@@ -15,7 +15,7 @@ monospace;
 }
 
 .editor-title {
-    width: 100%;
+    width: calc(100% - 210px);
     font-size: 4em;
     border: none;
     &:focus {

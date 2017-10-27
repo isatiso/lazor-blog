@@ -1,7 +1,7 @@
 <div class="container editor-container" #editorContainer [@childrenAppear]="editor_exists" (window:mousemove)="show_nav_button($event)">
     <mat-card>
-        <div class="">
-            <input [(ngModel)]="title" class="editor-title" placeholder="Untitled" />
+        <div class="editor-title-container">
+            <input [(ngModel)]="title" class="editor-title" placeholder="Untitled" maxlength="50" />
         </div>
         <div class="dash-board">
             <button mat-raised-button (click)="save_article()">Save</button>
@@ -12,7 +12,7 @@
             <mat-tab label="Input">
                 <div class="input-test" id="tab1">
                     <mat-input-container class="editor-input">
-                        <textarea matInput matTextareaAutosize [(ngModel)]="content" [matAutosizeMinRows]="min_rows"></textarea>
+                        <textarea matInput matTextareaAutosize [(ngModel)]="content" matAutosizeMinRows="30"></textarea>
                     </mat-input-container>
                 </div>
             </mat-tab>

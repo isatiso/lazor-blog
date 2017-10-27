@@ -48,14 +48,17 @@ export class HomeComponent implements OnInit, OnDestroy {
     home_exists = 'active';
     displayedColumns = [
         'title',
-        'author',
-        'create_time'
+        // 'author',
+        // 'category',
+        // 'create_time'
     ];
     articleDatabase = new ArticleDatabase();
     dataSource: ArticleDataSource | null;
     categories = [];
+    current_category = '';
     step = 0;
     new_category_name = null;
+    @ViewChild('deleteBtn') deleteBtn;
 
     constructor(
         private _http: HttpClient,
@@ -67,27 +70,24 @@ export class HomeComponent implements OnInit, OnDestroy {
     ngOnInit() {
         document.body.scrollTop = 0;
         this.home_exists = 'active';
-        this.query_category();
+        this.query_category_and_article();
         this.dataSource = new ArticleDataSource(this.articleDatabase);
-        this.articleDatabase.dataChange.next(
-            [{
-                article_id: '',
-                title: 'asdasdasdasdasdasdasdasdasdasdasdasd',
-                content: '',
-                author_id: '',
-                category: 'default',
-                author: 'plank',
-                create_time: 123123123123
-            }]
-        );
+
     }
 
     ngOnDestroy() {
         this.home_exists = 'inactive';
+        window.localStorage.setItem('current_category', JSON.stringify(this.current_category));
     }
 
-    setStep(i) {
-        this.step = i;
+    setStep(category) {
+        // this.current_category = category;
+        console.log(category);
+        if (this.current_category['category_id'] !== category['category_id']) {
+            this.current_category = category;
+            this.query_article_list();
+        }
+        console.log(this.deleteBtn);
     }
 
     click_category(event) {
@@ -98,9 +98,40 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     query_category() {
+        const current_category = this.current_category;
         this._http.get('/middle/category').subscribe(
             res => {
-                this.categories = res['data'];
+                if (res['data']) {
+                    this.categories = res['data'];
+                    if (current_category) {
+                        this.setStep(current_category);
+                    } else {
+                        this.setStep(this.categories[0]);
+                    }
+                } else {
+                    this.categories = [];
+                }
+            }
+        );
+    }
+
+    query_category_and_article() {
+        this._http.get('/middle/category').subscribe(
+            res => {
+                if (res['data']) {
+                    this.categories = res['data'];
+                    this.setStep(this.categories[0]);
+                    this._http.get(
+                        '/middle/article/list?category_id=default'
+                    ).subscribe(
+                        article_res => {
+                            this.articleDatabase.dataChange.next(article_res['data']);
+                            console.log();
+                        }
+                        );
+                } else {
+                    this.categories = [];
+                }
             }
         );
     }
@@ -145,6 +176,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         this._http.delete('/middle/category?category_id=' + category_id).subscribe(
             res => {
                 console.log(res);
+                this.current_category = '';
                 this.query_category();
             }
         );
@@ -158,15 +190,28 @@ export class HomeComponent implements OnInit, OnDestroy {
             }
         );
     }
+
+    query_article_list() {
+        this._http.get('/middle/article/list?category_id=' + this.current_category['category_id']).subscribe(
+            res => {
+                this.articleDatabase.dataChange.next(res['data']);
+                console.log(res);
+            }
+        );
+    }
 }
 export interface ArticleData {
     article_id: string;
+    user_id: string;
     title: string;
     author_id: string;
-    category: string;
+    category_id: string;
+    category_name: string;
     content: string;
     author: string;
+    update_time: number;
     create_time: number;
+    publish_status: number;
 }
 
 export class ArticleDatabase {

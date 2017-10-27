@@ -2,7 +2,7 @@
     <mat-card>
         <div class="header-area">
             <p class="title home-title">
-                Home Works!
+                Article List
             </p>
             <p class="create-button">
                 <button mat-raised-button color="primary" (click)="add_category()">Add Category</button><button mat-raised-button color="primary" routerLink="/editor/new-article">Create Article</button>
@@ -11,16 +11,16 @@
         <div class="divider"></div>
         <div class="content-container">
             <div class="category-list">
-                <mat-accordion *ngIf="categories.length > 0; else emptyInfo">
-                    <mat-expansion-panel *ngFor="let category of categories; let i = index" class="category-item" [@currentCategory]="step === i" [expanded]="step === i" (opened)="setStep(i)">
+                <mat-accordion *ngIf="categories.length; else emptyInfo">
+                    <mat-expansion-panel *ngFor="let category of categories; let i = index" class="category-item" [@currentCategory]="current_category.category_id === category.category_id" [expanded]="current_category.category_id === category.category_id" (opened)="setStep(category)">
                         <mat-expansion-panel-header color="primary">
                             <mat-panel-title>
                                 {{ category.name }} {{ i }}
                             </mat-panel-title>
                         </mat-expansion-panel-header>
                         <mat-action-row>
-                            <button mat-raised-button color="primary">Choose</button>
-                            <button mat-raised-button color="warn" (click)="delete_category(category.category_id)">Delete</button>
+                            <button mat-raised-button color="primary">Modify</button>
+                            <button mat-raised-button color="warn" (click)="delete_category(category.category_id)" #deleteBtn>Delete</button>
                         </mat-action-row>
                     </mat-expansion-panel>
                 </mat-accordion>
@@ -34,14 +34,19 @@
             <div class="article-list">
                 <mat-table #table [dataSource]="dataSource">
 
-                    <ng-container cdkColumnDef="title">
+                    <ng-container cdkColumnDef="title" aria-colspan="2">
                         <mat-header-cell *cdkHeaderCellDef> Title </mat-header-cell>
-                        <mat-cell *cdkCellDef="let row" style="overflow: hidden;text-overflow: ellipsis;"><a routerLink="/article/{{row.title}}">{{row.title}}</a></mat-cell>
+                        <mat-cell *cdkCellDef="let row" class="title-ceil"><a routerLink="/editor/{{row.article_id}}">{{row.title}}</a></mat-cell>
                     </ng-container>
 
                     <ng-container cdkColumnDef="author">
+                        <mat-header-cell *cdkHeaderCellDef> Author </mat-header-cell>
+                        <mat-cell *cdkCellDef="let row"> {{ row.user_name }} </mat-cell>
+                    </ng-container>
+
+                    <ng-container cdkColumnDef="category">
                         <mat-header-cell *cdkHeaderCellDef> Category </mat-header-cell>
-                        <mat-cell *cdkCellDef="let row"> {{ row.category }} </mat-cell>
+                        <mat-cell *cdkCellDef="let row"> {{ row.category_name }} </mat-cell>
                     </ng-container>
 
                     <ng-container cdkColumnDef="create_time">

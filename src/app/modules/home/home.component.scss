@@ -45,6 +45,18 @@
     opacity: 0;
 }
 
+.title-ceil {
+    width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    a {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
 .divider {
     height: 20px;
     width: 100%;
