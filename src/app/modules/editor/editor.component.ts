@@ -34,7 +34,9 @@ export class EditorComponent implements OnInit, OnDestroy {
     editor_exists = 'active';
     public title = '';
     public content = '';
-    public current_category = '';
+    public current_category: Category;
+    public current_category_id = '';
+    public categories = [];
     public article_id = '';
     public min_rows = 5;
     public max_rows = 20;
@@ -49,6 +51,7 @@ export class EditorComponent implements OnInit, OnDestroy {
     public tab_select = 0;
     public show_scroll: boolean;
     public current_article_id = '';
+    public options;
     private nav_zone_width = 100;
     private left_nav_show = false;
     private right_nav_show = false;
@@ -66,18 +69,26 @@ export class EditorComponent implements OnInit, OnDestroy {
     ngOnInit() {
         document.body.scrollTop = 0;
         this.article_id = this._activate_route.params['value']['id'];
+        this.query_categories();
         if (this.article_id === 'new-article') {
             const current_editor = JSON.parse(window.localStorage.getItem('current_editor'));
             this.content = current_editor['content'];
             this.title = current_editor['title'];
             this.current_category = JSON.parse(window.localStorage.getItem('current_category'));
+            this.current_category_id = this.current_category.category_id;
         } else {
             this._http.get('/middle/article?article_id=' + this.article_id).subscribe(
                 res => {
                     console.log(res);
                     this.content = res['data']['content'];
                     this.title = res['data']['title'];
-                    this.current_category = JSON.parse(window.localStorage.getItem('current_category'));
+                    this.current_category = {
+                        category_id: res['data']['category_id'],
+                        category_name: res['data']['category_name'],
+                        category_type: res['data']['category_type'],
+                        user_id: res['data']['user_id']
+                    };
+                    this.current_category_id = res['data']['category_id'];
                 }
             );
         }
@@ -169,7 +180,7 @@ export class EditorComponent implements OnInit, OnDestroy {
             this._http.put('/middle/article', {
                 title: this.title,
                 content: this.content,
-                category_id: this.current_category['category_id'],
+                category_id: this.current_category_id,
             }).subscribe(
                 res => {
                     console.log(res);
@@ -184,7 +195,7 @@ export class EditorComponent implements OnInit, OnDestroy {
                 article_id: this.article_id,
                 title: this.title,
                 content: this.content,
-                category_id: this.current_category['category_id'],
+                category_id: this.current_category_id,
             }).subscribe(
                 res => {
                     console.log(res);
@@ -210,4 +221,23 @@ export class EditorComponent implements OnInit, OnDestroy {
                     });
             });
     }
+
+    query_categories() {
+        this._http.get('/middle/category').subscribe(
+            res => {
+                if (res['data']) {
+                    this.categories = res['data'];
+                } else {
+                    this.categories = [];
+                }
+            }
+        );
+    }
+}
+
+export interface Category {
+    category_id: string;
+    category_name: string;
+    category_type: string;
+    user_id: string;
 }

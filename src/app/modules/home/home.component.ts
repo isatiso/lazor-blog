@@ -70,9 +70,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     ngOnInit() {
         document.body.scrollTop = 0;
         this.home_exists = 'active';
-        this.query_category_and_article();
         this.dataSource = new ArticleDataSource(this.articleDatabase);
-
+        console.log('init');
+        this.query_category_and_article();
     }
 
     ngOnDestroy() {
@@ -82,18 +82,18 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     setStep(category) {
         // this.current_category = category;
-        console.log(category);
+        // console.log(category);
         if (this.current_category['category_id'] !== category['category_id']) {
             this.current_category = category;
             this.query_article_list();
         }
-        console.log(this.deleteBtn);
+        // console.log(this.deleteBtn);
     }
 
     click_category(event) {
-        console.log('click_category');
+        // console.log('click_category');
         event.stopPropagation();
-        console.log(event);
+        // console.log(event);
         return false;
     }
 
@@ -120,9 +120,10 @@ export class HomeComponent implements OnInit, OnDestroy {
             res => {
                 if (res['data']) {
                     this.categories = res['data'];
+                    console.log(res['data']);
                     this.setStep(this.categories[0]);
                     this._http.get(
-                        '/middle/article/list?category_id=default'
+                        '/middle/article/list?category_id=' + this.current_category['category_id']
                     ).subscribe(
                         article_res => {
                             this.articleDatabase.dataChange.next(article_res['data']);
@@ -149,10 +150,10 @@ export class HomeComponent implements OnInit, OnDestroy {
             res => {
                 if (res) {
                     this._http.put(
-                        '/middle/category', { name: res }
+                        '/middle/category', { category_name: res }
                     ).subscribe(
                         add_category_data => {
-                            console.log(add_category_data);
+                            // console.log(add_category_data);
                             this.query_category();
                         }
                         // error => {
@@ -175,7 +176,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         }
         this._http.delete('/middle/category?category_id=' + category_id).subscribe(
             res => {
-                console.log(res);
+                // console.log(res);
                 this.current_category = '';
                 this.query_category();
             }
@@ -185,7 +186,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     get_article_id() {
         this._http.get('/middle/generate-id').subscribe(
             res => {
-                console.log('generate_id', res['data']['generate_id']);
+                // console.log('generate_id', res['data']['generate_id']);
                 this._router.navigate(['/editor/' + res['data']['generate_id']]);
             }
         );
@@ -195,7 +196,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         this._http.get('/middle/article/list?category_id=' + this.current_category['category_id']).subscribe(
             res => {
                 this.articleDatabase.dataChange.next(res['data']);
-                console.log(res);
+                // console.log(res);
             }
         );
     }
@@ -241,9 +242,16 @@ export class ArticleDataSource extends DataSource<any> {
     styleUrls: ['./home.component.scss']
 })
 export class AddCategoryComponent {
-    public nickname = '';
+    public name = '';
     constructor(
         public dialogRef: MatDialogRef<AddCategoryComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
     ) { }
+
+    submit(event) {
+        if (event.type === 'keyup' && event.key === 'Enter') {
+            this.dialogRef.close(this.name);
+            return false;
+        }
+    }
 }

@@ -7,6 +7,17 @@
             <button mat-raised-button (click)="save_article()">Save</button>
             <button mat-raised-button color="primary" (click)="publish_article()">Publish</button>
         </div>
+        <div class="category-editor">
+            <mat-form-field>
+                <mat-select [(ngModel)]="current_category_id">
+                    <!-- <mat-select-trigger>You have selected: {{ select.selected?.category_name }}</mat-select-trigger> -->
+                    <mat-option *ngFor="let category of categories" [value]="category.category_id">
+                        {{ category.category_name }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+        </div>
         <div class="divider"></div>
         <mat-tab-group MatTabGroup [dynamicHeight]="dynamic_height" [selectedIndex]="tab_select" (selectedIndexChange)="select_change($event)" disableRipple="false" class="mat-editor">
             <mat-tab label="Input">

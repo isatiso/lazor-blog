@@ -53,6 +53,13 @@ monospace;
     top: 56px;
 }
 
+.category-editor {
+    position: absolute;
+    right: 3%;
+    top: 100px;
+    z-index: 20;
+}
+
 .editor-container {
     opacity: 0;
 }

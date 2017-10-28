@@ -1,4 +1,4 @@
-<div style="width: 100%;text-align: center">
+<div style="width: 100%;text-align: center" (keyup)="submit($event)">
     <h2 mat-dialog-title>Add a new category</h2>
     <mat-dialog-content>
         <mat-input-container>
@@ -9,7 +9,7 @@
             <input matInput [(ngModel)]="name" />
         </mat-input-container>
     </mat-dialog-content>
-    <mat-dialog-actions style="text-align: center">
+    <mat-dialog-actions style="width: 100%;text-align: center">
         <button mat-button [mat-dialog-close]="false">Cancel</button>
         <button mat-button [mat-dialog-close]="name">Submit</button>
     </mat-dialog-actions>
