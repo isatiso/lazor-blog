@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 
+import { AccountService, Account } from 'service/account/account.service';
+
 @Component({
     selector: 'la-auth',
     templateUrl: './auth.component.html',
@@ -52,6 +54,7 @@ export class AuthComponent implements OnInit, OnDestroy {
         private _http: HttpClient,
         private _router: Router,
         private snack_bar: MatSnackBar,
+        public account: AccountService,
     ) { }
 
     ngOnInit() {
@@ -94,6 +97,7 @@ export class AuthComponent implements OnInit, OnDestroy {
             data => {
                 if (data['result'] === 1) {
                     this._router.navigate(['/home']);
+                    this.account.data = data['data'];
                 } else {
                     this.raiseSnackBar(data['msg'], 'OK', () => {
                         console.log('Got it.');

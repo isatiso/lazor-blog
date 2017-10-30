@@ -14,11 +14,12 @@ import {
 
 import { EditorRoutingModule } from './editor-routing.module';
 import { EditorComponent } from './editor.component';
-import { MarkdownDirective } from 'directive/markdown.directive';
+import { MarkdownModule } from 'directive/markdown.module';
 
 @NgModule({
     imports: [
         CommonModule,
+        MarkdownModule,
         FormsModule,
         MatCardModule,
         MatTabsModule,
@@ -28,6 +29,6 @@ import { MarkdownDirective } from 'directive/markdown.directive';
         MatSelectModule,
         EditorRoutingModule
     ],
-    declarations: [EditorComponent, MarkdownDirective]
+    declarations: [EditorComponent]
 })
 export class EditorModule { }

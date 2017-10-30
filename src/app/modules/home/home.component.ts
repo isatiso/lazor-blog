@@ -56,8 +56,10 @@ export class HomeComponent implements OnInit, OnDestroy {
     dataSource: ArticleDataSource | null;
     categories = [];
     current_category = '';
+    operator_status = false;
     step = 0;
     new_category_name = null;
+    user_name = '';
     @ViewChild('deleteBtn') deleteBtn;
 
     constructor(
@@ -71,7 +73,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         document.body.scrollTop = 0;
         this.home_exists = 'active';
         this.dataSource = new ArticleDataSource(this.articleDatabase);
-        console.log('init');
+        this.user_name = window.sessionStorage.getItem('user_name');
         this.query_category_and_article();
     }
 
@@ -87,6 +89,7 @@ export class HomeComponent implements OnInit, OnDestroy {
             this.current_category = category;
             this.query_article_list();
         }
+        this.operator_status = false;
         // console.log(this.deleteBtn);
     }
 
@@ -138,34 +141,42 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     add_category() {
-        const dialogRef = this.dialog.open(AddCategoryComponent, {
-            height: '250px',
-            width: '300px',
+        this.dialog.open(AddCategoryComponent, {
             data: {
-                name: ''
+                name: '',
+                placeholder: 'Enter a New Name'
             }
-        });
-
-        dialogRef.afterClosed().subscribe(
+        }).afterClosed().subscribe(
             res => {
                 if (res) {
                     this._http.put(
                         '/middle/category', { category_name: res }
                     ).subscribe(
                         add_category_data => {
-                            // console.log(add_category_data);
                             this.query_category();
+                        });
+                }
+            });
+    }
+
+    modify_category(event, category) {
+        this.dialog.open(AddCategoryComponent, {
+            data: {
+                name: category.category_name,
+                placeholder: 'Change Name of The Category'
+            }
+        }).afterClosed().subscribe(
+            res => {
+                if (res) {
+                    this._http.post(
+                        '/middle/category', {
+                            category_id: category.category_id,
+                            category_name: res
                         }
-                        // error => {
-                        //     const navigationExtras: NavigationExtras = {
-                        //         queryParams: {
-                        //             'message': 'Sorry, We can not contact chat server now.',
-                        //             'sub_message': 'Contact Administrator to fix that.'
-                        //         }
-                        //     };
-                        //     this._router.navigate(['/error'], navigationExtras);
-                        // }
-                        );
+                    ).subscribe(
+                        update_category_data => {
+                            this.query_category();
+                        });
                 }
             });
     }
@@ -199,6 +210,15 @@ export class HomeComponent implements OnInit, OnDestroy {
                 // console.log(res);
             }
         );
+    }
+
+    show_operator(event) {
+        this.operator_status = true;
+        console.log(event);
+    }
+
+    print(event) {
+        console.log(event);
     }
 }
 export interface ArticleData {
@@ -250,7 +270,7 @@ export class AddCategoryComponent {
 
     submit(event) {
         if (event.type === 'keyup' && event.key === 'Enter') {
-            this.dialogRef.close(this.name);
+            this.dialogRef.close(this.data.name);
             return false;
         }
     }

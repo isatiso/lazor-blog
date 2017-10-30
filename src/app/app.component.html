@@ -16,18 +16,19 @@
                     </svg>
                 <span class="home-button">Star-T</span>
             </a>
+            <a mat-button routerLink="/home" class="nav-font">
+                <span class="nav-button">Home</span>
+            </a>
             <a mat-button routerLink="/about" class="nav-font">
                 <span class="nav-button">About</span>
             </a>
             <!-- <a mat-button routerLink="/editor/new-article" class="nav-font">
                 <span class="nav-button">Editor</span>
             </a> -->
-            <a mat-button routerLink="/home" class="nav-font">
-                <span class="nav-button">Home</span>
-            </a>
-            <a mat-button routerLink="/article" class="nav-font">
+
+            <!-- <a mat-button routerLink="/article" class="nav-font">
                 <span class="nav-button">Article</span>
-            </a>
+            </a> -->
             <span class="nav-spacer"></span>
             <button mat-button class="nav-font" [matMenuTriggerFor]="menu">
                 <span class="entry-button">Menu <mat-icon>fingerprint</mat-icon></span>
@@ -35,11 +36,11 @@
             <mat-menu #menu="matMenu">
                 <!-- <button mat-menu-item routerLink="/auth"><span>Sign In</span></button>
                 <button mat-menu-item routerLink="/auth"><span>Sign Up</span></button> -->
-                <button mat-menu-item routerLink="/home"><span>Home</span></button>
-                <button mat-menu-item routerLink="/auth"><span>Auth</span></button>
-                <button mat-menu-item routerLink="/editor/new-article"><span>Editor</span></button>
+                <!-- <button mat-menu-item routerLink="/home"><span>Home</span></button> -->
+                <button mat-menu-item *ngIf="null === account.data" routerLink="/auth"><span>Auth</span></button>
+                <!-- <button mat-menu-item routerLink="/editor/new-article"><span>Editor</span></button> -->
                 <!-- <button mat-menu-item routerLink="/article"><span>Article</span></button> -->
-                <button mat-menu-item (click)="log_out($event)"><span>Log Out</span></button>
+                <button mat-menu-item *ngIf="null !== account.data" (click)="log_out($event)"><span>Log Out</span></button>
             </mat-menu>
         </div>
     </mat-toolbar>
@@ -51,10 +52,7 @@
 <footer>
     <div class="footer-container">
         <mat-grid-list cols="4" rowHeight="45px">
-            <!-- <mat-grid-tile *ngFor="let tile of tiles" [colspan]="tile.cols" [rowspan]="tile.rows" [style.background]="tile.color">
-                {{tile.text}}
-            </mat-grid-tile> -->
-            <mat-grid-tile>
+            <!-- <mat-grid-tile>
                 <a routerLink="/about" title="">About</a>
             </mat-grid-tile>
             <mat-grid-tile>
@@ -65,7 +63,7 @@
             </mat-grid-tile>
             <mat-grid-tile>
                 <a routerLink="http://www.jianshu.com/u/10e236e2ed6b" title="我的简书">Blog</a>
-            </mat-grid-tile>
+            </mat-grid-tile> -->
             <mat-grid-tile colspan="4">
                 Powered by Angular ©2010-2017. Code licensed under an &nbsp;<a href="license" title="License text">MIT-style License</a>.
             </mat-grid-tile>

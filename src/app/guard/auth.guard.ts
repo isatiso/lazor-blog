@@ -9,13 +9,16 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 
+import { AccountService } from 'service/account/account.service';
+
 @Injectable()
 export class AuthGuard implements CanActivate {
 
     constructor(
         private _http: HttpClient,
         private _router: Router,
-        private snack_bar: MatSnackBar
+        private snack_bar: MatSnackBar,
+        public account: AccountService
     ) { }
 
     raiseSnackBar(message: string, action_name: string, action) {
@@ -39,14 +42,20 @@ export class AuthGuard implements CanActivate {
             data => {
                 if (data['result'] !== 1) {
                     this._router.navigate(['/auth']);
+                    window.sessionStorage.setItem('user_name', null);
+                    this.account.data = null;
                     return false;
                 } else {
+                    window.sessionStorage.setItem('user_name', data['data']['user_name']);
+                    this.account.data = data['data'];
                     return true;
                 }
             },
         ).catch(
             error => {
                 this._router.navigate(['/auth']);
+                this.account.data = null;
+                window.sessionStorage.setItem('user_name', null);
                 return new Observable<boolean>();
             },
         );

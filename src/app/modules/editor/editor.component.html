@@ -20,26 +20,32 @@
         </div>
         <div class="divider"></div>
         <mat-tab-group MatTabGroup [dynamicHeight]="dynamic_height" [selectedIndex]="tab_select" (selectedIndexChange)="select_change($event)" disableRipple="false" class="mat-editor">
-            <mat-tab label="Input">
+            <mat-tab label="Editor">
                 <div class="input-test" id="tab1">
                     <mat-input-container class="editor-input">
                         <textarea matInput matTextareaAutosize [(ngModel)]="content" matAutosizeMinRows="30"></textarea>
                     </mat-input-container>
                 </div>
             </mat-tab>
-            <mat-tab label="Output">
+            <mat-tab label="View">
                 <div id="tab2">
                     <markdown [data]="content"></markdown>
                 </div>
             </mat-tab>
         </mat-tab-group>
-        <!-- <div class="editor-nav nav-left"> -->
-        <button #navLeft mat-fab color="primary" (click)="select1($event)" class="markdown-editor" *ngIf="true" [@navAppear]="active">
-                <mat-icon class="big-icon">navigate_before</mat-icon></button>
-        <!-- </div> -->
-        <!-- <div class="editor-nav nav-right"> -->
-        <button #navRight mat-fab color="primary" (click)="select2($event)" class="markdown-showup" *ngIf="true" [@navAppear]="active">
-                <mat-icon class="big-icon">navigate_next</mat-icon></button>
-        <!-- </div> -->
+        <!-- <button #navLeft mat-fab color="primary" (click)="select1($event)" class="markdown-editor" *ngIf="true">
+                <mat-icon class="big-icon">navigate_before</mat-icon></button> -->
+        <button #navHome mat-fab color="primary" (click)="save_article($event)" class="markdown-showup" *ngIf="true">
+                <mat-icon class="big-icon">save</mat-icon></button>
+        <button #navView mat-fab color="primary" (click)="toggle_select($event)" class="markdown-showup" *ngIf="true">
+                <mat-icon class="big-icon">{{ figure_button_name() }}</mat-icon></button>
+        <button #navTop mat-fab color="primary" (click)="goto_top($event)" class="markdown-showup" *ngIf="true">
+                <mat-icon class="big-icon">keyboard_arrow_up</mat-icon></button>
     </mat-card>
+    <form action="/middle/file" method="post" enctype="multipart/form-data" #imageUploads>
+        <label for="image_uploads">Choose file to upload</label>
+        <input type="file" id="image_uploads" name="file" multiple />
+        <input type="submit" value="Save" (click)="upload_file($event)" />
+    </form>
+
 </div>

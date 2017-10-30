@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { NavBgDirective } from 'directive/nav-bg.directive';
 import { NavProfileService } from 'service/nav-profile/nav-profile.service';
+import { AccountService } from 'service/account/account.service';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/filter';
@@ -45,6 +46,7 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit, AfterView
         private router: Router,
         private _http: HttpClient,
         private activatedRoute: ActivatedRoute,
+        public account: AccountService,
         public nav_profile: NavProfileService,
     ) { }
 
@@ -88,7 +90,11 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit, AfterView
     }
 
     log_out(event) {
-        this._http.delete('/middle/user').subscribe();
+        this._http.delete('/middle/user').subscribe(
+            res => {
+                this.account.data = null;
+            }
+        );
         this.router.navigate(['/auth']);
     }
 }

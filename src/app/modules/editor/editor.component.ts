@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpRequest } from '@angular/common/http';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 
 import { MarkdownDirective } from 'directive/markdown.directive';
@@ -21,12 +21,12 @@ declare var Prism: any;
             })),
             transition('* => active', animate('300ms ease-in'))
         ]),
-        trigger('navAppear', [
-            state('active', style({
-                opacity: 1
-            })),
-            transition('* => active', animate('300ms ease-in'))
-        ])
+        // trigger('navAppear', [
+        //     state('active', style({
+        //         opacity: 1
+        //     })),
+        //     transition('* => active', animate('300ms ease-in'))
+        // ])
     ]
 })
 export class EditorComponent implements OnInit, OnDestroy {
@@ -52,13 +52,16 @@ export class EditorComponent implements OnInit, OnDestroy {
     public show_scroll: boolean;
     public current_article_id = '';
     public options;
-    private nav_zone_width = 100;
+    private nav_zone_width = 125;
     private left_nav_show = false;
     private right_nav_show = false;
 
-    @ViewChild('navLeft') nav_left;
-    @ViewChild('navRight') nav_right;
+    // @ViewChild('navLeft') nav_left;
+    @ViewChild('navView') nav_view;
+    @ViewChild('navTop') nav_top;
+    @ViewChild('navHome') nav_home;
     @ViewChild('editorContainer') editor_container;
+    @ViewChild('imageUploads') image_uploads;
 
     constructor(
         private _http: HttpClient,
@@ -143,10 +146,44 @@ export class EditorComponent implements OnInit, OnDestroy {
         this.tab_select = 1;
     }
 
+    toggle_select(event) {
+        if (this.tab_select === 1) {
+            this.tab_select = 0;
+        } else if (this.tab_select === 0) {
+            this.tab_select = 1;
+        }
+    }
+
+    goto_top(event) {
+        let total_height = document.body.scrollTop;
+        const delta = total_height / 15;
+        if (total_height > 0) {
+            const interval_handler = setInterval(() => {
+                total_height -= delta;
+                document.body.scrollTop = total_height;
+                if (total_height <= 0) {
+                    clearInterval(interval_handler);
+                }
+            }, 15);
+        }
+    }
+
+    goto_home(event) {
+        this._router.navigate(['/home']);
+    }
+
     select_change(event) {
         this.tab_select = event;
         if (event === 1) {
             Prism.highlightAll(false);
+        }
+    }
+
+    figure_button_name() {
+        if (this.tab_select === 0) {
+            return 'remove_red_eye';
+        } else if (this.tab_select === 1) {
+            return 'mode_edit';
         }
     }
 
@@ -155,22 +192,20 @@ export class EditorComponent implements OnInit, OnDestroy {
             return event;
         }
 
-        if (0 <= event.x && event.x <= this.nav_zone_width) {
-            if (!this.left_nav_show) {
-                this.left_nav_show = true;
-                this.nav_left._elementRef.nativeElement.style.transform = 'translateX(30%) scale(2)';
-            }
-        } else if (event.view.innerWidth - this.nav_zone_width <= event.x && event.x <= event.view.innerWidth) {
+        if (event.view.innerWidth - this.nav_zone_width / 3 <= event.x && event.x <= event.view.innerWidth) {
             if (!this.right_nav_show) {
                 this.right_nav_show = true;
-                this.nav_right._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(2)';
+                this.nav_view._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(2)';
+                this.nav_top._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(2) translateY(-60px)';
+                this.nav_home._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(2) translateY(60px)';
             }
-        } else {
+        } else if (event.view.innerWidth - this.nav_zone_width > event.x) {
             if (this.left_nav_show || this.right_nav_show) {
                 this.left_nav_show = false;
                 this.right_nav_show = false;
-                this.nav_left._elementRef.nativeElement.style.transform = 'translateX(-80%)';
-                this.nav_right._elementRef.nativeElement.style.transform = 'translateX(80%)';
+                this.nav_view._elementRef.nativeElement.style.transform = 'translateX(80%)';
+                this.nav_top._elementRef.nativeElement.style.transform = 'translateX(80%)';
+                this.nav_home._elementRef.nativeElement.style.transform = 'translateX(80%)';
             }
         }
     }
@@ -232,6 +267,23 @@ export class EditorComponent implements OnInit, OnDestroy {
                 }
             }
         );
+    }
+
+    upload_file(event) {
+        console.log(this.image_uploads.nativeElement.files);
+        console.log(this.image_uploads.files);
+        const file = new FormData(this.image_uploads.nativeElement);
+        console.log(file);
+        const req = new HttpRequest('PUT', '/middle/file', file, {
+            reportProgress: false,
+        });
+        // this._http.put('/middle/file', file).subscribe(
+        this._http.request(req).subscribe(
+            res => {
+                console.log(res);
+            }
+        );
+        // console.log(event, this.image_uploads);
     }
 }
 

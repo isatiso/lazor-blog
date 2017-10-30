@@ -1,16 +1,15 @@
 <div style="width: 100%;text-align: center" (keyup)="submit($event)">
-    <h2 mat-dialog-title>Add a new category</h2>
-    <mat-dialog-content>
+    <mat-dialog-content style="width: 100%;">
         <mat-input-container>
             <mat-placeholder>
-                name
+                {{ data.placeholder }}
                 <mat-icon>mode_edit</mat-icon>
             </mat-placeholder>
-            <input matInput [(ngModel)]="name" />
+            <input matInput [(ngModel)]="data.name" />
         </mat-input-container>
     </mat-dialog-content>
-    <mat-dialog-actions style="width: 100%;text-align: center">
-        <button mat-button [mat-dialog-close]="false">Cancel</button>
-        <button mat-button [mat-dialog-close]="name">Submit</button>
+    <mat-dialog-actions style="width: 100%;text-align: center; display: flex;">
+        <button mat-raised-button [mat-dialog-close]="0" style="flex: 1">Cancel</button>
+        <button mat-raised-button [mat-dialog-close]="data.name" style="flex: 1" color="primary">Submit</button>
     </mat-dialog-actions>
 </div>

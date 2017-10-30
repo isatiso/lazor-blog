@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { CdkTableModule } from '@angular/cdk/table';
 import { HttpClientModule } from '@angular/common/http';
 import {
+    MatMenuModule,
     MatCardModule,
     MatTableModule,
     MatButtonModule,
@@ -23,6 +24,7 @@ import { HomeRoutingModule } from './home-routing.module';
         FormsModule,
         CommonModule,
         CdkTableModule,
+        MatMenuModule,
         MatCardModule,
         MatTableModule,
         MatButtonModule,

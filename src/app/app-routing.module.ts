@@ -32,7 +32,7 @@ const routes: Routes = [
         data: { title: 'about', scrollLimit: 0 }
     },
     {
-        path: 'article',
+        path: 'article/:id',
         loadChildren: './modules/article/article.module#ArticleModule',
         data: { title: 'article', scrollLimit: 0 }
     },

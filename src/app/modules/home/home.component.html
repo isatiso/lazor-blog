@@ -2,7 +2,7 @@
     <mat-card>
         <div class="header-area">
             <p class="title home-title">
-                Article List
+                Hi, {{ user_name }}
             </p>
             <p class="create-button">
                 <button mat-raised-button color="primary" (click)="add_category()">Add Category</button><button mat-raised-button color="primary" routerLink="/editor/new-article">Create Article</button>
@@ -13,14 +13,18 @@
             <div class="category-list">
                 <mat-accordion *ngIf="categories.length; else emptyInfo">
                     <mat-expansion-panel *ngFor="let category of categories; let i = index" class="category-item" [@currentCategory]="current_category.category_id === category.category_id" [expanded]="current_category.category_id === category.category_id" (opened)="setStep(category)">
-                        <mat-expansion-panel-header color="primary">
+                        <mat-expansion-panel-header color="primary" (dblclick)="show_operator($event)">
                             <mat-panel-title>
                                 {{ category.category_name }}
                             </mat-panel-title>
                         </mat-expansion-panel-header>
                         <mat-action-row>
-                            <button mat-raised-button color="primary">Modify</button>
-                            <button mat-raised-button color="warn" (click)="delete_category(category.category_id)" *ngIf="category.category_type">Delete</button>
+                            <button mat-raised-button color="primary" [matMenuTriggerFor]="options">Options</button>
+                            <mat-menu #options="matMenu">
+                                <button mat-menu-item (click)="modify_category($event, category)">Modify</button>
+                                <button mat-menu-item (click)="delete_category(category.category_id)" *ngIf="category.category_type">Delete</button>
+                            </mat-menu>
+                            <!-- <button mat-raised-button color="warn" (click)="delete_category(category.category_id)" *ngIf="category.category_type">Delete</button> -->
                         </mat-action-row>
                     </mat-expansion-panel>
                 </mat-accordion>
@@ -36,7 +40,7 @@
 
                     <ng-container cdkColumnDef="title" aria-colspan="2">
                         <mat-header-cell *cdkHeaderCellDef> Title </mat-header-cell>
-                        <mat-cell *cdkCellDef="let row" class="title-ceil"><a mat-raised-button routerLink="/editor/{{row.article_id}}" color="primary">{{row.title}}</a></mat-cell>
+                        <mat-cell *cdkCellDef="let row" class="title-ceil"><a mat-button routerLink="/article/{{row.article_id}}" color="primary">{{row.title}}</a></mat-cell>
                     </ng-container>
 
                     <ng-container cdkColumnDef="author">

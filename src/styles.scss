@@ -20,7 +20,7 @@ html {
     margin: 0;
     height: 4px;
     width: 100%;
-    background-color: map-get($primary, 500);
+    background-color: map-get($accent, 400);
 }
 
 .container {
@@ -34,7 +34,7 @@ html {
 
 .title {
     font-family: Raleway, Arial, Helvetica, sans-serif;
-    font-size: 3em;
+    font-size: 2.8em;
     padding-bottom: 20px;
 }
 

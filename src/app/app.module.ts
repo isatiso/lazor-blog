@@ -10,6 +10,7 @@ import { NavBgDirective } from 'directive/nav-bg.directive';
 import { MarkdownDirective } from 'directive/markdown.directive';
 import { NavProfileService } from 'service/nav-profile/nav-profile.service';
 import { MarkdownService } from 'service/markdown/markdown.service';
+import { AccountService } from 'service/account/account.service';
 import { AuthGuard } from 'guard/auth.guard';
 
 @NgModule({
@@ -31,6 +32,7 @@ import { AuthGuard } from 'guard/auth.guard';
     providers: [
         NavProfileService,
         MarkdownService,
+        AccountService,
         HttpClient,
         MatSnackBar,
         AuthGuard],
