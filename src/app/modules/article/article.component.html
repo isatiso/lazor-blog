@@ -1,15 +1,15 @@
 <div class="container article-container" [@childrenAppear]="article_exists" (window:mousemove)="show_nav_button($event)">
     <mat-card>
         <div class="title">
-            {{ title }}
+            {{ title ? title : 'Untitled'}}
         </div>
         <div class="divider"></div>
-        <markdown [data]="content"></markdown>
+        <markdown [data]="content ? content : 'Nothing Here'"></markdown>
         <button #navHome mat-fab color="primary" (click)="goto_home($event)" class="markdown-showup" *ngIf="true">
-            <mat-icon class="big-icon">home</mat-icon></button>
+            <mat-icon class="big-icon">account_balance</mat-icon></button>
         <button #navEditor mat-fab color="primary" (click)="goto_editor($event)" class="markdown-showup" *ngIf="true">
             <mat-icon class="big-icon">mode_edit</mat-icon></button>
         <button #navTop mat-fab color="primary" (click)="goto_top($event)" class="markdown-showup" *ngIf="true">
-            <mat-icon class="big-icon">keyboard_arrow_up</mat-icon></button>
+            <mat-icon class="big-icon">arrow_upward</mat-icon></button>
     </mat-card>
 </div>

@@ -40,7 +40,7 @@
 
                     <ng-container cdkColumnDef="title" aria-colspan="2">
                         <mat-header-cell *cdkHeaderCellDef> Title </mat-header-cell>
-                        <mat-cell *cdkCellDef="let row" class="title-ceil"><a mat-button routerLink="/article/{{row.article_id}}" color="primary">{{row.title}}</a></mat-cell>
+                        <mat-cell *cdkCellDef="let row" class="title-ceil"><a mat-button routerLink="/article/{{row.article_id}}" color="primary">{{row.title ? row.title : 'Untitled'}}</a></mat-cell>
                     </ng-container>
 
                     <ng-container cdkColumnDef="author">

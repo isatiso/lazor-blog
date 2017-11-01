@@ -9,11 +9,12 @@ import {
     MatInputModule,
     MatIconModule,
     MatSelectModule,
+    MatDialogModule,
     MatFormFieldModule
 } from '@angular/material';
 
 import { EditorRoutingModule } from './editor-routing.module';
-import { EditorComponent } from './editor.component';
+import { EditorComponent, InputComponent } from './editor.component';
 import { MarkdownModule } from 'directive/markdown.module';
 
 @NgModule({
@@ -27,8 +28,12 @@ import { MarkdownModule } from 'directive/markdown.module';
         MatInputModule,
         MatIconModule,
         MatSelectModule,
+        MatDialogModule,
         EditorRoutingModule
     ],
-    declarations: [EditorComponent]
+    entryComponents: [
+        InputComponent
+    ],
+    declarations: [EditorComponent, InputComponent]
 })
 export class EditorModule { }

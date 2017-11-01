@@ -1,5 +1,11 @@
 import { Component, OnInit, OnDestroy, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { trigger, state, style, animate, transition } from '@angular/animations';
+import { DataSource } from '@angular/cdk/table';
+
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Observable } from 'rxjs/Observable';
 
 import { NavProfileService } from 'service/nav-profile/nav-profile.service';
 
@@ -30,10 +36,20 @@ import { NavProfileService } from 'service/nav-profile/nav-profile.service';
 export class IndexComponent implements OnInit, OnDestroy {
     banner_exists = 'active';
     index_exists = 'active';
-
+    content_rows = 30;
+    articleDatabase = new ArticleDatabase();
+    dataSource: ArticleDataSource | null;
+    displayedColumns = [
+        'title',
+        // 'author',
+        // 'category',
+        // 'create_time'
+    ];
     @ViewChild('banner') banner;
     height = 100;
     constructor(
+        private _http: HttpClient,
+        private _router: Router,
         private el: ElementRef,
         private nav_profile: NavProfileService
     ) { }
@@ -41,7 +57,9 @@ export class IndexComponent implements OnInit, OnDestroy {
     ngOnInit() {
         document.body.scrollTop = 0;
         this.index_exists = 'active';
+        this.dataSource = new ArticleDataSource(this.articleDatabase);
         this.nav_profile.navbarWidth = this.el.nativeElement.firstChild.clientWidth;
+        this.query_article_list();
     }
 
     ngOnDestroy() {
@@ -56,4 +74,47 @@ export class IndexComponent implements OnInit, OnDestroy {
             this.banner.nativeElement.firstElementChild.style.opacity = 0;
         }
     }
+
+    query_article_list() {
+        this._http.get('/middle/article/index-list').subscribe(
+            res => {
+                this.articleDatabase.dataChange.next(res['data']);
+            }
+        );
+    }
+}
+
+export interface ArticleData {
+    article_id: string;
+    user_id: string;
+    title: string;
+    author_id: string;
+    category_id: string;
+    category_name: string;
+    content: string;
+    author: string;
+    update_time: number;
+    create_time: number;
+    publish_status: number;
+}
+
+export class ArticleDatabase {
+    dataChange: BehaviorSubject<ArticleData[]> = new BehaviorSubject<ArticleData[]>([]);
+
+    get data(): ArticleData[] { return this.dataChange.value; }
+
+    constructor() {
+    }
+}
+
+export class ArticleDataSource extends DataSource<any> {
+    constructor(private _exampleDatabase: ArticleDatabase) {
+        super();
+    }
+
+    connect(): Observable<ArticleData[]> {
+        return this._exampleDatabase.dataChange;
+    }
+
+    disconnect() { }
 }

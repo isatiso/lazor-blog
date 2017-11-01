@@ -9,7 +9,6 @@
                             </filter>
                         </defs>
                         <circle class="inner-circle" cx="15.0" cy="15.0" r="12.0" filter="url(#Gaussian_Blur)"/>
-                        <!-- <circle class="outer-circle" cx="15.0" cy="15.0" r="14.0"/> -->
                         <path class="path-1" d="M12.5 16.443375672974064 L11.345299461620748 18.443375672974064 L23.273502691896258 18.443375672974064 L16.154700538379252 6.113248654051871 L13.845299461620748 6.113248654051871 L19.809401076758505 16.443375672974064 L12.5 16.443375672974064" />
                         <path class="path-2" d="M11.345299461620748 18.443375672974064 L23.273502691896258 18.443375672974064 L22.118802153517006 20.443375672974064 L7.881197846482993 20.443375672974064 L13.845299461620748 10.113248654051871 L15.0 12.113248654051871 L11.345299461620748 18.443375672974064" />
                         <path class="path-3" d="M7.881197846482993 20.443375672974064 L6.726497308103742 18.443375672974064 L13.845299461620748 6.113248654051871 L19.809401076758505 16.443375672974064 L17.5 16.443375672974064 L13.845299461620748 10.113248654051871 L7.881197846482993 20.443375672974064" />
@@ -22,24 +21,12 @@
             <a mat-button routerLink="/about" class="nav-font">
                 <span class="nav-button">About</span>
             </a>
-            <!-- <a mat-button routerLink="/editor/new-article" class="nav-font">
-                <span class="nav-button">Editor</span>
-            </a> -->
-
-            <!-- <a mat-button routerLink="/article" class="nav-font">
-                <span class="nav-button">Article</span>
-            </a> -->
             <span class="nav-spacer"></span>
             <button mat-button class="nav-font" [matMenuTriggerFor]="menu">
                 <span class="entry-button">Menu <mat-icon>fingerprint</mat-icon></span>
             </button>
             <mat-menu #menu="matMenu">
-                <!-- <button mat-menu-item routerLink="/auth"><span>Sign In</span></button>
-                <button mat-menu-item routerLink="/auth"><span>Sign Up</span></button> -->
-                <!-- <button mat-menu-item routerLink="/home"><span>Home</span></button> -->
                 <button mat-menu-item *ngIf="null === account.data" routerLink="/auth"><span>Auth</span></button>
-                <!-- <button mat-menu-item routerLink="/editor/new-article"><span>Editor</span></button> -->
-                <!-- <button mat-menu-item routerLink="/article"><span>Article</span></button> -->
                 <button mat-menu-item *ngIf="null !== account.data" (click)="log_out($event)"><span>Log Out</span></button>
             </mat-menu>
         </div>
@@ -52,18 +39,6 @@
 <footer>
     <div class="footer-container">
         <mat-grid-list cols="4" rowHeight="45px">
-            <!-- <mat-grid-tile>
-                <a routerLink="/about" title="">About</a>
-            </mat-grid-tile>
-            <mat-grid-tile>
-                <a routerLink="/article" title="">Articles</a>
-            </mat-grid-tile>
-            <mat-grid-tile>
-                <a routerLink="/auth" title="">Auth</a>
-            </mat-grid-tile>
-            <mat-grid-tile>
-                <a routerLink="http://www.jianshu.com/u/10e236e2ed6b" title="我的简书">Blog</a>
-            </mat-grid-tile> -->
             <mat-grid-tile colspan="4">
                 Powered by Angular ©2010-2017. Code licensed under an &nbsp;<a href="license" title="License text">MIT-style License</a>.
             </mat-grid-tile>

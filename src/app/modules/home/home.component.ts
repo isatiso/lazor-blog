@@ -126,7 +126,7 @@ export class HomeComponent implements OnInit, OnDestroy {
                     console.log(res['data']);
                     this.setStep(this.categories[0]);
                     this._http.get(
-                        '/middle/article/list?category_id=' + this.current_category['category_id']
+                        '/middle/article/user-list?category_id=' + this.current_category['category_id']
                     ).subscribe(
                         article_res => {
                             this.articleDatabase.dataChange.next(article_res['data']);
@@ -204,10 +204,11 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     query_article_list() {
-        this._http.get('/middle/article/list?category_id=' + this.current_category['category_id']).subscribe(
+        this._http.get('/middle/article/user-list?category_id=' + this.current_category['category_id']).subscribe(
             res => {
+                console.log(res);
                 this.articleDatabase.dataChange.next(res['data']);
-                // console.log(res);
+
             }
         );
     }

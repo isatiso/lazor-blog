@@ -1,29 +1,28 @@
-<div class="container editor-container" #editorContainer [@childrenAppear]="editor_exists" (window:mousemove)="show_nav_button($event)">
+<div class="container editor-container" #editorContainer [@childrenAppear]="editor_exists" (window:mousemove)="show_nav_button($event)" (window:scroll)="set_scroll_top($event)">
     <mat-card>
         <div class="editor-title-container">
-            <input [(ngModel)]="title" class="editor-title" placeholder="Untitled" maxlength="50" />
+            <input [(ngModel)]="title" class="editor-title" placeholder="Untitled" maxlength="50" (input)="set_modify_status($event)" autofocus #titleRef/>
         </div>
         <div class="dash-board">
-            <button mat-raised-button (click)="save_article()">Save</button>
-            <button mat-raised-button color="primary" (click)="publish_article()">Publish</button>
+            <!-- <button mat-raised-button (click)="save_article()">Save</button> -->
+            <button mat-raised-button color="warn" (click)="delete_article()">Delete</button>
         </div>
         <div class="category-editor">
             <mat-form-field>
-                <mat-select [(ngModel)]="current_category_id">
+                <mat-select [(ngModel)]="current_category_id" (change)="category_change($event)">
                     <!-- <mat-select-trigger>You have selected: {{ select.selected?.category_name }}</mat-select-trigger> -->
                     <mat-option *ngFor="let category of categories" [value]="category.category_id">
                         {{ category.category_name }}
                     </mat-option>
                 </mat-select>
             </mat-form-field>
-
         </div>
         <div class="divider"></div>
-        <mat-tab-group MatTabGroup [dynamicHeight]="dynamic_height" [selectedIndex]="tab_select" (selectedIndexChange)="select_change($event)" disableRipple="false" class="mat-editor">
+        <mat-tab-group MatTabGroup dynamicHeight="true" [selectedIndex]="tab_select" (selectedIndexChange)="select_change($event)">
             <mat-tab label="Editor">
                 <div class="input-test" id="tab1">
                     <mat-input-container class="editor-input">
-                        <textarea matInput matTextareaAutosize [(ngModel)]="content" matAutosizeMinRows="30"></textarea>
+                        <textarea matInput matTextareaAutosize [(ngModel)]="content" [matAutosizeMinRows]="content_rows" (keydown)="set_modify_status($event)" (paste)="set_modify_status($event)" #contentRef></textarea>
                     </mat-input-container>
                 </div>
             </mat-tab>
@@ -35,16 +34,22 @@
         </mat-tab-group>
         <!-- <button #navLeft mat-fab color="primary" (click)="select1($event)" class="markdown-editor" *ngIf="true">
                 <mat-icon class="big-icon">navigate_before</mat-icon></button> -->
-        <button #navHome mat-fab color="primary" (click)="save_article($event)" class="markdown-showup" *ngIf="true">
-                <mat-icon class="big-icon">save</mat-icon></button>
+        <button #navAddLatex mat-fab color="primary" (click)="insert_latex($event)" class="markdown-showup" *ngIf="true">
+                <mat-icon class="big-icon">functions</mat-icon></button>
+        <button #navAddImage mat-fab color="primary" (click)="select_file_click($event)" class="markdown-showup" *ngIf="true">
+                <mat-icon class="big-icon">file_upload</mat-icon></button>
+        <button #navHome mat-fab color="primary" (click)="modify_button_move($event)" class="markdown-showup" *ngIf="true">
+                <mat-icon class="big-icon">{{ figure_modify_button() }}</mat-icon></button>
         <button #navView mat-fab color="primary" (click)="toggle_select($event)" class="markdown-showup" *ngIf="true">
                 <mat-icon class="big-icon">{{ figure_button_name() }}</mat-icon></button>
         <button #navTop mat-fab color="primary" (click)="goto_top($event)" class="markdown-showup" *ngIf="true">
-                <mat-icon class="big-icon">keyboard_arrow_up</mat-icon></button>
+                <mat-icon class="big-icon">arrow_upward</mat-icon></button>
+
+
     </mat-card>
-    <form action="/middle/file" method="post" enctype="multipart/form-data" #imageUploads>
+    <form class="add-image-form" action="/middle/file" method="post" enctype="multipart/form-data" #imageForm>
         <label for="image_uploads">Choose file to upload</label>
-        <input type="file" id="image_uploads" name="file" multiple />
+        <input type="file" id="image_uploads" name="file" multiple #imageUpload (change)="upload_file($event)" />
         <input type="submit" value="Save" (click)="upload_file($event)" />
     </form>
 
