@@ -5,3 +5,9 @@ $accent: mat-palette($mat-grey);
 $warn: mat-palette($mat-red);
 $theme: mat-light-theme($primary, $accent, $warn);
 @include angular-material-theme($theme);
+@font-face {
+    font-family: Zcool_kuhei;
+    src: url('/assets/font/Zcool_kuhei.ttf');
+    font-family: Zcool_fun;
+    src: url('/assets/font/Zcool_fun.ttf');
+}

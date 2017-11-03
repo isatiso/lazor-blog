@@ -2,11 +2,13 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 import { AuthGuard } from 'guard/auth.guard';
+import { ArticleOwnerGuard } from 'guard/article-owner.guard';
 
 const routes: Routes = [
     {
         path: 'home',
         loadChildren: './modules/home/home.module#HomeModule',
+        pathMatch: 'full',
         canActivate: [AuthGuard],
         data: { title: 'home', scrollLimit: 0 }
     },
@@ -18,7 +20,7 @@ const routes: Routes = [
     {
         path: 'editor/:id',
         loadChildren: './modules/editor/editor.module#EditorModule',
-        canActivate: [AuthGuard],
+        canActivate: [AuthGuard, ArticleOwnerGuard],
         data: { title: 'editor', scrollLimit: 0 }
     },
     {
@@ -37,11 +39,19 @@ const routes: Routes = [
         data: { title: 'article', scrollLimit: 0 }
     },
     {
+        path: 'error',
+        loadChildren: './modules/error/error.module#ErrorModule'
+    },
+    {
         path: '',
         redirectTo: 'home',
         pathMatch: 'full',
         data: { title: 'home', scrollLimit: 276 }
     },
+    {
+        path: '**',
+        redirectTo: '/error'
+    }
 ];
 
 @NgModule({

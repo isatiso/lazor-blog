@@ -4,8 +4,6 @@ import { MarkdownDirective } from 'directive/markdown.directive';
     declarations: [
         MarkdownDirective
     ],
-    imports: [
-    ],
     exports: [
         MarkdownDirective
     ]

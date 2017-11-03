@@ -1,0 +1,22 @@
+<div class="container error-container" [@childrenAppear]="error_exists" id="top">
+    <mat-card>
+        <mat-grid-list cols="10" rowHeight="300px">
+            <mat-grid-tile [colspan]="figure_left_width()">
+                <div class="cry-face">
+                    <mat-icon>sentiment_very_dissatisfied</mat-icon>
+                </div>
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="figure_right_width()">
+                <div class="sorry-content">
+                    <div class="error-title">
+                        {{ message }}
+                    </div>
+                    <div class="error-content">
+                        {{ sub_message }}
+                    </div>
+                    <button mat-raised-button routerLink="/">Back</button>
+                </div>
+            </mat-grid-tile>
+        </mat-grid-list>
+    </mat-card>
+</div>

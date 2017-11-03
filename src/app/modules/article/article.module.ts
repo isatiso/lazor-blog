@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatCardModule, MatButtonModule, MatIconModule } from '@angular/material';
+import { MatCardModule, MatButtonModule, MatDialogModule, MatIconModule } from '@angular/material';
 import { HttpClientModule } from '@angular/common/http';
 
-import { ArticleComponent } from './article.component';
+import { ArticleComponent, PreviewComponent } from './article.component';
 import { ArticleRoutingModule } from './article-routing.module';
 import { MarkdownModule } from 'directive/markdown.module';
 
@@ -14,9 +14,13 @@ import { MarkdownModule } from 'directive/markdown.module';
         MatCardModule,
         MatButtonModule,
         MatIconModule,
+        MatDialogModule,
         HttpClientModule,
         ArticleRoutingModule
     ],
-    declarations: [ArticleComponent]
+    entryComponents: [
+        PreviewComponent
+    ],
+    declarations: [ArticleComponent, PreviewComponent]
 })
 export class ArticleModule { }

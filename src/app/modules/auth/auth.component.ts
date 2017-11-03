@@ -4,7 +4,8 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 
-import { AccountService, Account } from 'service/account/account.service';
+import { AccountService } from 'service/account/account.service';
+import { Account } from 'data-struct-definition';
 
 @Component({
     selector: 'la-auth',

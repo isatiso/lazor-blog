@@ -16,20 +16,12 @@ monospace;
 
 .editor-title {
     width: 100%;
-    font-size: 4em;
+    font-size: 56px;
     border: none;
+    font-family: Zcool_fun, Raleway, Arial, Helvetica, sans-serif;
     &:focus {
         outline: none;
     }
-}
-
-.markdown-editor {
-    z-index: 10;
-    position: fixed;
-    transition: transform 200ms ease-out;
-    transform: translateX(-80%);
-    top: 48%;
-    left: 0;
 }
 
 .markdown-showup {
@@ -50,14 +42,14 @@ monospace;
 .dash-board {
     position: absolute;
     right: 3%;
-    top: 126px;
+    top: 117px;
     z-index: 9;
 }
 
 .category-editor {
     position: absolute;
     right: 13%;
-    top: 113px;
+    top: 105px;
     z-index: 9;
 }
 

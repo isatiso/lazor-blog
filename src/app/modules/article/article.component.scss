@@ -1,3 +1,4 @@
+@import '../../../assets/scss/material_theming.scss';
 .article-container {
     opacity: 0;
 }
@@ -9,4 +10,22 @@
     transform: translateX(80%);
     top: 48%;
     right: 0;
+}
+
+.description {
+    font-family: Zcool_fun, Arial, Helvetica, sans-serif;
+    font-size: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    padding-bottom: 20px;
+    .username {
+        flex: 1;
+    }
+    .data {
+        flex: 2;
+    }
+    .spacer {
+        flex: auto;
+    }
 }

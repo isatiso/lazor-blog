@@ -8,6 +8,7 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 
 import { NavProfileService } from 'service/nav-profile/nav-profile.service';
+import { ArticleData } from 'data-struct-definition';
 
 @Component({
     selector: 'la-index',
@@ -82,20 +83,6 @@ export class IndexComponent implements OnInit, OnDestroy {
             }
         );
     }
-}
-
-export interface ArticleData {
-    article_id: string;
-    user_id: string;
-    title: string;
-    author_id: string;
-    category_id: string;
-    category_name: string;
-    content: string;
-    author: string;
-    update_time: number;
-    create_time: number;
-    publish_status: number;
 }
 
 export class ArticleDatabase {

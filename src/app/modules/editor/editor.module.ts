@@ -5,12 +5,12 @@ import { HttpClientModule } from '@angular/common/http';
 import {
     MatCardModule,
     MatTabsModule,
-    MatButtonModule,
-    MatInputModule,
     MatIconModule,
+    MatInputModule,
+    MatButtonModule,
     MatSelectModule,
     MatDialogModule,
-    MatFormFieldModule
+    MatTooltipModule
 } from '@angular/material';
 
 import { EditorRoutingModule } from './editor-routing.module';
@@ -24,11 +24,12 @@ import { MarkdownModule } from 'directive/markdown.module';
         FormsModule,
         MatCardModule,
         MatTabsModule,
-        MatButtonModule,
-        MatInputModule,
         MatIconModule,
+        MatInputModule,
+        MatButtonModule,
         MatSelectModule,
         MatDialogModule,
+        MatTooltipModule,
         EditorRoutingModule
     ],
     entryComponents: [

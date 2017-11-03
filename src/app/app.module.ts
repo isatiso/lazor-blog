@@ -1,7 +1,15 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
-import { MatSnackBar, MatToolbarModule, MatButtonModule, MatGridListModule, MatMenuModule, MatIconModule } from '@angular/material';
+import { 
+    MatSnackBar, 
+    MatToolbarModule, 
+    MatButtonModule, 
+    MatGridListModule, 
+    MatMenuModule, 
+    MatIconModule, 
+    MatSnackBarModule
+} from '@angular/material';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from 'app-routing.module';
@@ -12,6 +20,7 @@ import { NavProfileService } from 'service/nav-profile/nav-profile.service';
 import { MarkdownService } from 'service/markdown/markdown.service';
 import { AccountService } from 'service/account/account.service';
 import { AuthGuard } from 'guard/auth.guard';
+import { ArticleOwnerGuard } from 'guard/article-owner.guard';
 
 @NgModule({
     declarations: [
@@ -26,6 +35,7 @@ import { AuthGuard } from 'guard/auth.guard';
         MatGridListModule,
         MatIconModule,
         MatMenuModule,
+        MatSnackBarModule,
         BrowserAnimationsModule,
         AppRoutingModule
     ],
@@ -35,7 +45,8 @@ import { AuthGuard } from 'guard/auth.guard';
         AccountService,
         HttpClient,
         MatSnackBar,
-        AuthGuard],
+        AuthGuard,
+        ArticleOwnerGuard],
     bootstrap: [AppComponent]
 })
 export class AppModule { }

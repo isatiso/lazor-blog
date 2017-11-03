@@ -3,8 +3,13 @@
         <div class="title">
             {{ title ? title : 'Untitled'}}
         </div>
+        <div class="description">
+            <div class="username">作者：{{ article_user_name }}</div>
+            <div class="date">发布时间：{{ article_create_time | date: 'y年MM月dd日 HH:mm:ss' }}</div>
+            <div class="spacer"></div>
+        </div>
         <div class="divider"></div>
-        <markdown [data]="content ? content : 'Nothing Here'"></markdown>
+        <markdown [data]="content ? content : 'Nothing Here'" (click)="preview_image($event)"></markdown>
         <button #navHome mat-fab color="primary" (click)="goto_home($event)" class="markdown-showup" *ngIf="true">
             <mat-icon class="big-icon">account_balance</mat-icon></button>
         <button #navEditor mat-fab color="primary" (click)="goto_editor($event)" class="markdown-showup" *ngIf="true">

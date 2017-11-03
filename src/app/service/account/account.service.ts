@@ -2,6 +2,8 @@ import { Injectable, Input } from '@angular/core';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
+import { Account } from 'data-struct-definition';
+
 @Injectable()
 export class AccountService {
     private account_data = new BehaviorSubject<Account>(null);
@@ -17,7 +19,3 @@ export class AccountService {
     }
 }
 
-export interface Account {
-    user_id: string;
-    user_name: string;
-}

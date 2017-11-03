@@ -34,15 +34,16 @@
         </mat-tab-group>
         <!-- <button #navLeft mat-fab color="primary" (click)="select1($event)" class="markdown-editor" *ngIf="true">
                 <mat-icon class="big-icon">navigate_before</mat-icon></button> -->
-        <button #navAddLatex mat-fab color="primary" (click)="insert_latex($event)" class="markdown-showup" *ngIf="true">
-                <mat-icon class="big-icon">functions</mat-icon></button>
-        <button #navAddImage mat-fab color="primary" (click)="select_file_click($event)" class="markdown-showup" *ngIf="true">
-                <mat-icon class="big-icon">file_upload</mat-icon></button>
-        <button #navHome mat-fab color="primary" (click)="modify_button_move($event)" class="markdown-showup" *ngIf="true">
+
+        <button #navHome mat-fab color="primary" (click)="modify_button_move($event)" class="markdown-showup" *ngIf="true" matTooltip="保存和发布" matTooltipPosition="left">
                 <mat-icon class="big-icon">{{ figure_modify_button() }}</mat-icon></button>
-        <button #navView mat-fab color="primary" (click)="toggle_select($event)" class="markdown-showup" *ngIf="true">
+        <button #navAddLatex mat-fab color="primary" (click)="insert_latex($event)" class="markdown-showup" *ngIf="true" matTooltip="插入公式" matTooltipPosition="left">
+                <mat-icon class="big-icon">functions</mat-icon></button>
+        <button #navAddImage mat-fab color="primary" (click)="select_file_click($event)" class="markdown-showup" *ngIf="true" matTooltip="插入图片" matTooltipPosition="left">
+                <mat-icon class="big-icon">insert_photo</mat-icon></button>
+        <button #navView mat-fab color="primary" (click)="toggle_select($event)" class="markdown-showup" *ngIf="true" matTooltip="预览文章" matTooltipPosition="left">
                 <mat-icon class="big-icon">{{ figure_button_name() }}</mat-icon></button>
-        <button #navTop mat-fab color="primary" (click)="goto_top($event)" class="markdown-showup" *ngIf="true">
+        <button #navTop mat-fab color="primary" (click)="goto_top($event)" class="markdown-showup" *ngIf="true" matTooltip="回到顶部" matTooltipPosition="left">
                 <mat-icon class="big-icon">arrow_upward</mat-icon></button>
 
 

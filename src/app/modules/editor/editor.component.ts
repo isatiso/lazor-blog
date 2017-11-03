@@ -5,6 +5,7 @@ import { trigger, state, style, animate, transition } from '@angular/animations'
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 import { MarkdownDirective } from 'directive/markdown.directive';
+import { Category } from 'data-struct-definition';
 
 declare var Prism: any;
 
@@ -87,8 +88,11 @@ export class EditorComponent implements OnInit, OnDestroy {
         if (this.article_id === 'new-article') {
             const current_editor = JSON.parse(window.localStorage.getItem('current_editor'));
             if (current_editor) {
-                this.content = current_editor['content'];
-                this.title = current_editor['title'];
+                this.content = current_editor['content'] ? current_editor['content'] : '';
+                this.title = current_editor['title'] ? current_editor['title'] : '';
+            } else {
+                this.content = '';
+                this.title = '';
             }
             this.current_category = JSON.parse(window.localStorage.getItem('current_category'));
             if (this.current_category) {
@@ -97,6 +101,10 @@ export class EditorComponent implements OnInit, OnDestroy {
         } else {
             this._http.get('/middle/article?article_id=' + this.article_id).subscribe(
                 res => {
+                    if (!res['result'] && res['status'] === 4004) {
+                        this._router.navigate(['/home']);
+                        return;
+                    }
                     console.log(res);
                     this.content = res['data']['content'];
                     this.title = res['data']['title'];
@@ -107,6 +115,9 @@ export class EditorComponent implements OnInit, OnDestroy {
                         user_id: res['data']['user_id']
                     };
                     this.current_category_id = res['data']['category_id'];
+                },
+                error => {
+                    console.log(error);
                 }
             );
 
@@ -125,6 +136,7 @@ export class EditorComponent implements OnInit, OnDestroy {
         setTimeout(() => {
             this.content_rows = this.content_ref.nativeElement.style.height.slice(0, -2) / 18 - 2;
         }, 100);
+        console.log('content', this.content);
     }
 
     ngOnDestroy() {
@@ -214,11 +226,13 @@ export class EditorComponent implements OnInit, OnDestroy {
         if (event.view.innerWidth - this.nav_zone_width / 3 <= event.x && event.x <= event.view.innerWidth) {
             if (!this.right_nav_show) {
                 this.right_nav_show = true;
-                this.nav_view._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(2)';
-                this.nav_top._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(2) translateY(-60px)';
-                this.nav_home._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(2) translateY(60px)';
-                this.nav_add_image._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(2) translateY(120px)';
-                this.nav_add_latex._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(2) translateY(180px)';
+                this.nav_top._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5) translateY(-120px)';
+                this.nav_view._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5) translateY(-60px)';
+                this.nav_add_image._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5)';
+                this.nav_add_latex._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5) translateY(60px)';
+                this.nav_home._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5) translateY(120px)';
+
+
             }
         } else if (event.view.innerWidth - this.nav_zone_width > event.x) {
             if (this.left_nav_show || this.right_nav_show) {
@@ -308,10 +322,13 @@ export class EditorComponent implements OnInit, OnDestroy {
     }
 
     upload_file(event) {
+
         const file = new FormData(this.image_form.nativeElement);
+        this.article_status = 'modified';
         this.image_upload.nativeElement.value = '';
         this._http.put('/middle/file', file).subscribe(
             res => {
+                console.log('content', this.content);
                 const content_index = this.content_ref.nativeElement.selectionStart;
                 const file_path = 'https://lazor.cn' + res['data']['file_path'];
                 const left = this.content.slice(0, content_index);
@@ -400,6 +417,7 @@ export class EditorComponent implements OnInit, OnDestroy {
         }).afterClosed().subscribe(
             res => {
                 if (res) {
+                    this.article_status = 'modified';
                     const escaped_string = encodeURIComponent(res).replace(
                         /[!'()*]/g,
                         (char) => {
@@ -422,12 +440,7 @@ export class EditorComponent implements OnInit, OnDestroy {
     }
 }
 
-export interface Category {
-    category_id: string;
-    category_name: string;
-    category_type: string;
-    user_id: string;
-}
+
 
 @Component({
     selector: 'la-input',
