@@ -2,7 +2,7 @@ import { Injectable, Input } from '@angular/core';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { Account } from 'data-struct-definition';
+import { Account } from 'public/data-struct-definition';
 
 @Injectable()
 export class AccountService {

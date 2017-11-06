@@ -55,7 +55,7 @@ export class ArticleOwnerGuard implements CanActivate {
             error => {
                 this._router.navigate(['/auth']);
                 this.account.data = null;
-                window.sessionStorage.setItem('user_name', null);
+                window.localStorage.setItem('user_name', null);
                 return new Observable<boolean>();
             },
         );

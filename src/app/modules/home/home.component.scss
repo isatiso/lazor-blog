@@ -8,7 +8,9 @@
         right: 3%;
         top: 20px;
         button {
+            font-family: Zcool_fun, Raleway, Arial, Helvetica, sans-serif;
             margin-left: 20px;
+            font-size: 20px;
         }
     }
     .home-title {
@@ -27,8 +29,17 @@
         width: 400px;
         .category-item {
             background-color: map-get($accent, 200);
+            mat-panel-title {
+                font-family: Zcool_fun, Raleway, Arial, Helvetica, sans-serif;
+                font-size: 20px;
+            }
             button {
                 margin-left: 20px;
+                font-family: Zcool_fun, Raleway, Arial, Helvetica, sans-serif;
+                font-size: 20px;
+            }
+            .mate-menu-content .mat-menu-item {
+                font-family: Zcool_fun, Raleway, Arial, Helvetica, sans-serif;
             }
         }
     }
@@ -56,6 +67,7 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        font-size: 16px;
     }
 }
 

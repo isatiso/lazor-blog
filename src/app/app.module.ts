@@ -19,6 +19,8 @@ import { MarkdownDirective } from 'directive/markdown.directive';
 import { NavProfileService } from 'service/nav-profile/nav-profile.service';
 import { MarkdownService } from 'service/markdown/markdown.service';
 import { AccountService } from 'service/account/account.service';
+import { CategoryDatabaseService } from 'service/category-database/category-database.service';
+import { ArticleDatabaseService } from 'service/article-database/article-database.service';
 import { AuthGuard } from 'guard/auth.guard';
 import { ArticleOwnerGuard } from 'guard/article-owner.guard';
 
@@ -43,6 +45,8 @@ import { ArticleOwnerGuard } from 'guard/article-owner.guard';
         NavProfileService,
         MarkdownService,
         AccountService,
+        CategoryDatabaseService,
+        ArticleDatabaseService,
         HttpClient,
         MatSnackBar,
         AuthGuard,

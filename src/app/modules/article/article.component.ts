@@ -5,7 +5,8 @@ import { HttpClient } from '@angular/common/http';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 import { MarkdownDirective } from 'directive/markdown.directive';
-import { Article } from 'data-struct-definition';
+import { ArticleDatabaseService } from 'service/article-database/article-database.service';
+import { Article } from 'public/data-struct-definition';
 
 declare var Prism: any;
 
@@ -44,6 +45,7 @@ export class ArticleComponent implements OnInit, OnDestroy {
         private _http: HttpClient,
         private _router: Router,
         private _activate_route: ActivatedRoute,
+        private _article_db: ArticleDatabaseService,
         public dialog: MatDialog,
     ) { }
 
@@ -51,23 +53,14 @@ export class ArticleComponent implements OnInit, OnDestroy {
         document.body.scrollTop = 0;
         this.article_exists = 'active';
         this.article_id = this._activate_route.params['value']['id'];
-        this._http.get('/middle/article?article_id=' + this.article_id).subscribe(
-            res => {
-                if (!res['result'] && res['status'] === 4004) {
-                    const navigationExtras: NavigationExtras = {
-                        queryParams: {
-                            'message': 'Sorry, we can\'t find this article.',
-                        }
-                    };
-                    this._router.navigate(['/error'], navigationExtras);
-                    return;
-                }
-                console.log(res);
-                this.content = res['data']['content'];
-                this.title = res['data']['title'];
-                this.article_create_time = res['data']['create_time'] * 1000;
-                this.article_user_name = res['data']['username'];
-            });
+        this._article_db.fetch(this.article_id).subscribe(
+            data => {
+                this.content = data['content'];
+                this.title = data['title'];
+                this.article_create_time = data['create_time'] * 1000;
+                this.article_user_name = data['username'];
+            }
+        );
     }
 
     ngOnDestroy() {
@@ -155,7 +148,7 @@ export class PreviewComponent implements OnInit {
     ngOnInit() {
         setTimeout(() => {
             this.dialogRef.updateSize(
-                this.image.nativeElement.naturalWidth + 48 + 'px', 
+                this.image.nativeElement.naturalWidth + 48 + 'px',
                 this.image.nativeElement.naturalHeight + 48 + 'px');
         }, 0);
     }

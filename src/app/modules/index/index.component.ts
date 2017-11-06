@@ -8,7 +8,7 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 
 import { NavProfileService } from 'service/nav-profile/nav-profile.service';
-import { ArticleData } from 'data-struct-definition';
+import { ArticleData } from 'public/data-struct-definition';
 
 @Component({
     selector: 'la-index',

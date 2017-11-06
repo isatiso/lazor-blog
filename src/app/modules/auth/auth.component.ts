@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 
 import { AccountService } from 'service/account/account.service';
-import { Account } from 'data-struct-definition';
+import { Account } from 'public/data-struct-definition';
 
 @Component({
     selector: 'la-auth',
@@ -61,6 +61,15 @@ export class AuthComponent implements OnInit, OnDestroy {
     ngOnInit() {
         document.body.scrollTop = 0;
         this.auth_exists = 'active';
+        this._http.get('/middle/guard/auth').subscribe(
+            data => {
+                if (data['result'] === 1) {
+                    window.localStorage.setItem('user_name', data['data']['user_name']);
+                    this.account.data = data['data'];
+                    this._router.navigate(['/home']);
+                }
+            },
+        );
     }
 
     ngOnDestroy() {

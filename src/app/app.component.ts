@@ -51,7 +51,8 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit, AfterView
     ) { }
 
     ngOnInit() {
-
+        console.log('app init');
+        window.sessionStorage.clear();
         if (this.router.url === '/home' || this.router.url === '/') {
             this.height_limit = 276;
         }

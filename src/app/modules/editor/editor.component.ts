@@ -2,10 +2,11 @@ import { Component, OnInit, OnDestroy, ViewChild, Inject } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { HttpClient, HttpRequest } from '@angular/common/http';
 import { trigger, state, style, animate, transition } from '@angular/animations';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatSnackBar, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 import { MarkdownDirective } from 'directive/markdown.directive';
-import { Category } from 'data-struct-definition';
+import { ArticleDatabaseService } from 'service/article-database/article-database.service';
+import { Category } from 'public/data-struct-definition';
 
 declare var Prism: any;
 
@@ -23,12 +24,6 @@ declare var Prism: any;
             })),
             transition('* => active', animate('300ms ease-in'))
         ]),
-        // trigger('navAppear', [
-        //     state('active', style({
-        //         opacity: 1
-        //     })),
-        //     transition('* => active', animate('300ms ease-in'))
-        // ])
     ]
 })
 export class EditorComponent implements OnInit, OnDestroy {
@@ -37,6 +32,8 @@ export class EditorComponent implements OnInit, OnDestroy {
     public title = '';
     public content = '';
     public content_rows = 0;
+    public user_name = window.localStorage.getItem('user_name');
+    public article_create_time = '';
     public current_category: Category;
     public current_category_id = '';
     public categories = [];
@@ -61,7 +58,6 @@ export class EditorComponent implements OnInit, OnDestroy {
     private article_status = 'published';
     private current_scroll_top = 0;
 
-    // @ViewChild('navLeft') nav_left;
     @ViewChild('navView') nav_view;
     @ViewChild('navTop') nav_top;
     @ViewChild('navHome') nav_home;
@@ -78,7 +74,9 @@ export class EditorComponent implements OnInit, OnDestroy {
         private _http: HttpClient,
         private _router: Router,
         private _activate_route: ActivatedRoute,
+        private _article_db: ArticleDatabaseService,
         public dialog: MatDialog,
+        public snack_bar: MatSnackBar,
     ) { }
 
     ngOnInit() {
@@ -94,45 +92,41 @@ export class EditorComponent implements OnInit, OnDestroy {
                 this.content = '';
                 this.title = '';
             }
-            this.current_category = JSON.parse(window.localStorage.getItem('current_category'));
+            const current_category = window.localStorage.getItem('current_category');
+            this.current_category = current_category ? JSON.parse(current_category) : null;
             if (this.current_category) {
                 this.current_category_id = this.current_category.category_id;
             }
         } else {
-            this._http.get('/middle/article?article_id=' + this.article_id).subscribe(
-                res => {
-                    if (!res['result'] && res['status'] === 4004) {
-                        this._router.navigate(['/home']);
-                        return;
-                    }
-                    console.log(res);
-                    this.content = res['data']['content'];
-                    this.title = res['data']['title'];
+            this._article_db.fetch(this.article_id).subscribe(
+                data => {
+                    this.article_create_time = data['create_time'];
+                    this.user_name = data['user_name'];
+                    this.content = data['content'];
+                    this.title = data['title'];
                     this.current_category = {
-                        category_id: res['data']['category_id'],
-                        category_name: res['data']['category_name'],
-                        category_type: res['data']['category_type'],
-                        user_id: res['data']['user_id']
+                        category_id: data['category_id'],
+                        category_name: data['category_name'],
+                        category_type: data['category_type'],
+                        user_id: data['user_id']
                     };
-                    this.current_category_id = res['data']['category_id'];
-                },
-                error => {
-                    console.log(error);
+                    this.current_category_id = data['category_id'];
                 }
             );
-
         }
 
-
+        window.onkeydown = (event => {
+            if (event.key === 's' && event.ctrlKey) {
+                // console.log(event, this.article_status);
+                this.modify_button_move();
+                return false;
+            }
+        });
         const total_width = document.body.clientWidth;
         const editor_width = this.editor_container.nativeElement.clientWidth;
         let nav_width = (total_width - editor_width) / 2;
         nav_width = nav_width > 50 ? nav_width : 50;
-        // this.nav_left.nativeElement.style.width = nav_width + 'px';
-        // this.nav_right.nativeElement.style.width = nav_width + 'px';
         this.editor_exists = 'active';
-        // console.log(this.nav_left);
-        // this.nav_left.nativeElement.style.width
         setTimeout(() => {
             this.content_rows = this.content_ref.nativeElement.style.height.slice(0, -2) / 18 - 2;
         }, 100);
@@ -140,6 +134,7 @@ export class EditorComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
+        window.onkeydown = null;
         this.editor_exists = 'inactive';
         if (this.article_id === 'new-article') {
             const current_editor = { 'title': this.title, 'content': this.content };
@@ -147,17 +142,16 @@ export class EditorComponent implements OnInit, OnDestroy {
         }
     }
 
-    // scroll_top() {
-    //     this._scrollor.scroll_top(this.element);
-    // }
-
-    // scroll_bottom() {
-    //     this._scrollor.scroll_bottom(this.element);
-    // }
-
-    // figure_pos() {
-    //     this._scrollor.figure_pos(this.element);
-    // }
+    raiseSnackBar(message: string, action_name: string, action) {
+        const snack_ref = this.snack_bar.open(
+            message,
+            action_name,
+            {
+                duration: 2000
+            }
+        );
+        snack_ref.onAction().subscribe(action);
+    }
 
     figure_scroll_top() {
         if (this.element.scrollTop > 100) {
@@ -247,6 +241,12 @@ export class EditorComponent implements OnInit, OnDestroy {
         }
     }
 
+    set_scroll_top(event) {
+        // console.log(event);
+        // this.current_scroll_top = document.body.scrollTop;
+        // console.log('onscroll', this.current_scroll_top);
+    }
+
     save_article() {
         if (this.article_id === 'new-article') {
             this._http.put('/middle/article', {
@@ -259,6 +259,7 @@ export class EditorComponent implements OnInit, OnDestroy {
                     this.article_id = res['data']['article_id'];
                     window.localStorage.setItem('current_editor', JSON.stringify({}));
                     this._router.navigate(['/editor/' + res['data']['article_id']]);
+                    this.raiseSnackBar('Save Article Successfully.', 'OK', null);
                 });
         } else {
             this._http.post('/middle/article', {
@@ -268,7 +269,14 @@ export class EditorComponent implements OnInit, OnDestroy {
                 category_id: this.current_category_id,
             }).subscribe(
                 res => {
-                    console.log(res);
+                    this.raiseSnackBar('Save Article Successfully.', 'OK', null);
+                    window.sessionStorage.setItem('article-' + this.article_id, JSON.stringify({
+                        article_id: this.article_id,
+                        article_content: this.content,
+                        article_title: this.title,
+                        article_create_time: this.article_create_time,
+                        article_user_name: this.user_name
+                    }));
                 });
         }
     }
@@ -276,10 +284,11 @@ export class EditorComponent implements OnInit, OnDestroy {
     publish_article() {
         this._http.post('/middle/article/publish-state', {
             article_id: this.article_id,
-            publish_state: 1
+            publish_status: 1
         }).subscribe(
             res => {
                 console.log(res);
+                this.raiseSnackBar('Publish Article Successfully.', 'OK', null);
             });
     }
 
@@ -322,13 +331,11 @@ export class EditorComponent implements OnInit, OnDestroy {
     }
 
     upload_file(event) {
-
         const file = new FormData(this.image_form.nativeElement);
         this.article_status = 'modified';
         this.image_upload.nativeElement.value = '';
         this._http.put('/middle/file', file).subscribe(
             res => {
-                console.log('content', this.content);
                 const content_index = this.content_ref.nativeElement.selectionStart;
                 const file_path = 'https://lazor.cn' + res['data']['file_path'];
                 const left = this.content.slice(0, content_index);
@@ -345,35 +352,29 @@ export class EditorComponent implements OnInit, OnDestroy {
     }
 
     set_modify_status(event) {
+        if (event.key === 'Shift' || event.key === 'Control' || event.key === 'Alt') {
+            return event;
+        }
+        if (event.key === 's' && event.ctrlKey) {
+            return event;
+        }
         this.article_status = 'modified';
-        // console.log(this.content_ref.nativeElement.style.height);
         if (event.keyCode === 'Enter') {
-            // this.content_rows = this.content_ref.nativeElement.style.height.slice(0, -2) / 18 - 2;
             this.content_rows += 1;
         } else if (event.key === 'Backspace' || event.key === 'Delete') {
             this.content_rows = this.content.split('\n').length;
-            // console.log('tmp content rows', this.content_rows, this.content_ref);
             setTimeout(() => {
                 this.content_rows = this.content_ref.nativeElement.style.height.slice(0, -2) / 18 - 2;
-                // this.content_rows = this.content.split('\n').length;
             }, 100);
         }
-        // console.log('content_rows', this.content_rows);
     }
 
     set_content_rows_plus(event) {
         this.content_rows += 1;
-        console.log(this.content_rows);
     }
 
     set_content_rows(event) {
         this.content_rows = this.content_ref.nativeElement.style.height.slice(0, -2) / 18 - 2;
-    }
-
-    set_scroll_top(event) {
-        // console.log(event);
-        // this.current_scroll_top = document.body.scrollTop;
-        // console.log('onscroll', this.current_scroll_top);
     }
 
     figure_modify_button() {
@@ -404,7 +405,6 @@ export class EditorComponent implements OnInit, OnDestroy {
 
     resetChange(e) {
         this.content_rows = this.content_ref.nativeElement.style.height.slice(0, -2) / 18;
-        console.log('change');
     }
 
     insert_latex(event) {
@@ -437,6 +437,11 @@ export class EditorComponent implements OnInit, OnDestroy {
                     }, 0);
                 }
             });
+    }
+
+    save_action(event) {
+        event.preventDefault();
+        return false;
     }
 }
 

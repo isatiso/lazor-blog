@@ -9,7 +9,8 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 
 import { NavProfileService } from 'service/nav-profile/nav-profile.service';
-import { ArticleData } from 'data-struct-definition';
+import { CategoryDatabaseService } from 'service/category-database/category-database.service';
+import { ArticleData, Category } from 'public/data-struct-definition';
 
 @Component({
     selector: 'la-home',
@@ -40,24 +41,19 @@ import { ArticleData } from 'data-struct-definition';
             state('0', style({
                 backgroundColor: '#f0f0f0',
             })),
-            // transition('void => 0', animate('0ms ease-in')),
-            transition('1 <=> 0', animate('0ms ease-in'))
+            transition('void => 1', animate('300ms ease-in')),
+            transition('1 <=> 0', animate('300ms ease-in'))
         ]),
     ]
 })
 export class HomeComponent implements OnInit, OnDestroy {
 
     home_exists = 'active';
-    displayedColumns = [
-        'title',
-        // 'author',
-        // 'category',
-        // 'create_time'
-    ];
-    articleDatabase = new ArticleDatabase();
+    displayedColumns = ['title'];
     dataSource: ArticleDataSource | null;
     categories = [];
-    current_category = '';
+    current_category = null;
+    current_category_id = '';
     operator_status = false;
     step = 0;
     new_category_name = null;
@@ -67,6 +63,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     constructor(
         private _http: HttpClient,
         private _router: Router,
+        private _category_db: CategoryDatabaseService,
         private snack_bar: MatSnackBar,
         public dialog: MatDialog,
     ) { }
@@ -74,9 +71,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     ngOnInit() {
         document.body.scrollTop = 0;
         this.home_exists = 'active';
-        this.dataSource = new ArticleDataSource(this.articleDatabase);
-        this.user_name = window.sessionStorage.getItem('user_name');
+        this.dataSource = new ArticleDataSource(this._category_db);
+        this.user_name = window.localStorage.getItem('user_name');
+        const current_category = window.localStorage.getItem('current_category');
+        this.current_category = current_category ? JSON.parse(current_category) : {};
         this.query_category_and_article();
+
     }
 
     ngOnDestroy() {
@@ -84,21 +84,17 @@ export class HomeComponent implements OnInit, OnDestroy {
         window.localStorage.setItem('current_category', JSON.stringify(this.current_category));
     }
 
-    setStep(category) {
-        // this.current_category = category;
-        // console.log(category);
-        if (this.current_category['category_id'] !== category['category_id']) {
+    set_step(category) {
+        if (this.current_category_id !== category['category_id']) {
             this.current_category = category;
+            this.current_category_id = category['category_id'];
             this.query_article_list();
         }
         this.operator_status = false;
-        // console.log(this.deleteBtn);
     }
 
     click_category(event) {
-        // console.log('click_category');
         event.stopPropagation();
-        // console.log(event);
         return false;
     }
 
@@ -109,9 +105,9 @@ export class HomeComponent implements OnInit, OnDestroy {
                 if (res['data']) {
                     this.categories = res['data'];
                     if (current_category) {
-                        this.setStep(current_category);
+                        this.set_step(current_category);
                     } else {
-                        this.setStep(this.categories[0]);
+                        this.set_step(this.categories[0]);
                     }
                 } else {
                     this.categories = [];
@@ -125,16 +121,21 @@ export class HomeComponent implements OnInit, OnDestroy {
             res => {
                 if (res['data']) {
                     this.categories = res['data'];
-                    console.log(res['data']);
-                    this.setStep(this.categories[0]);
-                    this._http.get(
-                        '/middle/article/user-list?category_id=' + this.current_category['category_id']
-                    ).subscribe(
-                        article_res => {
-                            this.articleDatabase.dataChange.next(article_res['data']);
-                            console.log();
-                        }
-                        );
+                    const current_category_exists = this.categories.filter(
+                        ctg => {
+                            if (ctg['category_id'] === this.current_category['category_id']) {
+                                return true;
+                            }
+                            return false;
+                        }).length;
+                    if (current_category_exists) {
+                        this.set_step(this.current_category);
+                    } else {
+                        this.set_step(this.categories[0]);
+                    }
+
+                    this._category_db.update(this.current_category['category_id']);
+
                 } else {
                     this.categories = [];
                 }
@@ -189,7 +190,6 @@ export class HomeComponent implements OnInit, OnDestroy {
         }
         this._http.delete('/middle/category?category_id=' + category_id).subscribe(
             res => {
-                // console.log(res);
                 this.current_category = '';
                 this.query_category();
             }
@@ -206,18 +206,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     query_article_list() {
-        this._http.get('/middle/article/user-list?category_id=' + this.current_category['category_id']).subscribe(
-            res => {
-                console.log(res);
-                this.articleDatabase.dataChange.next(res['data']);
-
-            }
-        );
-    }
-
-    show_operator(event) {
-        this.operator_status = true;
-        console.log(event);
+        this._category_db.update(this.current_category['category_id']);
     }
 
     print(event) {
@@ -225,22 +214,13 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 }
 
-export class ArticleDatabase {
-    dataChange: BehaviorSubject<ArticleData[]> = new BehaviorSubject<ArticleData[]>([]);
-
-    get data(): ArticleData[] { return this.dataChange.value; }
-
-    constructor() {
-    }
-}
-
 export class ArticleDataSource extends DataSource<any> {
-    constructor(private _exampleDatabase: ArticleDatabase) {
+    constructor(private _db: CategoryDatabaseService) {
         super();
     }
 
     connect(): Observable<ArticleData[]> {
-        return this._exampleDatabase.dataChange;
+        return this._db.dataExchange;
     }
 
     disconnect() { }

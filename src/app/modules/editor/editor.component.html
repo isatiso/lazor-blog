@@ -19,10 +19,10 @@
         </div>
         <div class="divider"></div>
         <mat-tab-group MatTabGroup dynamicHeight="true" [selectedIndex]="tab_select" (selectedIndexChange)="select_change($event)">
-            <mat-tab label="Editor">
+            <mat-tab label="{{ article_status === 'modified' ? '●' : ''}} Editor">
                 <div class="input-test" id="tab1">
                     <mat-input-container class="editor-input">
-                        <textarea matInput matTextareaAutosize [(ngModel)]="content" [matAutosizeMinRows]="content_rows" (keydown)="set_modify_status($event)" (paste)="set_modify_status($event)" #contentRef></textarea>
+                        <textarea matInput matTextareaAutosize [(ngModel)]="content" [matAutosizeMinRows]="content_rows" (keyup)="set_modify_status($event)" (paste)="set_modify_status($event)" #contentRef></textarea>
                     </mat-input-container>
                 </div>
             </mat-tab>

@@ -42,11 +42,11 @@ export class AuthGuard implements CanActivate {
             data => {
                 if (data['result'] !== 1) {
                     this._router.navigate(['/auth']);
-                    window.sessionStorage.setItem('user_name', null);
+                    window.localStorage.setItem('user_name', null);
                     this.account.data = null;
                     return false;
                 } else {
-                    window.sessionStorage.setItem('user_name', data['data']['user_name']);
+                    window.localStorage.setItem('user_name', data['data']['user_name']);
                     this.account.data = data['data'];
                     return true;
                 }
@@ -55,7 +55,7 @@ export class AuthGuard implements CanActivate {
             error => {
                 this._router.navigate(['/auth']);
                 this.account.data = null;
-                window.sessionStorage.setItem('user_name', null);
+                window.localStorage.setItem('user_name', null);
                 return new Observable<boolean>();
             },
         );
