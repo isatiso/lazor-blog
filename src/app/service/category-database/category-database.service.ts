@@ -6,18 +6,19 @@ import { ArticleData } from 'public/data-struct-definition';
 
 @Injectable()
 export class CategoryDatabaseService {
-    dataExchange: BehaviorSubject<ArticleData[]> = new BehaviorSubject<ArticleData[]>([]);
+    home_list: BehaviorSubject<ArticleData[]> = new BehaviorSubject<ArticleData[]>([]);
+    index_list: BehaviorSubject<ArticleData[]> = new BehaviorSubject<ArticleData[]>([]);
 
     constructor(
         private _http: HttpClient,
     ) { }
 
     get data(): ArticleData[] {
-        return this.dataExchange.value;
+        return this.home_list.value;
     }
 
     set data(source: ArticleData[]) {
-        this.dataExchange.next(source);
+        this.home_list.next(source);
     }
 
     update(category_id: string) {
@@ -36,6 +37,17 @@ export class CategoryDatabaseService {
         } else {
             this.data = JSON.parse(cache_info);
         }
+    }
+
+    shuffle(limit: number) {
+        this._http.get('/middle/article/index-list?limit=' + limit).subscribe(
+            res => {
+                this.index_list.next(res['data']);
+            },
+            error => {
+                console.log(error);
+            }
+        );
     }
 }
 

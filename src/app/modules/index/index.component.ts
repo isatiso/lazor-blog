@@ -8,6 +8,7 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 
 import { NavProfileService } from 'service/nav-profile/nav-profile.service';
+import { CategoryDatabaseService } from 'service/category-database/category-database.service';
 import { ArticleData } from 'public/data-struct-definition';
 
 @Component({
@@ -38,7 +39,6 @@ export class IndexComponent implements OnInit, OnDestroy {
     banner_exists = 'active';
     index_exists = 'active';
     content_rows = 30;
-    articleDatabase = new ArticleDatabase();
     dataSource: ArticleDataSource | null;
     displayedColumns = [
         'title',
@@ -52,13 +52,14 @@ export class IndexComponent implements OnInit, OnDestroy {
         private _http: HttpClient,
         private _router: Router,
         private el: ElementRef,
+        private _category_db: CategoryDatabaseService,
         private nav_profile: NavProfileService
     ) { }
 
     ngOnInit() {
         document.body.scrollTop = 0;
         this.index_exists = 'active';
-        this.dataSource = new ArticleDataSource(this.articleDatabase);
+        this.dataSource = new ArticleDataSource(this._category_db);
         this.nav_profile.navbarWidth = this.el.nativeElement.firstChild.clientWidth;
         this.query_article_list();
     }
@@ -77,30 +78,17 @@ export class IndexComponent implements OnInit, OnDestroy {
     }
 
     query_article_list() {
-        this._http.get('/middle/article/index-list').subscribe(
-            res => {
-                this.articleDatabase.dataChange.next(res['data']);
-            }
-        );
-    }
-}
-
-export class ArticleDatabase {
-    dataChange: BehaviorSubject<ArticleData[]> = new BehaviorSubject<ArticleData[]>([]);
-
-    get data(): ArticleData[] { return this.dataChange.value; }
-
-    constructor() {
+        this._category_db.shuffle(10);
     }
 }
 
 export class ArticleDataSource extends DataSource<any> {
-    constructor(private _exampleDatabase: ArticleDatabase) {
+    constructor(private _db: CategoryDatabaseService) {
         super();
     }
 
     connect(): Observable<ArticleData[]> {
-        return this._exampleDatabase.dataChange;
+        return this._db.index_list;
     }
 
     disconnect() { }

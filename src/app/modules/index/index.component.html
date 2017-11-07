@@ -5,12 +5,14 @@
     <mat-card>
 
         <!-- <div class="divider"></div> -->
-        <p class="content">这是本着自己做的工具最好用的想法，实现的一个博客网站。</p>
+        <div class="title">最新发布</div>
+        <!-- <p class="content">这是本着自己做的工具最好用的想法，实现的一个博客网站。最初用的CSDN的博客，但是感觉显示效果不够美观，而且广告太多。后来换成简书，但是又不支持公式，</p> -->
+        <!-- <p class="content"></p> -->
         <div class="article-list">
             <mat-table #table [dataSource]="dataSource">
 
                 <ng-container cdkColumnDef="title" aria-colspan="2">
-                    <mat-header-cell *cdkHeaderCellDef> Title </mat-header-cell>
+                    <mat-header-cell *cdkHeaderCellDef> Article </mat-header-cell>
                     <mat-cell *cdkCellDef="let row" class="title-ceil"><a mat-button routerLink="/article/{{row.article_id}}" color="primary">{{row.title ? row.title : 'Untitled'}}</a></mat-cell>
                 </ng-container>
 

@@ -220,7 +220,7 @@ export class ArticleDataSource extends DataSource<any> {
     }
 
     connect(): Observable<ArticleData[]> {
-        return this._db.dataExchange;
+        return this._db.home_list;
     }
 
     disconnect() { }

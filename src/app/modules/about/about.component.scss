@@ -1,3 +1,42 @@
+@import '../../../assets/scss/material_theming.scss';
 .about-container {
     opacity: 0;
+}
+
+.divider {
+    padding: 0;
+    margin: 0;
+    height: 4px;
+    width: 100%;
+    background-color: map-get($accent, 400);
+    margin-top: 30px;
+    margin-bottom: 40px;
+}
+
+.container {
+    padding: 30px;
+    margin: 0 auto;
+    margin-top: 64px;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 1280px;
+}
+
+.title {
+    font-family: Zcool_fun, Raleway, Arial, Helvetica, sans-serif;
+    font-size: 56px;
+    padding-bottom: 20px;
+}
+
+.content {
+    font-family: Raleway, Arial, Helvetica, sans-serif;
+    font-size: 1.5em;
+}
+
+a.link {
+    color: map-get($mat-blue, 500);
+    text-decoration: none;
+    &:hover {
+        color: map-get($mat-orange, 500);
+    }
 }

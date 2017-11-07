@@ -5,7 +5,8 @@ import 'rxjs/add/observable/throw';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
 
-import * as  marked from 'marked';
+// A javascript lib has import, so here is just a delaration
+declare var marked: any;
 
 @Injectable()
 export class MarkdownService {
