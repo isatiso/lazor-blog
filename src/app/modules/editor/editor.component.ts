@@ -1,11 +1,12 @@
 import { Component, OnInit, OnDestroy, ViewChild, Inject } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { HttpClient, HttpRequest } from '@angular/common/http';
+import { HttpClient, HttpRequest, HttpEventType, HttpResponse } from '@angular/common/http';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { MatSnackBar, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 import { MarkdownDirective } from 'directive/markdown.directive';
 import { ArticleDatabaseService } from 'service/article-database/article-database.service';
+import { SnackBarService } from 'service/snack-bar/snack-bar.service';
 import { Category } from 'public/data-struct-definition';
 
 declare var Prism: any;
@@ -24,13 +25,25 @@ declare var Prism: any;
             })),
             transition('* => active', animate('300ms ease-in'))
         ]),
+        trigger('progressAppear', [
+            state('active', style({
+                opacity: 1,
+            })),
+            state('inactive', style({
+                opacity: 0,
+            })),
+            transition('* <=> active', animate('200ms ease-out'))
+        ]),
     ]
 })
 export class EditorComponent implements OnInit, OnDestroy {
 
     editor_exists = 'active';
-    public title = '';
-    public content = '';
+    progress_value = 0;
+    render_latex = false;
+    article_object = {};
+    public title_data = '';
+    public content_data = '';
     public content_rows = 0;
     public user_name = window.localStorage.getItem('user_name');
     public article_create_time = '';
@@ -52,6 +65,7 @@ export class EditorComponent implements OnInit, OnDestroy {
     public show_scroll: boolean;
     public current_article_id = '';
     public options;
+    public progress_state = 'inactive';
     private nav_zone_width = 125;
     private left_nav_show = false;
     private right_nav_show = false;
@@ -62,12 +76,14 @@ export class EditorComponent implements OnInit, OnDestroy {
     @ViewChild('navTop') nav_top;
     @ViewChild('navHome') nav_home;
     @ViewChild('navAddImage') nav_add_image;
-    @ViewChild('navAddLatex') nav_add_latex;
+    // @ViewChild('navAddLatex') nav_add_latex;
     @ViewChild('editorContainer') editor_container;
     @ViewChild('imageForm') image_form;
     @ViewChild('imageUpload') image_upload;
     @ViewChild('titleRef') title_ref;
     @ViewChild('contentRef') content_ref;
+    @ViewChild('progressBarContainer') progress_bar_container;
+    @ViewChild('progressBar') progress_bar;
     @ViewChild('divEditor') div_editor;
 
     constructor(
@@ -75,14 +91,38 @@ export class EditorComponent implements OnInit, OnDestroy {
         private _router: Router,
         private _activate_route: ActivatedRoute,
         private _article_db: ArticleDatabaseService,
+        public snack_bar: SnackBarService,
         public dialog: MatDialog,
-        public snack_bar: MatSnackBar,
+        // public snack_bar: MatSnackBar,
     ) { }
+
+    get content(): string {
+        return this.content_data;
+    }
+
+    set content(value: string) {
+        this.content_data = value;
+        this.article_status = 'modified';
+        this.content_rows = this.content.split('\n').length;
+        setTimeout(() => {
+            this.content_rows = this.content_ref.nativeElement.style.height.slice(0, -2) / 28 - 2;
+        }, 100);
+    }
+
+    get title(): string {
+        return this.title_data;
+    }
+
+    set title(value: string) {
+        this.title_data = value;
+        this.article_status = 'modified';
+    }
 
     ngOnInit() {
         document.body.scrollTop = 0;
         this.article_id = this._activate_route.params['value']['id'];
         this.query_categories();
+        this.progress_bar.color = 'accent';
         if (this.article_id === 'new-article') {
             const current_editor = JSON.parse(window.localStorage.getItem('current_editor'));
             if (current_editor) {
@@ -97,9 +137,11 @@ export class EditorComponent implements OnInit, OnDestroy {
             if (this.current_category) {
                 this.current_category_id = this.current_category.category_id;
             }
+            this.article_status = 'saved';
         } else {
             this._article_db.fetch(this.article_id).subscribe(
                 data => {
+                    this.article_object = data;
                     this.article_create_time = data['create_time'];
                     this.user_name = data['user_name'];
                     this.content = data['content'];
@@ -111,17 +153,11 @@ export class EditorComponent implements OnInit, OnDestroy {
                         user_id: data['user_id']
                     };
                     this.current_category_id = data['category_id'];
+                    this.article_status = 'saved';
                 }
             );
         }
 
-        window.onkeydown = (event => {
-            if (event.key === 's' && event.ctrlKey) {
-                // console.log(event, this.article_status);
-                this.modify_button_move();
-                return false;
-            }
-        });
         const total_width = document.body.clientWidth;
         const editor_width = this.editor_container.nativeElement.clientWidth;
         let nav_width = (total_width - editor_width) / 2;
@@ -130,7 +166,6 @@ export class EditorComponent implements OnInit, OnDestroy {
         setTimeout(() => {
             this.content_rows = this.content_ref.nativeElement.style.height.slice(0, -2) / 18 - 2;
         }, 100);
-        console.log('content', this.content);
     }
 
     ngOnDestroy() {
@@ -142,17 +177,6 @@ export class EditorComponent implements OnInit, OnDestroy {
         }
     }
 
-    raiseSnackBar(message: string, action_name: string, action) {
-        const snack_ref = this.snack_bar.open(
-            message,
-            action_name,
-            {
-                duration: 2000
-            }
-        );
-        snack_ref.onAction().subscribe(action);
-    }
-
     figure_scroll_top() {
         if (this.element.scrollTop > 100) {
             this.show_scroll = true;
@@ -161,14 +185,6 @@ export class EditorComponent implements OnInit, OnDestroy {
             this.show_scroll = false;
             return false;
         }
-    }
-
-    select1() {
-        this.tab_select = 0;
-    }
-
-    select2() {
-        this.tab_select = 1;
     }
 
     toggle_select(event) {
@@ -200,7 +216,10 @@ export class EditorComponent implements OnInit, OnDestroy {
     select_change(event) {
         this.tab_select = event;
         if (event === 1) {
+            this.render_latex = true;
             Prism.highlightAll(false);
+        } else {
+            this.render_latex = false;
         }
     }
 
@@ -213,20 +232,13 @@ export class EditorComponent implements OnInit, OnDestroy {
     }
 
     show_nav_button(event) {
-        if (event.type !== 'mousemove') {
-            return event;
-        }
-
         if (event.view.innerWidth - this.nav_zone_width / 3 <= event.x && event.x <= event.view.innerWidth) {
             if (!this.right_nav_show) {
                 this.right_nav_show = true;
                 this.nav_top._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5) translateY(-120px)';
                 this.nav_view._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5) translateY(-60px)';
                 this.nav_add_image._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5)';
-                this.nav_add_latex._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5) translateY(60px)';
-                this.nav_home._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5) translateY(120px)';
-
-
+                this.nav_home._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5) translateY(60px)';
             }
         } else if (event.view.innerWidth - this.nav_zone_width > event.x) {
             if (this.left_nav_show || this.right_nav_show) {
@@ -236,15 +248,8 @@ export class EditorComponent implements OnInit, OnDestroy {
                 this.nav_top._elementRef.nativeElement.style.transform = 'translateX(80%)';
                 this.nav_home._elementRef.nativeElement.style.transform = 'translateX(80%)';
                 this.nav_add_image._elementRef.nativeElement.style.transform = 'translateX(80%)';
-                this.nav_add_latex._elementRef.nativeElement.style.transform = 'translateX(80%)';
             }
         }
-    }
-
-    set_scroll_top(event) {
-        // console.log(event);
-        // this.current_scroll_top = document.body.scrollTop;
-        // console.log('onscroll', this.current_scroll_top);
     }
 
     save_article() {
@@ -255,11 +260,10 @@ export class EditorComponent implements OnInit, OnDestroy {
                 category_id: this.current_category_id,
             }).subscribe(
                 res => {
-                    console.log(res);
                     this.article_id = res['data']['article_id'];
                     window.localStorage.setItem('current_editor', JSON.stringify({}));
                     this._router.navigate(['/editor/' + res['data']['article_id']]);
-                    this.raiseSnackBar('Save Article Successfully.', 'OK', null);
+                    this.snack_bar.show('Save Article Successfully.', 'OK', null);
                 });
         } else {
             this._http.post('/middle/article', {
@@ -269,14 +273,11 @@ export class EditorComponent implements OnInit, OnDestroy {
                 category_id: this.current_category_id,
             }).subscribe(
                 res => {
-                    this.raiseSnackBar('Save Article Successfully.', 'OK', null);
-                    window.sessionStorage.setItem('article-' + this.article_id, JSON.stringify({
-                        article_id: this.article_id,
-                        article_content: this.content,
-                        article_title: this.title,
-                        article_create_time: this.article_create_time,
-                        article_user_name: this.user_name
-                    }));
+                    this.snack_bar.show('Save Article Successfully.', 'OK', null);
+                    this.article_object['title'] = this.title;
+                    this.article_object['content'] = this.content;
+                    this.article_object['category_id'] = this.current_category_id;
+                    window.sessionStorage.setItem('article-' + this.article_id, JSON.stringify(this.article_object));
                 });
         }
     }
@@ -287,19 +288,16 @@ export class EditorComponent implements OnInit, OnDestroy {
             publish_status: 1
         }).subscribe(
             res => {
-                console.log(res);
-                this.raiseSnackBar('Publish Article Successfully.', 'OK', null);
+                this.snack_bar.show('Publish Article Successfully.', 'OK', null);
             });
     }
 
     delete_article() {
         this._http.delete('/middle/article?article_id=' + this.article_id).subscribe(
             res => {
-                console.log('success');
                 this._router.navigate(['/home']);
             },
             error => {
-                console.log('error', error);
             }
         );
     }
@@ -334,39 +332,39 @@ export class EditorComponent implements OnInit, OnDestroy {
         const file = new FormData(this.image_form.nativeElement);
         this.article_status = 'modified';
         this.image_upload.nativeElement.value = '';
-        this._http.put('/middle/file', file).subscribe(
-            res => {
-                const content_index = this.content_ref.nativeElement.selectionStart;
-                const file_path = 'https://lazor.cn' + res['data']['file_path'];
-                const left = this.content.slice(0, content_index);
-                const right = this.content.slice(content_index);
-                this.content = left + '![' + res['data']['file_name'] + '](' + file_path + ')\n' + right;
-                this.content_ref.nativeElement.focus();
-                setTimeout(() => {
-                    const pos = content_index + 2;
-                    const pos2 = pos + res['data']['file_name'].length;
-                    this.content_ref.nativeElement.setSelectionRange(pos, pos2);
-                }, 0);
+        const req = new HttpRequest('PUT', '/middle/file', file, {
+            reportProgress: true,
+        });
+        this.progress_bar.color = 'primary';
+        this.progress_state = 'active';
+        this._http.request(req).subscribe(
+            next => {
+                if (next.type === HttpEventType.UploadProgress) {
+                    const percentDone = Math.round(100 * next.loaded / next.total);
+                    this.progress_value = percentDone;
+                } else if (next instanceof HttpResponse) {
+                    const content_index = this.content_ref.nativeElement.selectionStart;
+                    const file_path = 'https://lazor.cn' + next.body['data']['file_path'];
+                    const left = this.content.slice(0, content_index);
+                    const right = this.content.slice(content_index);
+                    const content = `![${next.body['data']['file_name']}](${file_path})\n`;
+
+                    this.content = left + content + right;
+                    // this.content_ref.nativeElement.focus();
+                    setTimeout(() => {
+                        const pos = content_index + content.length;
+                        this.content_ref.nativeElement.setSelectionRange(pos, pos);
+                    }, 0);
+                    this.progress_bar.color = 'accent';
+                    this.progress_state = 'inactive';
+                    setTimeout(() => { this.progress_value = 0; }, 200);
+
+                }
+
+            },
+            error => {
             }
         );
-    }
-
-    set_modify_status(event) {
-        if (event.key === 'Shift' || event.key === 'Control' || event.key === 'Alt') {
-            return event;
-        }
-        if (event.key === 's' && event.ctrlKey) {
-            return event;
-        }
-        this.article_status = 'modified';
-        if (event.keyCode === 'Enter') {
-            this.content_rows += 1;
-        } else if (event.key === 'Backspace' || event.key === 'Delete') {
-            this.content_rows = this.content.split('\n').length;
-            setTimeout(() => {
-                this.content_rows = this.content_ref.nativeElement.style.height.slice(0, -2) / 18 - 2;
-            }, 100);
-        }
     }
 
     set_content_rows_plus(event) {
@@ -403,45 +401,26 @@ export class EditorComponent implements OnInit, OnDestroy {
         this.article_status = 'modified';
     }
 
-    resetChange(e) {
-        this.content_rows = this.content_ref.nativeElement.style.height.slice(0, -2) / 18;
-    }
-
-    insert_latex(event) {
-        this.dialog.open(InputComponent, {
-            width: '700px',
-            data: {
-                name: '',
-                placeholder: 'Enter Latex Code.'
-            }
-        }).afterClosed().subscribe(
-            res => {
-                if (res) {
-                    this.article_status = 'modified';
-                    const escaped_string = encodeURIComponent(res).replace(
-                        /[!'()*]/g,
-                        (char) => {
-                            return '%' + char.charCodeAt(0).toString(16);
-                        });
-                    const latex_string = 'https://latex.codecogs.com/gif.latex?' + escaped_string;
-                    const content_index = this.content_ref.nativeElement.selectionStart;
-                    const left = this.content.slice(0, content_index);
-                    const right = this.content.slice(content_index);
-                    this.content = left + '![' + res + '](' + latex_string + ')\n' + right;
-                    this.content_ref.nativeElement.value = left + '![' + res + '](' + latex_string + ')\n' + right;
-                    this.content_ref.nativeElement.focus();
-                    setTimeout(() => {
-                        const pos = content_index + 2;
-                        const pos2 = pos + res.length;
-                        this.content_ref.nativeElement.setSelectionRange(pos, pos2);
-                    }, 0);
-                }
-            });
-    }
-
     save_action(event) {
         event.preventDefault();
         return false;
+    }
+
+    change_tab(event) {
+        if (!event.ctrlKey || (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 's')) {
+            return event;
+        }
+        if (event.key === 'ArrowLeft') {
+
+            this.tab_select = 0;
+            setTimeout(() => { this.content_ref.nativeElement.focus(); }, 0);
+        } else if (event.key === 'ArrowRight') {
+            this.content_ref.nativeElement.blur();
+            this.tab_select = 1;
+        } else if (event.key === 's') {
+            this.modify_button_move();
+        }
+        event.preventDefault();
     }
 }
 

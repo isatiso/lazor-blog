@@ -33,7 +33,7 @@ import 'rxjs/add/operator/mergeMap';
         ]),
     ]
 })
-export class AppComponent implements OnInit, OnChanges, AfterViewInit, AfterViewChecked {
+export class AppComponent implements OnInit {
     navbar_exists = 'active';
     children_appear = 'active';
     title = 'Lazor Blog';
@@ -51,7 +51,6 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit, AfterView
     ) { }
 
     ngOnInit() {
-        console.log('app init');
         window.sessionStorage.clear();
         if (this.router.url === '/home' || this.router.url === '/') {
             this.height_limit = 276;
@@ -72,17 +71,6 @@ export class AppComponent implements OnInit, OnChanges, AfterViewInit, AfterView
                     this.height_limit = 0;
                 }
             });
-    }
-
-    ngAfterViewInit() {
-        // console.log(this.el.nativeElement.lastElementChild.style.backgroundColor);
-    }
-
-    ngAfterViewChecked() {
-        // console.log(this.el.nativeElement.lastElementChild.style.backgroundColor);
-    }
-
-    ngOnChanges() {
     }
 
     onscroll(event) {

@@ -35,7 +35,6 @@ export class ArticleDatabaseService {
                     }
                 },
                 error => {
-                    console.log(error);
                 }
             );
         } else {

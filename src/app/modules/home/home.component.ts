@@ -199,7 +199,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     get_article_id() {
         this._http.get('/middle/generate-id').subscribe(
             res => {
-                // console.log('generate_id', res['data']['generate_id']);
                 this._router.navigate(['/editor/' + res['data']['generate_id']]);
             }
         );
@@ -210,7 +209,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     print(event) {
-        console.log(event);
     }
 }
 

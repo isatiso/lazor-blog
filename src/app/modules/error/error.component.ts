@@ -28,7 +28,6 @@ export class ErrorComponent implements OnInit {
     ngOnInit() {
         this._router.routerState.root.queryParams.subscribe(
             value => {
-                console.log(value);
                 if (value.message) {
                     this.message = value.message;
                     this.sub_message = value.sub_message;

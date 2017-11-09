@@ -95,7 +95,6 @@ export class AuthComponent implements OnInit, OnDestroy {
         if (event.type === 'keydown' && event.key !== 'Enter') {
             return event;
         }
-        console.log('get in sign in.');
         this.sign_in_data.name = this.sign_in_data.name.trim();
 
         this._http.post(
@@ -110,9 +109,7 @@ export class AuthComponent implements OnInit, OnDestroy {
                     this.account.data = data['data'];
                 } else {
                     this.raiseSnackBar(data['msg'], 'OK', () => {
-                        console.log('Got it.');
                     });
-                    console.log(data);
                     return false;
                 }
             });
@@ -135,7 +132,6 @@ export class AuthComponent implements OnInit, OnDestroy {
         }
         if (not_regular) {
             this.raiseSnackBar(message, 'OK', () => {
-                console.log('The snack-bar action was triggered!');
             });
             return false;
         }
@@ -149,14 +145,11 @@ export class AuthComponent implements OnInit, OnDestroy {
             data => {
                 if (data['result'] === 1) {
                     this.raiseSnackBar('Sign Up Successfully.', 'OK', () => {
-                        console.log('The snack-bar action was triggered!');
                     });
                     this.tab_select = 0;
                 } else {
                     this.raiseSnackBar(data['msg'], 'OK', () => {
-                        console.log('Got it.');
                     });
-                    console.log(data);
                     return false;
                 }
             });

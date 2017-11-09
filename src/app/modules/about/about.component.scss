@@ -34,7 +34,7 @@
 }
 
 a.link {
-    color: map-get($mat-blue, 500);
+    color: map-get($mat-teal, 500);
     text-decoration: none;
     &:hover {
         color: map-get($mat-orange, 500);

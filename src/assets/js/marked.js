@@ -874,7 +874,7 @@
     };
 
     Renderer.prototype.image = function(href, title, text) {
-        var out = '<div class="md-image" onclick="window.current_image=\'' + href + '\';console.log(window.current_image)"><img src="' + href + '" alt="' + text + '"';
+        var out = '<div class="md-image" onclick="window.current_image=\'' + href + '\'; console.log(window.current_image)"><img src="' + href + '" alt="' + text + '"';
         if (title) {
             out += ' title="' + title + '"';
         }

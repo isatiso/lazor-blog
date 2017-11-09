@@ -31,7 +31,6 @@ export class CategoryDatabaseService {
                     this.data = res['data'];
                 },
                 error => {
-                    console.log(error);
                 }
             );
         } else {
@@ -45,7 +44,6 @@ export class CategoryDatabaseService {
                 this.index_list.next(res['data']);
             },
             error => {
-                console.log(error);
             }
         );
     }

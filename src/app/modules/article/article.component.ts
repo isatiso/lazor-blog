@@ -30,6 +30,7 @@ declare var Prism: any;
 export class ArticleComponent implements OnInit, OnDestroy {
 
     article_exists = 'active';
+    render_latex = false;
     article_id: string;
     content: string;
     title: string;
@@ -59,6 +60,7 @@ export class ArticleComponent implements OnInit, OnDestroy {
                 this.title = data['title'];
                 this.article_create_time = data['create_time'] * 1000;
                 this.article_user_name = data['username'];
+                this.render_latex = true;
             }
         );
     }
@@ -113,7 +115,6 @@ export class ArticleComponent implements OnInit, OnDestroy {
 
     preview_image(event) {
         if (window['current_image']) {
-            console.log('preview', window['current_image']);
             this.dialog.open(PreviewComponent, {
                 data: {
                     name: '',
@@ -121,7 +122,6 @@ export class ArticleComponent implements OnInit, OnDestroy {
                 }
             }).afterClosed().subscribe(
                 res => {
-                    console.log('show up');
                 }
                 );
             window['current_image'] = null;

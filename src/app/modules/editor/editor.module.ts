@@ -10,7 +10,8 @@ import {
     MatButtonModule,
     MatSelectModule,
     MatDialogModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatProgressBarModule
 } from '@angular/material';
 
 import { EditorRoutingModule } from './editor-routing.module';
@@ -30,6 +31,7 @@ import { MarkdownModule } from 'directive/markdown.module';
         MatSelectModule,
         MatDialogModule,
         MatTooltipModule,
+        MatProgressBarModule,
         EditorRoutingModule
     ],
     entryComponents: [

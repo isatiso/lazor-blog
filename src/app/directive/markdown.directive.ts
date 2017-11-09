@@ -82,6 +82,13 @@ export class MarkdownDirective implements OnInit {
         }
     }
 
+    @Input()
+    set renderLatex(value: boolean) {
+        if (value) {
+            this._markdown.latexRender(this.el.nativeElement);
+        }
+    }
+
     onDataChange(data: string) {
         if (data) {
             this.el.nativeElement.innerHTML = this._markdown.compile(data);

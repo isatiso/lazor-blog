@@ -7,6 +7,7 @@ import 'rxjs/add/operator/map';
 
 // A javascript lib has import, so here is just a delaration
 declare var marked: any;
+declare var MathJax: any;
 
 @Injectable()
 export class MarkdownService {
@@ -16,6 +17,7 @@ export class MarkdownService {
     constructor() {
         this.extendRenderer();
         this.setMarkedOptions({});
+        this.setMathJaxOptions({});
     }
 
     public get renderer() {
@@ -37,9 +39,39 @@ export class MarkdownService {
         marked.setOptions(options);
     }
 
+    public setMathJaxOptions(options: any) {
+        // MathJax.Ajax.loadComplete('/assets/js/mathjax/config/TeX-AMS_HTML.js');
+        MathJax.Hub.Config({
+            showProcessingMessages: false,
+            tex2jax: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            jax: [
+                'input/TeX',
+                'output/HTML-CSS'
+            ],
+            TeX: {
+                equationNumbers: {
+                    autoNumber: 'AMS'
+                }
+            },
+            'HTML-CSS': {
+                preferredFont: null,
+                webFont: 'Gyre-Pagella',
+                availableFonts: []
+            }
+        });
+    }
+
     // comple markdown to html
     public compile(data: string) {
         return marked(data);
+    }
+
+    public latexRender(env: any) {
+        MathJax.Hub.Queue(
+            ['Typeset', MathJax.Hub, env]
+        );
     }
 
     // extend marked render to support todo checkbox

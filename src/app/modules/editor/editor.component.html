@@ -1,16 +1,14 @@
-<div class="container editor-container" #editorContainer [@childrenAppear]="editor_exists" (window:mousemove)="show_nav_button($event)" (window:scroll)="set_scroll_top($event)">
+<div (window:keydown)="change_tab($event)" class="container editor-container" #editorContainer [@childrenAppear]="editor_exists" (window:mousemove)="show_nav_button($event)">
     <mat-card>
         <div class="editor-title-container">
-            <input [(ngModel)]="title" class="editor-title" placeholder="Untitled" maxlength="50" (input)="set_modify_status($event)" autofocus #titleRef/>
+            <input [(ngModel)]="title" class="editor-title" placeholder="Untitled" maxlength="50" autofocus #titleRef/>
         </div>
         <div class="dash-board">
-            <!-- <button mat-raised-button (click)="save_article()">Save</button> -->
             <button mat-raised-button color="warn" (click)="delete_article()">Delete</button>
         </div>
         <div class="category-editor">
             <mat-form-field>
                 <mat-select [(ngModel)]="current_category_id" (change)="category_change($event)">
-                    <!-- <mat-select-trigger>You have selected: {{ select.selected?.category_name }}</mat-select-trigger> -->
                     <mat-option *ngFor="let category of categories" [value]="category.category_id">
                         {{ category.category_name }}
                     </mat-option>
@@ -18,34 +16,32 @@
             </mat-form-field>
         </div>
         <div class="divider"></div>
+        <div class="page-progress" #progressBarContainer [@progressAppear]="progress_state">
+            <mat-progress-bar #progressBar color="accent" mode="determinate" [value]="progress_value"> </mat-progress-bar>
+        </div>
         <mat-tab-group MatTabGroup dynamicHeight="true" [selectedIndex]="tab_select" (selectedIndexChange)="select_change($event)">
             <mat-tab label="{{ article_status === 'modified' ? '●' : ''}} Editor">
                 <div class="input-test" id="tab1">
                     <mat-input-container class="editor-input">
-                        <textarea matInput matTextareaAutosize [(ngModel)]="content" [matAutosizeMinRows]="content_rows" (keyup)="set_modify_status($event)" (paste)="set_modify_status($event)" #contentRef></textarea>
+                        <textarea matInput matTextareaAutosize [(ngModel)]="content" [matAutosizeMinRows]="content_rows" #contentRef></textarea>
                     </mat-input-container>
                 </div>
             </mat-tab>
             <mat-tab label="View">
                 <div id="tab2">
-                    <markdown [data]="content"></markdown>
+                    <markdown [data]="content" [renderLatex]="render_latex"></markdown>
                 </div>
             </mat-tab>
         </mat-tab-group>
-        <!-- <button #navLeft mat-fab color="primary" (click)="select1($event)" class="markdown-editor" *ngIf="true">
-                <mat-icon class="big-icon">navigate_before</mat-icon></button> -->
 
         <button #navHome mat-fab color="primary" (click)="modify_button_move($event)" class="markdown-showup" *ngIf="true" matTooltip="保存和发布" matTooltipPosition="left">
                 <mat-icon class="big-icon">{{ figure_modify_button() }}</mat-icon></button>
-        <button #navAddLatex mat-fab color="primary" (click)="insert_latex($event)" class="markdown-showup" *ngIf="true" matTooltip="插入公式" matTooltipPosition="left">
-                <mat-icon class="big-icon">functions</mat-icon></button>
         <button #navAddImage mat-fab color="primary" (click)="select_file_click($event)" class="markdown-showup" *ngIf="true" matTooltip="插入图片" matTooltipPosition="left">
                 <mat-icon class="big-icon">insert_photo</mat-icon></button>
         <button #navView mat-fab color="primary" (click)="toggle_select($event)" class="markdown-showup" *ngIf="true" matTooltip="预览文章" matTooltipPosition="left">
                 <mat-icon class="big-icon">{{ figure_button_name() }}</mat-icon></button>
         <button #navTop mat-fab color="primary" (click)="goto_top($event)" class="markdown-showup" *ngIf="true" matTooltip="回到顶部" matTooltipPosition="left">
                 <mat-icon class="big-icon">arrow_upward</mat-icon></button>
-
 
     </mat-card>
     <form class="add-image-form" action="/middle/file" method="post" enctype="multipart/form-data" #imageForm>
