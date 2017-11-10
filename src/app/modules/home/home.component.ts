@@ -1,15 +1,13 @@
 import { Component, OnInit, OnDestroy, ElementRef, ViewChild, AfterViewInit, Inject } from '@angular/core';
-import { DataSource } from '@angular/cdk/table';
 import { MatSnackBar, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Observable } from 'rxjs/Observable';
 
 import { NavProfileService } from 'service/nav-profile/nav-profile.service';
-import { CategoryDatabaseService } from 'service/category-database/category-database.service';
+import { CategoryDatabaseService, CategorySource } from 'service/category-database/category-database.service';
 import { ArticleData, Category } from 'public/data-struct-definition';
 
 @Component({
@@ -50,33 +48,27 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     home_exists = 'active';
     displayedColumns = ['title'];
-    dataSource: ArticleDataSource | null;
+    dataSource: CategorySource | null;
     categories = [];
     current_category = null;
     current_category_id = '';
-    operator_status = false;
-    step = 0;
-    new_category_name = null;
     user_name = '';
-    @ViewChild('deleteBtn') deleteBtn;
 
     constructor(
         private _http: HttpClient,
         private _router: Router,
         private _category_db: CategoryDatabaseService,
-        private snack_bar: MatSnackBar,
         public dialog: MatDialog,
     ) { }
 
     ngOnInit() {
         document.body.scrollTop = 0;
-        this.home_exists = 'active';
-        this.dataSource = new ArticleDataSource(this._category_db);
-        this.user_name = window.localStorage.getItem('user_name');
         const current_category = window.localStorage.getItem('current_category');
+        this.home_exists = 'active';
+        this.dataSource = new CategorySource(this._category_db, 'home');
+        this.user_name = window.localStorage.getItem('user_name');
         this.current_category = current_category ? JSON.parse(current_category) : {};
         this.query_category_and_article();
-
     }
 
     ngOnDestroy() {
@@ -90,12 +82,6 @@ export class HomeComponent implements OnInit, OnDestroy {
             this.current_category_id = category['category_id'];
             this.query_article_list();
         }
-        this.operator_status = false;
-    }
-
-    click_category(event) {
-        event.stopPropagation();
-        return false;
     }
 
     query_category() {
@@ -207,21 +193,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     query_article_list() {
         this._category_db.update(this.current_category['category_id']);
     }
-
-    print(event) {
-    }
-}
-
-export class ArticleDataSource extends DataSource<any> {
-    constructor(private _db: CategoryDatabaseService) {
-        super();
-    }
-
-    connect(): Observable<ArticleData[]> {
-        return this._db.home_list;
-    }
-
-    disconnect() { }
 }
 
 @Component({

@@ -29,3 +29,26 @@
         flex: auto;
     }
 }
+
+.last-next {
+    display: flex;
+    justify-content: space-between;
+    .last {
+        flex: auto;
+        text-align: left;
+    }
+    .spacer {
+        flex: auto;
+    }
+    .next {
+        flex: auto;
+        text-align: right;
+    }
+    a {
+        color: map-get($mat-teal, 500);
+        text-decoration: none;
+        &:hover {
+            color: map-get($mat-orange, 500);
+        }
+    }
+}

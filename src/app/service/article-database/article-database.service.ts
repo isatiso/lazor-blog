@@ -45,5 +45,17 @@ export class ArticleDatabaseService {
         return dataExchange;
     }
 
+    remove(article_id: string) {
+        this._http.delete('/middle/article?article_id=' + article_id).subscribe(
+            res => {
+                if (res['result']) {
+                    window.sessionStorage.removeItem('article-' + article_id);
+                }
+            },
+            error => {
+            }
+        );
+    }
+
 }
 

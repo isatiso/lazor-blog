@@ -23,7 +23,7 @@
             </a>
             <span class="nav-spacer"></span>
             <button mat-button class="nav-font" [matMenuTriggerFor]="menu">
-                <span class="entry-button">Menu <mat-icon>fingerprint</mat-icon></span>
+                <span class="entry-button">{{ current_user ? current_user : 'Menu' }} <mat-icon>fingerprint</mat-icon></span>
             </button>
             <mat-menu #menu="matMenu">
                 <button mat-menu-item *ngIf="null === account.data" routerLink="/auth"><span>Auth</span></button>

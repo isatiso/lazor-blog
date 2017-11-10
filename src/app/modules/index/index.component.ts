@@ -1,14 +1,9 @@
-import { Component, OnInit, OnDestroy, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { trigger, state, style, animate, transition } from '@angular/animations';
-import { DataSource } from '@angular/cdk/table';
 
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Observable } from 'rxjs/Observable';
-
-import { NavProfileService } from 'service/nav-profile/nav-profile.service';
-import { CategoryDatabaseService } from 'service/category-database/category-database.service';
+import { CategoryDatabaseService, CategorySource } from 'service/category-database/category-database.service';
 import { ArticleData } from 'public/data-struct-definition';
 
 @Component({
@@ -16,7 +11,7 @@ import { ArticleData } from 'public/data-struct-definition';
     templateUrl: './index.component.html',
     styleUrls: ['./index.component.scss'],
     animations: [
-        trigger('bannerAnimation', [
+        trigger('bannerMove', [
             state('active', style({
                 transform: 'translateY(0)',
                 opacity: 1,
@@ -30,38 +25,33 @@ import { ArticleData } from 'public/data-struct-definition';
             state('inactive', style({
                 opacity: 0,
             })),
-            transition('void => active', animate('300ms ease-in')),
-            transition('inactive => active', animate('300ms ease-in'))
+            transition('void <=> active', animate('300ms ease-in')),
+            transition('inactive <=> active', animate('300ms ease-in'))
         ]),
     ]
 })
 export class IndexComponent implements OnInit, OnDestroy {
-    banner_exists = 'active';
-    index_exists = 'active';
-    content_rows = 30;
-    dataSource: ArticleDataSource | null;
-    displayedColumns = [
-        'title',
-        // 'author',
-        // 'category',
-        // 'create_time'
-    ];
-    @ViewChild('banner') banner;
-    height = 100;
+    public banner_exists = 'active';
+    public index_exists = 'active';
+    public display_columns = ['title'];
+    public displayColumns = ['title'];
+    public category_source: CategorySource | null;
+    private _scroll_height_limit = 100;
+
+    @ViewChild('banner') private banner;
+
     constructor(
+        private _el: ElementRef,
         private _http: HttpClient,
         private _router: Router,
-        private el: ElementRef,
-        private _category_db: CategoryDatabaseService,
-        private nav_profile: NavProfileService
+        private _category_db: CategoryDatabaseService
     ) { }
 
     ngOnInit() {
         document.body.scrollTop = 0;
         this.index_exists = 'active';
-        this.dataSource = new ArticleDataSource(this._category_db);
-        this.nav_profile.navbarWidth = this.el.nativeElement.firstChild.clientWidth;
-        this.query_article_list();
+        this.category_source = new CategorySource(this._category_db, 'index');
+        this._category_db.shuffle(20);
     }
 
     ngOnDestroy() {
@@ -69,27 +59,11 @@ export class IndexComponent implements OnInit, OnDestroy {
     }
 
     onscroll(event) {
-        const scrollTop = event.target.scrollingElement.scrollTop;
-        if (scrollTop <= this.height) {
-            this.banner.nativeElement.firstElementChild.style.opacity = 1 - (scrollTop / this.height);
+        const scroll_top = event.target.scrollingElement.scrollTop;
+        if (scroll_top <= this._scroll_height_limit) {
+            this.banner.nativeElement.firstElementChild.style.opacity = 1 - (scroll_top / this._scroll_height_limit);
         } else {
             this.banner.nativeElement.firstElementChild.style.opacity = 0;
         }
     }
-
-    query_article_list() {
-        this._category_db.shuffle(10);
-    }
-}
-
-export class ArticleDataSource extends DataSource<any> {
-    constructor(private _db: CategoryDatabaseService) {
-        super();
-    }
-
-    connect(): Observable<ArticleData[]> {
-        return this._db.index_list;
-    }
-
-    disconnect() { }
 }

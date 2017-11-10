@@ -1,15 +1,11 @@
-<div class="site-banner" #banner [@bannerAnimation]="banner_exists" (window:scroll)="onscroll($event)">
-    <h1>Chasing a Cat</h1>
+<div class="site-banner" #banner [@bannerMove]="banner_exists" (window:scroll)="onscroll($event)">
+    <h1>Capture The Cat</h1>
 </div>
 <div class="container index-container" [@childrenAppear]="index_exists">
     <mat-card>
-
-        <!-- <div class="divider"></div> -->
         <div class="title">最新发布</div>
-        <!-- <p class="content">这是本着自己做的工具最好用的想法，实现的一个博客网站。最初用的CSDN的博客，但是感觉显示效果不够美观，而且广告太多。后来换成简书，但是又不支持公式，</p> -->
-        <!-- <p class="content"></p> -->
         <div class="article-list">
-            <mat-table #table [dataSource]="dataSource">
+            <mat-table #table [dataSource]="category_source">
 
                 <ng-container cdkColumnDef="title" aria-colspan="2">
                     <mat-header-cell *cdkHeaderCellDef> Article </mat-header-cell>
@@ -28,10 +24,10 @@
 
                 <ng-container cdkColumnDef="create_time">
                     <mat-header-cell *cdkHeaderCellDef> Create Time </mat-header-cell>
-                    <mat-cell *cdkCellDef="let row"> {{ row.create_time * 1000 | date: 'y-MM-dd HH:mm:ss' }} </mat-cell>
+                    <mat-cell *cdkCellDef="let row"> {{ row.create_time * 1000 | date: 'y-MM-dd HH:mm' }} </mat-cell>
                 </ng-container>
-                <mat-header-row *cdkHeaderRowDef="displayedColumns"></mat-header-row>
-                <mat-row *cdkRowDef="let row; columns: displayedColumns;"></mat-row>
+                <mat-header-row *cdkHeaderRowDef="display_columns"></mat-header-row>
+                <mat-row *cdkRowDef="let row; columns: display_columns;"></mat-row>
             </mat-table>
         </div>
     </mat-card>

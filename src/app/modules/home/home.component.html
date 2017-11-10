@@ -5,22 +5,21 @@
                 Hi, {{ user_name }}
             </p>
             <p class="create-button">
-                <button mat-raised-button color="primary" (click)="add_category()">Add Category</button><button mat-raised-button color="primary" routerLink="/editor/new-article">Create Article</button>
+                <button mat-raised-button class="add-category" color="primary" (click)="add_category()">Add Category</button>
+                <button mat-raised-button class="create-article" color="primary" routerLink="/editor/new-article">Create Article</button>
             </p>
         </div>
         <div class="divider"></div>
         <div class="content-container">
             <div class="category-list">
                 <mat-accordion *ngIf="categories.length; else emptyInfo" displayMode="flat">
-                    <mat-expansion-panel *ngFor="let category of categories; let i = index" class="category-item" [@currentCategory]="current_category_id === category.category_id" [expanded]="current_category_id === category.category_id" (click)="set_step(category)">
-                        <!-- [expanded]="current_category.category_id === category.category_id" -->
+                    <mat-expansion-panel *ngFor="let category of categories;" class="category-item" [@currentCategory]="current_category_id === category.category_id" [expanded]="current_category_id === category.category_id" (click)="set_step(category)">
                         <mat-expansion-panel-header collapsedHeight="60px" expandedHeight="60px">
                             <mat-panel-title>
                                 {{ category.category_name }}
                             </mat-panel-title>
                         </mat-expansion-panel-header>
                         <mat-action-row>
-                            <!-- <button mat-raised-button color="primary" (click)="set_step(category)">Select</button> -->
                             <button mat-raised-button color="primary" [matMenuTriggerFor]="options">Options</button>
                             <mat-menu #options="matMenu">
                                 <button mat-menu-item (click)="modify_category($event, category)">Modify</button>

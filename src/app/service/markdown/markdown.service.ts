@@ -40,7 +40,6 @@ export class MarkdownService {
     }
 
     public setMathJaxOptions(options: any) {
-        // MathJax.Ajax.loadComplete('/assets/js/mathjax/config/TeX-AMS_HTML.js');
         MathJax.Hub.Config({
             showProcessingMessages: false,
             tex2jax: {

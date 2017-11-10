@@ -41,6 +41,7 @@ export class AppComponent implements OnInit {
     height_limit = 0;
     client_width = 0;
     navbarWidth = 0;
+    current_user: string;
     constructor(
         private el: ElementRef,
         private router: Router,
@@ -71,6 +72,7 @@ export class AppComponent implements OnInit {
                     this.height_limit = 0;
                 }
             });
+        this.current_user = window.localStorage.getItem('user_name');
     }
 
     onscroll(event) {

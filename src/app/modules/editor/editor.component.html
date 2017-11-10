@@ -1,7 +1,7 @@
-<div (window:keydown)="change_tab($event)" class="container editor-container" #editorContainer [@childrenAppear]="editor_exists" (window:mousemove)="show_nav_button($event)">
+<div (window:keydown)="boss_key($event)" class="container editor-container" #editorContainer [@childrenAppear]="editor_exists" (window:mousemove)="show_nav_button($event)">
     <mat-card>
         <div class="editor-title-container">
-            <input [(ngModel)]="title" class="editor-title" placeholder="Untitled" maxlength="50" autofocus #titleRef/>
+            <input [(ngModel)]="title" class="editor-title" placeholder="Untitled" maxlength="50" #titleRef/>
         </div>
         <div class="dash-board">
             <button mat-raised-button color="warn" (click)="delete_article()">Delete</button>
@@ -34,13 +34,13 @@
             </mat-tab>
         </mat-tab-group>
 
-        <button #navHome mat-fab color="primary" (click)="modify_button_move($event)" class="markdown-showup" *ngIf="true" matTooltip="保存和发布" matTooltipPosition="left">
+        <button #navHome mat-fab color="primary" (click)="modify_button_move($event)" class="markdown-showup" *ngIf="true" [matTooltip]="modify_button_info()" matTooltipPosition="left">
                 <mat-icon class="big-icon">{{ figure_modify_button() }}</mat-icon></button>
-        <button #navAddImage mat-fab color="primary" (click)="select_file_click($event)" class="markdown-showup" *ngIf="true" matTooltip="插入图片" matTooltipPosition="left">
+        <button #navAddImage mat-fab color="primary" (click)="select_file_click($event)" class="markdown-showup" *ngIf="true" matTooltip="插入图片 (ctrl + P)" matTooltipPosition="left">
                 <mat-icon class="big-icon">insert_photo</mat-icon></button>
-        <button #navView mat-fab color="primary" (click)="toggle_select($event)" class="markdown-showup" *ngIf="true" matTooltip="预览文章" matTooltipPosition="left">
+        <button #navView mat-fab color="primary" (click)="toggle_select($event)" class="markdown-showup" *ngIf="true" [matTooltip]="get_button_info()" matTooltipPosition="left">
                 <mat-icon class="big-icon">{{ figure_button_name() }}</mat-icon></button>
-        <button #navTop mat-fab color="primary" (click)="goto_top($event)" class="markdown-showup" *ngIf="true" matTooltip="回到顶部" matTooltipPosition="left">
+        <button #navTop mat-fab color="primary" (click)="goto_top($event)" class="markdown-showup" *ngIf="true" matTooltip="回到顶部 (ctrl + ↑)" matTooltipPosition="left">
                 <mat-icon class="big-icon">arrow_upward</mat-icon></button>
 
     </mat-card>

@@ -6,6 +6,7 @@ import { MatSnackBar, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/
 
 import { MarkdownDirective } from 'directive/markdown.directive';
 import { ArticleDatabaseService } from 'service/article-database/article-database.service';
+import { CategoryDatabaseService } from 'service/category-database/category-database.service';
 import { SnackBarService } from 'service/snack-bar/snack-bar.service';
 import { Category } from 'public/data-struct-definition';
 
@@ -66,17 +67,16 @@ export class EditorComponent implements OnInit, OnDestroy {
     public current_article_id = '';
     public options;
     public progress_state = 'inactive';
+    public article_status = 'published';
     private nav_zone_width = 125;
     private left_nav_show = false;
     private right_nav_show = false;
-    private article_status = 'published';
     private current_scroll_top = 0;
 
     @ViewChild('navView') nav_view;
     @ViewChild('navTop') nav_top;
     @ViewChild('navHome') nav_home;
     @ViewChild('navAddImage') nav_add_image;
-    // @ViewChild('navAddLatex') nav_add_latex;
     @ViewChild('editorContainer') editor_container;
     @ViewChild('imageForm') image_form;
     @ViewChild('imageUpload') image_upload;
@@ -91,9 +91,9 @@ export class EditorComponent implements OnInit, OnDestroy {
         private _router: Router,
         private _activate_route: ActivatedRoute,
         private _article_db: ArticleDatabaseService,
+        private _category_db: CategoryDatabaseService,
         public snack_bar: SnackBarService,
-        public dialog: MatDialog,
-        // public snack_bar: MatSnackBar,
+        public dialog: MatDialog
     ) { }
 
     get content(): string {
@@ -164,8 +164,9 @@ export class EditorComponent implements OnInit, OnDestroy {
         nav_width = nav_width > 50 ? nav_width : 50;
         this.editor_exists = 'active';
         setTimeout(() => {
-            this.content_rows = this.content_ref.nativeElement.style.height.slice(0, -2) / 18 - 2;
+            this.content_rows = this.content_ref.nativeElement.style.height.slice(0, -2) / 28 - 2;
         }, 100);
+        this.title_ref.nativeElement.focus();
     }
 
     ngOnDestroy() {
@@ -203,6 +204,23 @@ export class EditorComponent implements OnInit, OnDestroy {
                 total_height -= delta;
                 document.body.scrollTop = total_height;
                 if (total_height <= 0) {
+                    clearInterval(interval_handler);
+                }
+            }, 15);
+        }
+    }
+
+    goto_bottom(event) {
+        const scroll_height = document.body.scrollHeight;
+        const client_height = document.body.clientHeight;
+        const scroll_range = scroll_height - client_height;
+        let total_height = document.body.scrollTop;
+        const delta = (scroll_range - total_height) / 15;
+        if (total_height < scroll_range) {
+            const interval_handler = setInterval(() => {
+                total_height += delta;
+                document.body.scrollTop = total_height;
+                if (total_height >= scroll_range) {
                     clearInterval(interval_handler);
                 }
             }, 15);
@@ -264,6 +282,7 @@ export class EditorComponent implements OnInit, OnDestroy {
                     window.localStorage.setItem('current_editor', JSON.stringify({}));
                     this._router.navigate(['/editor/' + res['data']['article_id']]);
                     this.snack_bar.show('Save Article Successfully.', 'OK', null);
+                    this._category_db.update(this.current_category_id, true);
                 });
         } else {
             this._http.post('/middle/article', {
@@ -280,9 +299,11 @@ export class EditorComponent implements OnInit, OnDestroy {
                     window.sessionStorage.setItem('article-' + this.article_id, JSON.stringify(this.article_object));
                 });
         }
+
     }
 
     publish_article() {
+
         this._http.post('/middle/article/publish-state', {
             article_id: this.article_id,
             publish_status: 1
@@ -293,13 +314,9 @@ export class EditorComponent implements OnInit, OnDestroy {
     }
 
     delete_article() {
-        this._http.delete('/middle/article?article_id=' + this.article_id).subscribe(
-            res => {
-                this._router.navigate(['/home']);
-            },
-            error => {
-            }
-        );
+        this._article_db.remove(this.article_id);
+        this._category_db.update(this.current_category_id, true);
+        this._router.navigate(['/home']);
     }
 
     query_categories() {
@@ -372,7 +389,7 @@ export class EditorComponent implements OnInit, OnDestroy {
     }
 
     set_content_rows(event) {
-        this.content_rows = this.content_ref.nativeElement.style.height.slice(0, -2) / 18 - 2;
+        this.content_rows = this.content_ref.nativeElement.style.height.slice(0, -2) / 28 - 2;
     }
 
     figure_modify_button() {
@@ -397,6 +414,30 @@ export class EditorComponent implements OnInit, OnDestroy {
         }
     }
 
+    modify_button_info() {
+        switch (this.article_status) {
+            case 'modified':
+                return '保存文章 (ctrl + S)';
+            case 'saved':
+                return '发布文章 (ctrl + S)';
+            case 'published':
+                return '查看文章 (ctrl + S)';
+            default:
+                return '';
+        }
+    }
+
+    get_button_info() {
+        switch (this.tab_select) {
+            case 0:
+                return '预览文章 (ctrl + →)';
+            case 1:
+                return '编辑文章 (ctrl + ←)';
+            default:
+                return '';
+        }
+    }
+
     category_change(event) {
         this.article_status = 'modified';
     }
@@ -406,19 +447,35 @@ export class EditorComponent implements OnInit, OnDestroy {
         return false;
     }
 
-    change_tab(event) {
-        if (!event.ctrlKey || (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 's')) {
+    boss_key(event) {
+        const access_key = [
+            'ArrowLeft',
+            'ArrowRight',
+            'ArrowUp',
+            'ArrowDown',
+            's',
+            'p'
+        ];
+
+        if (!event.ctrlKey || access_key.indexOf(event.key) === -1) {
             return event;
         }
         if (event.key === 'ArrowLeft') {
-
             this.tab_select = 0;
             setTimeout(() => { this.content_ref.nativeElement.focus(); }, 0);
         } else if (event.key === 'ArrowRight') {
             this.content_ref.nativeElement.blur();
             this.tab_select = 1;
+        } else if (event.key === 'ArrowUp') {
+            console.log(event);
+            this.goto_top(null);
+        } else if (event.key === 'ArrowDown') {
+            console.log(event);
+            this.goto_bottom(null);
         } else if (event.key === 's') {
             this.modify_button_move();
+        } else if (event.key === 'p') {
+            this.select_file_click(null);
         }
         event.preventDefault();
     }

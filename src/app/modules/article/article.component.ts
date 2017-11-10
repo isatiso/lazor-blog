@@ -6,6 +6,7 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 import { MarkdownDirective } from 'directive/markdown.directive';
 import { ArticleDatabaseService } from 'service/article-database/article-database.service';
+import { CategoryDatabaseService } from 'service/category-database/category-database.service';
 import { Article } from 'public/data-struct-definition';
 
 declare var Prism: any;
@@ -36,6 +37,7 @@ export class ArticleComponent implements OnInit, OnDestroy {
     title: string;
     article_create_time: number;
     article_user_name: string;
+    category_id: string;
     private nav_zone_width = 125;
     private right_nav_show = false;
     @ViewChild('navEditor') nav_editor;
@@ -47,6 +49,7 @@ export class ArticleComponent implements OnInit, OnDestroy {
         private _router: Router,
         private _activate_route: ActivatedRoute,
         private _article_db: ArticleDatabaseService,
+        private _category_db: CategoryDatabaseService,
         public dialog: MatDialog,
     ) { }
 
@@ -56,11 +59,14 @@ export class ArticleComponent implements OnInit, OnDestroy {
         this.article_id = this._activate_route.params['value']['id'];
         this._article_db.fetch(this.article_id).subscribe(
             data => {
+                console.log(data);
+                this.category_id = data['category_id'];
                 this.content = data['content'];
                 this.title = data['title'];
                 this.article_create_time = data['create_time'] * 1000;
                 this.article_user_name = data['username'];
                 this.render_latex = true;
+                this._category_db.update(this.category_id);
             }
         );
     }
