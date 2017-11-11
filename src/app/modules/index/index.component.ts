@@ -18,7 +18,7 @@ import { ArticleData } from 'public/data-struct-definition';
             })),
             transition('void <=> active', animate('300ms ease-in'))
         ]),
-        trigger('childrenAppear', [
+        trigger('pageAppear', [
             state('active', style({
                 opacity: 1,
             })),
@@ -31,10 +31,9 @@ import { ArticleData } from 'public/data-struct-definition';
     ]
 })
 export class IndexComponent implements OnInit, OnDestroy {
-    public banner_exists = 'active';
-    public index_exists = 'active';
+    public banner_move = 'active';
+    public page_appear = 'active';
     public display_columns = ['title'];
-    public displayColumns = ['title'];
     public category_source: CategorySource | null;
     private _scroll_height_limit = 100;
 
@@ -49,13 +48,13 @@ export class IndexComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         document.body.scrollTop = 0;
-        this.index_exists = 'active';
+        this.page_appear = 'active';
         this.category_source = new CategorySource(this._category_db, 'index');
         this._category_db.shuffle(20);
     }
 
     ngOnDestroy() {
-        this.index_exists = 'inactive';
+        this.page_appear = 'inactive';
     }
 
     onscroll(event) {

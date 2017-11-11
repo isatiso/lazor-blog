@@ -54,8 +54,8 @@ export class AuthComponent implements OnInit, OnDestroy {
     constructor(
         private _http: HttpClient,
         private _router: Router,
-        private snack_bar: MatSnackBar,
-        public account: AccountService,
+        private _snack_bar: MatSnackBar,
+        private _account: AccountService,
     ) { }
 
     ngOnInit() {
@@ -65,7 +65,7 @@ export class AuthComponent implements OnInit, OnDestroy {
             data => {
                 if (data['result'] === 1) {
                     window.localStorage.setItem('user_name', data['data']['user_name']);
-                    this.account.data = data['data'];
+                    this._account.data = data['data'];
                     this._router.navigate(['/home']);
                 }
             },
@@ -77,7 +77,7 @@ export class AuthComponent implements OnInit, OnDestroy {
     }
 
     raiseSnackBar(message: string, action_name: string, action) {
-        const snack_ref = this.snack_bar.open(
+        const snack_ref = this._snack_bar.open(
             message,
             action_name,
             {
@@ -106,7 +106,7 @@ export class AuthComponent implements OnInit, OnDestroy {
             data => {
                 if (data['result'] === 1) {
                     this._router.navigate(['/home']);
-                    this.account.data = data['data'];
+                    this._account.data = data['data'];
                 } else {
                     this.raiseSnackBar(data['msg'], 'OK', () => {
                     });

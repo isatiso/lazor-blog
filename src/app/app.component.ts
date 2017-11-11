@@ -5,6 +5,8 @@ import { HttpClient } from '@angular/common/http';
 
 import { NavBgDirective } from 'directive/nav-bg.directive';
 import { NavProfileService } from 'service/nav-profile/nav-profile.service';
+import { ArticleDatabaseService } from 'service/article-database/article-database.service';
+import { CategoryDatabaseService } from 'service/category-database/category-database.service';
 import { AccountService } from 'service/account/account.service';
 
 import 'rxjs/add/operator/map';
@@ -47,7 +49,9 @@ export class AppComponent implements OnInit {
         private router: Router,
         private _http: HttpClient,
         private activatedRoute: ActivatedRoute,
-        public account: AccountService,
+        private _account: AccountService,
+        private _article_db: ArticleDatabaseService,
+        private _category_db: CategoryDatabaseService,
         public nav_profile: NavProfileService,
     ) { }
 
@@ -75,6 +79,10 @@ export class AppComponent implements OnInit {
         this.current_user = window.localStorage.getItem('user_name');
     }
 
+    is_logged() {
+        return this._account.data !== null;
+    }
+
     onscroll(event) {
         this.scroll_top = event.target.scrollingElement.scrollTop;
         return event;
@@ -83,7 +91,7 @@ export class AppComponent implements OnInit {
     log_out(event) {
         this._http.delete('/middle/user').subscribe(
             res => {
-                this.account.data = null;
+                this._account.data = null;
             }
         );
         this.router.navigate(['/auth']);

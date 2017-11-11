@@ -17,7 +17,11 @@
         <button #navTop mat-fab color="primary" (click)="goto_top($event)" class="markdown-showup" *ngIf="true">
             <mat-icon class="big-icon">arrow_upward</mat-icon></button>
         <div class="last-next">
-            <a class="last" routerLink="/article/">上一篇</a><span class="spacer"> </span><a class="next" routerLink="/article/">下一篇</a>
+            <a *ngIf="last_article" class="last" routerLink="/article/{{ last_article.article_id }}">上一篇: {{ last_article.title }}</a>
+            <span *ngIf="!last_article" class="last">上一篇: 没有了</span>
+            <span class="spacer"> </span>
+            <a *ngIf="next_article" class="next" routerLink="/article/{{ next_article.article_id }}">下一篇: {{ next_article.title }}</a>
+            <span *ngIf="!next_article" class="next">下一篇: 没有了</span>
         </div>
     </mat-card>
 </div>

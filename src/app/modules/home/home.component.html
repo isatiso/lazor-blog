@@ -1,27 +1,27 @@
-<div class="container home-container" [@childrenAppear]="home_exists">
+<div class="container home-container" [@pageAppear]="page_appear">
     <mat-card>
         <div class="header-area">
             <p class="title home-title">
                 Hi, {{ user_name }}
             </p>
             <p class="create-button">
-                <button mat-raised-button class="add-category" color="primary" (click)="add_category()">Add Category</button>
-                <button mat-raised-button class="create-article" color="primary" routerLink="/editor/new-article">Create Article</button>
+                <button mat-raised-button class="add-category" color="primary" (click)="input_category()">添加分类</button>
+                <button mat-raised-button class="create-article" color="primary" routerLink="/editor/new-article">写新文章</button>
             </p>
         </div>
         <div class="divider"></div>
         <div class="content-container">
             <div class="category-list">
                 <mat-accordion *ngIf="categories.length; else emptyInfo" displayMode="flat">
-                    <mat-expansion-panel *ngFor="let category of categories;" class="category-item" [@currentCategory]="current_category_id === category.category_id" [expanded]="current_category_id === category.category_id" (click)="set_step(category)">
+                    <mat-expansion-panel *ngFor="let category of categories;" class="category-item" [@lightCategory]="is_current(category)" [expanded]="is_current(category)" (click)="set_step(category)">
                         <mat-expansion-panel-header collapsedHeight="60px" expandedHeight="60px">
                             <mat-panel-title>
                                 {{ category.category_name }}
                             </mat-panel-title>
                         </mat-expansion-panel-header>
                         <mat-action-row>
-                            <button mat-raised-button color="primary" [matMenuTriggerFor]="options">Options</button>
-                            <mat-menu #options="matMenu">
+                            <button mat-raised-button color="primary" [matMenuTriggerFor]="categoryOptions">Options</button>
+                            <mat-menu #categoryOptions="matMenu">
                                 <button mat-menu-item (click)="modify_category($event, category)">Modify</button>
                                 <button mat-menu-item (click)="delete_category(category.category_id)" *ngIf="category.category_type">Delete</button>
                             </mat-menu>

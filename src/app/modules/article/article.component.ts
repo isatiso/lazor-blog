@@ -53,20 +53,26 @@ export class ArticleComponent implements OnInit, OnDestroy {
         public dialog: MatDialog,
     ) { }
 
+    get last_article() {
+        return this._category_db.last;
+    }
+
+    get next_article() {
+        return this._category_db.next;
+    }
+
     ngOnInit() {
         document.body.scrollTop = 0;
         this.article_exists = 'active';
         this.article_id = this._activate_route.params['value']['id'];
         this._article_db.fetch(this.article_id).subscribe(
             data => {
-                console.log(data);
                 this.category_id = data['category_id'];
                 this.content = data['content'];
                 this.title = data['title'];
                 this.article_create_time = data['create_time'] * 1000;
                 this.article_user_name = data['username'];
                 this.render_latex = true;
-                this._category_db.update(this.category_id);
             }
         );
     }
@@ -134,6 +140,8 @@ export class ArticleComponent implements OnInit, OnDestroy {
         }
 
     }
+
+
 }
 
 @Component({

@@ -1,7 +1,7 @@
-<div class="site-banner" #banner [@bannerMove]="banner_exists" (window:scroll)="onscroll($event)">
+<div class="site-banner" #banner [@bannerMove]="banner_move" (window:scroll)="onscroll($event)">
     <h1>Capture The Cat</h1>
 </div>
-<div class="container index-container" [@childrenAppear]="index_exists">
+<div class="container index-container" [@pageAppear]="page_appear">
     <mat-card>
         <div class="title">最新发布</div>
         <div class="article-list">

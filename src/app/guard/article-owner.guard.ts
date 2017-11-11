@@ -17,12 +17,12 @@ export class ArticleOwnerGuard implements CanActivate {
     constructor(
         private _http: HttpClient,
         private _router: Router,
-        public snack_bar: MatSnackBar,
-        public account: AccountService
+        private _snack_bar: MatSnackBar,
+        private _account: AccountService
     ) { }
 
     raiseSnackBar(message: string, action_name: string, action) {
-        const snack_ref = this.snack_bar.open(
+        const snack_ref = this._snack_bar.open(
             message,
             action_name,
             {
@@ -54,7 +54,7 @@ export class ArticleOwnerGuard implements CanActivate {
         ).catch(
             error => {
                 this._router.navigate(['/auth']);
-                this.account.data = null;
+                this._account.data = null;
                 window.localStorage.setItem('user_name', null);
                 return new Observable<boolean>();
             },

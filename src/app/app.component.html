@@ -26,8 +26,8 @@
                 <span class="entry-button">{{ current_user ? current_user : 'Menu' }} <mat-icon>fingerprint</mat-icon></span>
             </button>
             <mat-menu #menu="matMenu">
-                <button mat-menu-item *ngIf="null === account.data" routerLink="/auth"><span>Auth</span></button>
-                <button mat-menu-item *ngIf="null !== account.data" (click)="log_out($event)"><span>Log Out</span></button>
+                <button mat-menu-item *ngIf="!is_logged()" routerLink="/auth"><span>Auth</span></button>
+                <button mat-menu-item *ngIf="is_logged()" (click)="log_out($event)"><span>Log Out</span></button>
             </mat-menu>
         </div>
     </mat-toolbar>

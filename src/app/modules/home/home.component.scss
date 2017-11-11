@@ -7,21 +7,18 @@
         position: absolute;
         right: 3%;
         top: 20px;
-        button.add-category {
+        button {
             font-family: Zcool_fun, Raleway, Arial, Helvetica, sans-serif;
             font-size: 20px;
             position: absolute;
-            top: -20px;
             right: -12px;
-            width: 170px;
-        }
-        button.create-article {
-            font-family: Zcool_fun, Raleway, Arial, Helvetica, sans-serif;
-            font-size: 20px;
-            position: absolute;
-            top: 20px;
-            right: -12px;
-            width: 170px;
+            width: 120px;
+            &.add-category {
+                top: -20px;
+            }
+            &.create-article {
+                top: 20px;
+            }
         }
     }
     .home-title {

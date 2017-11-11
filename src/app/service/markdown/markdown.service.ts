@@ -15,7 +15,7 @@ export class MarkdownService {
     private _renderer: any = new marked.Renderer();
 
     constructor() {
-        this.extendRenderer();
+        // this.extendRenderer();
         this.setMarkedOptions({});
         this.setMathJaxOptions({});
     }
@@ -43,7 +43,8 @@ export class MarkdownService {
         MathJax.Hub.Config({
             showProcessingMessages: false,
             tex2jax: {
-                inlineMath: [['$', '$'], ['\\(', '\\)']]
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']],
             },
             jax: [
                 'input/TeX',
@@ -73,7 +74,6 @@ export class MarkdownService {
         );
     }
 
-    // extend marked render to support todo checkbox
     private extendRenderer() {
         this._renderer.listitem = function (text: string) {
             if (/^\s*\[[x ]\]\s*/.test(text)) {

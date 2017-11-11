@@ -17,12 +17,12 @@ export class AuthGuard implements CanActivate {
     constructor(
         private _http: HttpClient,
         private _router: Router,
-        private snack_bar: MatSnackBar,
-        public account: AccountService
+        private _snack_bar: MatSnackBar,
+        private _account: AccountService
     ) { }
 
     raiseSnackBar(message: string, action_name: string, action) {
-        const snack_ref = this.snack_bar.open(
+        const snack_ref = this._snack_bar.open(
             message,
             action_name,
             {
@@ -43,18 +43,19 @@ export class AuthGuard implements CanActivate {
                 if (data['result'] !== 1) {
                     this._router.navigate(['/auth']);
                     window.localStorage.setItem('user_name', null);
-                    this.account.data = null;
+                    this._account.data = null;
                     return false;
                 } else {
                     window.localStorage.setItem('user_name', data['data']['user_name']);
-                    this.account.data = data['data'];
+                    this._account.data = data['data'];
+                    console.log(this._account.data);
                     return true;
                 }
             },
         ).catch(
             error => {
                 this._router.navigate(['/auth']);
-                this.account.data = null;
+                this._account.data = null;
                 window.localStorage.setItem('user_name', null);
                 return new Observable<boolean>();
             },

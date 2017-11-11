@@ -49,7 +49,7 @@ MathJax.Hub.Config({
     //  Example:    config: ["local/local.js"],
     //  Example:    config: ["local/local.js","MMLtoHTML.js"],
     //
-    config: [],
+    config: ["local/local.js", "TEX-AMS_HTML.js"],
 
     //
     //  A comma-separated list of CSS stylesheet files to be loaded
@@ -544,7 +544,7 @@ MathJax.Hub.Config({
         //  Equation numbering parameters.
         //  
         equationNumbers: {
-            autoNumber: "none", // "AMS" for standard AMS environment numbering,
+            autoNumber: "AMS", // "AMS" for standard AMS environment numbering,
             //  or "all" to number all displayed equations
             //    formatNumber: function (n) {return n},                // format for equation number n
             //    formatTag:    function (n) {return '('+n+')'},        // format for \tag and \eqref
@@ -665,13 +665,14 @@ MathJax.Hub.Config({
         //  use of the STIX fonts, or set it to an empty list, [], if
         //  you want to force MathJax to use web-based or image fonts.
         //
-        availableFonts: ["STIX", "TeX"],
+
+        availableFonts: [],
 
         //
         //  This is the preferred font to use when more than one of those
         //  listed above is available.
         //
-        preferredFont: "TeX",
+        preferredFont: null,
 
         //
         //  This is the web-based font to use when none of the fonts listed
@@ -682,7 +683,8 @@ MathJax.Hub.Config({
         //
         //  if you want to prevent the use of web-based fonts.
         //
-        webFont: "TeX",
+
+        webFont: 'Gyre-Pagella',
 
         //
         //  This is the font to use for image fallback mode (when none of the
