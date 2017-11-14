@@ -47,7 +47,7 @@ export class IndexComponent implements OnInit, OnDestroy {
     ) { }
 
     ngOnInit() {
-        document.body.scrollTop = 0;
+        document.scrollingElement.scrollTop = 0;
         this.page_appear = 'active';
         this.category_source = new CategorySource(this._category_db, 'index');
         this._category_db.shuffle(20);

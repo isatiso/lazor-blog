@@ -83,7 +83,7 @@ export class MarkdownDirective implements OnInit {
     }
 
     @Input()
-    set renderLatex(value: boolean) {
+    set renderLatex(value: any) {
         if (value) {
             this._markdown.latexRender(this.el.nativeElement);
         }

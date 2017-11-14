@@ -5,61 +5,65 @@
                 Hi, {{ user_name }}
             </p>
             <p class="create-button">
-                <button mat-raised-button class="add-category" color="primary" (click)="input_category()">添加分类</button>
+
                 <button mat-raised-button class="create-article" color="primary" routerLink="/editor/new-article">写新文章</button>
             </p>
         </div>
         <div class="divider"></div>
         <div class="content-container">
             <div class="category-list">
-                <mat-accordion *ngIf="categories.length; else emptyInfo" displayMode="flat">
-                    <mat-expansion-panel *ngFor="let category of categories;" class="category-item" [@lightCategory]="is_current(category)" [expanded]="is_current(category)" (click)="set_step(category)">
-                        <mat-expansion-panel-header collapsedHeight="60px" expandedHeight="60px">
-                            <mat-panel-title>
-                                {{ category.category_name }}
-                            </mat-panel-title>
-                        </mat-expansion-panel-header>
-                        <mat-action-row>
-                            <button mat-raised-button color="primary" [matMenuTriggerFor]="categoryOptions">Options</button>
-                            <mat-menu #categoryOptions="matMenu">
-                                <button mat-menu-item (click)="modify_category($event, category)">Modify</button>
-                                <button mat-menu-item (click)="delete_category(category.category_id)" *ngIf="category.category_type">Delete</button>
-                            </mat-menu>
-                        </mat-action-row>
-                    </mat-expansion-panel>
-                </mat-accordion>
+                <ul *ngIf="categories.length; else emptyInfo" [sortablejs]="categories">
+                    <li *ngFor="let category of categories;" class="category-item" (click)="set_step(category)">
+                        <mat-card [@lightCategory]="is_current(category)" [@showOptions]="show_options(category)">
+                            {{ category.category_name }}
+                        </mat-card>
+                        <div class="options-button">
+                            <div class="spacer"></div>
+                            <div class="button-container">
+                                <div class="button">
+                                    <button mat-icon-button class="modify-button" color="primary" (click)="modify_category($event, category)">
+                                        <mat-icon>mode_edit</mat-icon>
+                                    </button>
+                                </div>
+                                <div class="button" *ngIf="category.category_type">
+                                    <button mat-icon-button class="delete-button" color="warn" (click)="delete_category(category.category_id)">
+                                        <mat-icon>delete</mat-icon>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
                 <ng-template #emptyInfo>
-                    <p style="width: 100%; text-align: center;">Add a Category~<br/><br/><button mat-raised-button color="primary" (click)="add_category()">Add Category</button></p>
+                    <p style="width: 100%; text-align: center;">添加分类<br/><br/><button mat-raised-button color="primary" (click)="add_category()">Add Category</button></p>
                 </ng-template>
+                <div class="add-category-container">
+                    <button mat-raised-button class="add-category" color="primary" (click)="input_category()">添加分类</button>
+                </div>
             </div>
 
             <div class="spacer"></div>
 
             <div class="article-list">
-                <mat-table #table [dataSource]="dataSource">
+                <div class="article-item">
+                    <div class="list-title">
+                        Article
+                    </div>
+                </div>
+                <ul [sortablejs]="article_list" [sortablejsOptions]="sortable_options">
+                    <li *ngFor="let article of article_list" class="article-item">
+                        <div class="helper"></div>
+                        <!-- <button mat-button routerLink="/article/{{article.article_id}}" color="primary">
+                            {{ article.title }}
+                        </button> -->
+                        <mat-chip-list>
+                            <mat-chip routerLink="/article/{{article.article_id}}" selected="true" color="primary">
+                                {{ article.title }}
+                            </mat-chip>
+                        </mat-chip-list>
+                    </li>
+                </ul>
 
-                    <ng-container cdkColumnDef="title" aria-colspan="2">
-                        <mat-header-cell *cdkHeaderCellDef> Article </mat-header-cell>
-                        <mat-cell *cdkCellDef="let row" class="title-ceil"><a mat-button routerLink="/article/{{row.article_id}}" color="primary">{{row.title ? row.title : 'Untitled'}}</a></mat-cell>
-                    </ng-container>
-
-                    <ng-container cdkColumnDef="author">
-                        <mat-header-cell *cdkHeaderCellDef> Author </mat-header-cell>
-                        <mat-cell *cdkCellDef="let row"> {{ row.user_name }} </mat-cell>
-                    </ng-container>
-
-                    <ng-container cdkColumnDef="category">
-                        <mat-header-cell *cdkHeaderCellDef> Category </mat-header-cell>
-                        <mat-cell *cdkCellDef="let row"> {{ row.category_name }} </mat-cell>
-                    </ng-container>
-
-                    <ng-container cdkColumnDef="create_time">
-                        <mat-header-cell *cdkHeaderCellDef> Create Time </mat-header-cell>
-                        <mat-cell *cdkCellDef="let row"> {{ row.create_time * 1000 | date: 'y-MM-dd HH:mm:ss' }} </mat-cell>
-                    </ng-container>
-                    <mat-header-row *cdkHeaderRowDef="displayedColumns"></mat-header-row>
-                    <mat-row *cdkRowDef="let row; columns: displayedColumns;"></mat-row>
-                </mat-table>
             </div>
         </div>
     </mat-card>

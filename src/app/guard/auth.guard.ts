@@ -48,7 +48,6 @@ export class AuthGuard implements CanActivate {
                 } else {
                     window.localStorage.setItem('user_name', data['data']['user_name']);
                     this._account.data = data['data'];
-                    console.log(this._account.data);
                     return true;
                 }
             },

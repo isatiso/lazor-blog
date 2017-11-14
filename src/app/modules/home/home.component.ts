@@ -4,12 +4,13 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 
+import { SortablejsOptions } from 'angular-sortablejs';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { NavProfileService } from 'service/nav-profile/nav-profile.service';
 import { CategoryDatabaseService, CategorySource } from 'service/category-database/category-database.service';
 import { AccountService } from 'service/account/account.service';
-import { ArticleData, Category } from 'public/data-struct-definition';
+import { ArticleData, Category, Options } from 'public/data-struct-definition';
 
 @Component({
     selector: 'la-home',
@@ -33,8 +34,16 @@ import { ArticleData, Category } from 'public/data-struct-definition';
             state('0', style({
                 backgroundColor: '#f0f0f0',
             })),
-            transition('void <=> 1', animate('300ms ease-in')),
             transition('1 <=> 0', animate('300ms ease-in'))
+        ]),
+        trigger('showOptions', [
+            state('1', style({
+                transform: 'translateX(-40%)',
+            })),
+            state('0', style({
+                transform: 'translateX(0)',
+            })),
+            transition('1 <=> 0', animate('100ms ease'))
         ]),
     ]
 })
@@ -43,9 +52,17 @@ export class HomeComponent implements OnInit, OnDestroy {
     page_appear = 'active';
     displayedColumns = ['title'];
     dataSource: CategorySource | null;
+    sortable_options: SortablejsOptions = {
+        onStart: event => {
+            this._category_db.clear_push_order();
+        },
+        onEnd: event => {
+            this._category_db.push_order();
+        },
+    };
 
     constructor(
-        private _http: HttpClient,
+        private _http_client: HttpClient,
         private _router: Router,
         private _account: AccountService,
         private _category_db: CategoryDatabaseService,
@@ -56,34 +73,58 @@ export class HomeComponent implements OnInit, OnDestroy {
         return this._category_db.category_list;
     }
 
+    set categoried(source: Category[]) {
+        this._category_db.category_list = source;
+    }
+
     get user_name() {
         return this._account.data ? this._account.data.user_name : '';
     }
 
+    get article_list(): ArticleData[] {
+        return this._category_db.home_list;
+    }
+
     ngOnInit() {
-        document.body.scrollTop = 0;
-        const current_category_id = window.localStorage.getItem('current_category');
-        this._category_db.update(window.localStorage.getItem('current_category'));
+        document.scrollingElement.scrollTop = 0;
         this.page_appear = 'active';
         this.dataSource = new CategorySource(this._category_db, 'home');
-        this._category_db.pull(true);
+        this.query_category();
+        console.log(this);
     }
 
     ngOnDestroy() {
         this.page_appear = 'inactive';
-        window.localStorage.setItem('current_category', this._category_db.current_category_id);
     }
 
     set_step(category) {
-        this._category_db.update(category['category_id']);
+        if (!this.is_current(category)) {
+            this._category_db.current_category.show_options = 0;
+            this._category_db.update(category['category_id']);
+        } else {
+            this.toggle_button();
+        }
+
     }
 
     is_current(category) {
-        return this._category_db.is_current(category.category_id);
+        return this._category_db.current_category.category_id === category.category_id;
+    }
+
+    show_options(category) {
+        return this.is_current(category) && this._category_db.current_category.show_options === 1;
+    }
+
+    toggle_button() {
+        if (this._category_db.current_category.show_options === 1) {
+            this._category_db.current_category.show_options = 0;
+        } else {
+            this._category_db.current_category.show_options = 1;
+        }
     }
 
     query_category() {
-        this._category_db.pull(true);
+        this._category_db.pull(new Options({ flush: true }));
     }
 
     input_category() {
@@ -92,12 +133,14 @@ export class HomeComponent implements OnInit, OnDestroy {
                 name: '',
                 placeholder: 'Enter a New Name'
             }
-        }).afterClosed().subscribe(this.add_category);
+        }).afterClosed().subscribe(name => { this.add_category(name); });
     }
 
     add_category(category_name) {
+        console.log(this);
+        console.log(category_name);
         if (category_name) {
-            this._http.put(
+            this._http_client.put(
                 '/middle/category', { category_name: category_name }
             ).subscribe(
                 res => {
@@ -115,7 +158,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         }).afterClosed().subscribe(
             res => {
                 if (res) {
-                    this._http.post(
+                    this._http_client.post(
                         '/middle/category', {
                             category_id: category.category_id,
                             category_name: res
@@ -132,12 +175,24 @@ export class HomeComponent implements OnInit, OnDestroy {
         if (!category_id) {
             return;
         }
-        this._http.delete('/middle/category?category_id=' + category_id).subscribe(
+        this._http_client.delete('/middle/category?category_id=' + category_id).subscribe(
             res => {
                 this.query_category();
             }
         );
     }
+
+    move_up(category) {
+
+    }
+
+    move_down(category) {
+
+    }
+
+
+
+
 }
 
 @Component({

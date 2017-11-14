@@ -8,7 +8,7 @@ import { MarkdownDirective } from 'directive/markdown.directive';
 import { ArticleDatabaseService } from 'service/article-database/article-database.service';
 import { CategoryDatabaseService } from 'service/category-database/category-database.service';
 import { SnackBarService } from 'service/snack-bar/snack-bar.service';
-import { Category } from 'public/data-struct-definition';
+import { ArticleData, Category, Options } from 'public/data-struct-definition';
 
 declare var Prism: any;
 
@@ -17,7 +17,7 @@ declare var Prism: any;
     templateUrl: './editor.component.html',
     styleUrls: ['./editor.component.scss'],
     animations: [
-        trigger('childrenAppear', [
+        trigger('pageAppear', [
             state('active', style({
                 opacity: 1,
             })),
@@ -39,39 +39,15 @@ declare var Prism: any;
 })
 export class EditorComponent implements OnInit, OnDestroy {
 
-    editor_exists = 'active';
-    progress_value = 0;
-    render_latex = false;
-    article_object = {};
-    public title_data = '';
-    public content_data = '';
+    public page_appear = 'active';
     public content_rows = 0;
-    public user_name = window.localStorage.getItem('user_name');
-    public article_create_time = '';
-    public current_category: Category;
-    public current_category_id = '';
-    public categories = [];
-    public article_id = '';
-    public min_rows = 5;
-    public max_rows = 20;
-    public dynamic_height = true;
-    public tab_position = 'bellow';
-    public anchor_tip = { name: 'top' };
-    public element: any;
-    public tab1: any;
-    public tab_height_1: number;
-    public tab_height_2: number;
-    public tab2: any;
     public tab_select = 0;
-    public show_scroll: boolean;
-    public current_article_id = '';
-    public options;
+    public render_latex = false;
+    public progress_value = 0;
     public progress_state = 'inactive';
-    public article_status = 'published';
-    private nav_zone_width = 125;
-    private left_nav_show = false;
-    private right_nav_show = false;
-    private current_scroll_top = 0;
+    private _article_status = 'published';
+    private _nav_zone_width = 125;
+    private _nav_show = false;
 
     @ViewChild('navView') nav_view;
     @ViewChild('navTop') nav_top;
@@ -82,9 +58,7 @@ export class EditorComponent implements OnInit, OnDestroy {
     @ViewChild('imageUpload') image_upload;
     @ViewChild('titleRef') title_ref;
     @ViewChild('contentRef') content_ref;
-    @ViewChild('progressBarContainer') progress_bar_container;
     @ViewChild('progressBar') progress_bar;
-    @ViewChild('divEditor') div_editor;
 
     constructor(
         private _http: HttpClient,
@@ -97,112 +71,84 @@ export class EditorComponent implements OnInit, OnDestroy {
     ) { }
 
     get content(): string {
-        return this.content_data;
+        return this._article_db.current_article.content;
     }
 
     set content(value: string) {
-        this.content_data = value;
-        this.article_status = 'modified';
+        this._article_db.current_article_data.value.content = value;
+        this._article_status = 'modified';
+        this.remove_extra_lines();
+    }
+
+    get title(): string {
+        return this._article_db.current_article.title;
+    }
+
+    set title(value: string) {
+        this._article_db.current_article_data.value.title = value;
+        this._article_status = 'modified';
+    }
+
+    get categories(): Category[] {
+        return this._category_db.category_list;
+    }
+
+    get current_category(): Category {
+        return this._category_db.current_category;
+    }
+
+    set current_category(source: Category) {
+        this._category_db.current_category = source;
+    }
+
+    get current_article(): ArticleData {
+        return this._article_db.current_article;
+    }
+
+    set current_article(source: ArticleData) {
+        this._article_db.current_article = source;
+    }
+
+    ngOnInit() {
+        document.scrollingElement.scrollTop = 0;
+        const total_width = document.scrollingElement.clientWidth;
+        const editor_width = this.editor_container.nativeElement.clientWidth;
+        const article_id = this._activate_route.params['value']['id'];
+
+        this._nav_zone_width = Math.max((total_width - editor_width) / 2, 50);
+        this._category_db.pull(new Options({ flush: true }));
+        this._article_status = 'saved';
+        this.page_appear = 'active';
+
+        if (article_id !== 'new-article') {
+            this._article_db.fetch(article_id).subscribe(
+                data => {
+                }
+            );
+        }
+
+        this.remove_extra_lines();
+        this.title_ref.nativeElement.focus();
+    }
+
+    ngOnDestroy() {
+        this.page_appear = 'inactive';
+    }
+
+    remove_extra_lines() {
         this.content_rows = this.content.split('\n').length;
         setTimeout(() => {
             this.content_rows = this.content_ref.nativeElement.style.height.slice(0, -2) / 28 - 2;
         }, 100);
     }
 
-    get title(): string {
-        return this.title_data;
-    }
-
-    set title(value: string) {
-        this.title_data = value;
-        this.article_status = 'modified';
-    }
-
-    ngOnInit() {
-        document.body.scrollTop = 0;
-        this.article_id = this._activate_route.params['value']['id'];
-        this.query_categories();
-        this.progress_bar.color = 'accent';
-        if (this.article_id === 'new-article') {
-            const current_editor = JSON.parse(window.localStorage.getItem('current_editor'));
-            if (current_editor) {
-                this.content = current_editor['content'] ? current_editor['content'] : '';
-                this.title = current_editor['title'] ? current_editor['title'] : '';
-            } else {
-                this.content = '';
-                this.title = '';
-            }
-            const current_category = window.localStorage.getItem('current_category');
-            this.current_category = current_category ? JSON.parse(current_category) : null;
-            if (this.current_category) {
-                this.current_category_id = this.current_category.category_id;
-            }
-            this.article_status = 'saved';
-        } else {
-            this._article_db.fetch(this.article_id).subscribe(
-                data => {
-                    this.article_object = data;
-                    this.article_create_time = data['create_time'];
-                    this.user_name = data['user_name'];
-                    this.content = data['content'];
-                    this.title = data['title'];
-                    this.current_category = {
-                        category_id: data['category_id'],
-                        category_name: data['category_name'],
-                        category_type: data['category_type'],
-                        user_id: data['user_id']
-                    };
-                    this.current_category_id = data['category_id'];
-                    this.article_status = 'saved';
-                }
-            );
-        }
-
-        const total_width = document.body.clientWidth;
-        const editor_width = this.editor_container.nativeElement.clientWidth;
-        let nav_width = (total_width - editor_width) / 2;
-        nav_width = nav_width > 50 ? nav_width : 50;
-        this.editor_exists = 'active';
-        setTimeout(() => {
-            this.content_rows = this.content_ref.nativeElement.style.height.slice(0, -2) / 28 - 2;
-        }, 100);
-        this.title_ref.nativeElement.focus();
-    }
-
-    ngOnDestroy() {
-        window.onkeydown = null;
-        this.editor_exists = 'inactive';
-        if (this.article_id === 'new-article') {
-            const current_editor = { 'title': this.title, 'content': this.content };
-            window.localStorage.setItem('current_editor', JSON.stringify(current_editor));
-        }
-    }
-
-    figure_scroll_top() {
-        if (this.element.scrollTop > 100) {
-            this.show_scroll = true;
-            return true;
-        } else {
-            this.show_scroll = false;
-            return false;
-        }
-    }
-
-    toggle_select(event) {
-        if (this.tab_select === 1) {
-            this.tab_select = 0;
-        } else if (this.tab_select === 0) {
-            this.tab_select = 1;
-        }
-    }
-
     goto_top(event) {
-        let total_height = document.body.scrollTop;
+        let total_height = document.scrollingElement.scrollTop;
         const delta = total_height / 15;
         if (total_height > 0) {
             const interval_handler = setInterval(() => {
                 total_height -= delta;
-                document.body.scrollTop = total_height;
+                document.scrollingElement.scrollTop = total_height;
                 if (total_height <= 0) {
                     clearInterval(interval_handler);
                 }
@@ -211,15 +157,15 @@ export class EditorComponent implements OnInit, OnDestroy {
     }
 
     goto_bottom(event) {
-        const scroll_height = document.body.scrollHeight;
-        const client_height = document.body.clientHeight;
+        const scroll_height = document.scrollingElement.scrollHeight;
+        const client_height = document.scrollingElement.clientHeight;
         const scroll_range = scroll_height - client_height;
-        let total_height = document.body.scrollTop;
+        let total_height = document.scrollingElement.scrollTop;
         const delta = (scroll_range - total_height) / 15;
         if (total_height < scroll_range) {
             const interval_handler = setInterval(() => {
                 total_height += delta;
-                document.body.scrollTop = total_height;
+                document.scrollingElement.scrollTop = total_height;
                 if (total_height >= scroll_range) {
                     clearInterval(interval_handler);
                 }
@@ -241,27 +187,18 @@ export class EditorComponent implements OnInit, OnDestroy {
         }
     }
 
-    figure_button_name() {
-        if (this.tab_select === 0) {
-            return 'remove_red_eye';
-        } else if (this.tab_select === 1) {
-            return 'mode_edit';
-        }
-    }
-
     show_nav_button(event) {
-        if (event.view.innerWidth - this.nav_zone_width / 3 <= event.x && event.x <= event.view.innerWidth) {
-            if (!this.right_nav_show) {
-                this.right_nav_show = true;
+        if (event.view.innerWidth - this._nav_zone_width / 3 <= event.x && event.x <= event.view.innerWidth) {
+            if (!this._nav_show) {
+                this._nav_show = true;
                 this.nav_top._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5) translateY(-120px)';
                 this.nav_view._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5) translateY(-60px)';
                 this.nav_add_image._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5)';
                 this.nav_home._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5) translateY(60px)';
             }
-        } else if (event.view.innerWidth - this.nav_zone_width > event.x) {
-            if (this.left_nav_show || this.right_nav_show) {
-                this.left_nav_show = false;
-                this.right_nav_show = false;
+        } else if (event.view.innerWidth - this._nav_zone_width > event.x) {
+            if (this._nav_show) {
+                this._nav_show = false;
                 this.nav_view._elementRef.nativeElement.style.transform = 'translateX(80%)';
                 this.nav_top._elementRef.nativeElement.style.transform = 'translateX(80%)';
                 this.nav_home._elementRef.nativeElement.style.transform = 'translateX(80%)';
@@ -271,41 +208,36 @@ export class EditorComponent implements OnInit, OnDestroy {
     }
 
     save_article() {
-        if (this.article_id === 'new-article') {
+        if (this._activate_route.params['value']['id'] === 'new-article') {
             this._http.put('/middle/article', {
                 title: this.title,
                 content: this.content,
-                category_id: this.current_category_id,
+                category_id: this.current_category.category_id,
             }).subscribe(
                 res => {
-                    this.article_id = res['data']['article_id'];
-                    window.localStorage.setItem('current_editor', JSON.stringify({}));
-                    this._router.navigate(['/editor/' + res['data']['article_id']]);
+                    this._article_db.current_article = new ArticleData(res['data']);
                     this.snack_bar.show('Save Article Successfully.', 'OK', null);
-                    this._category_db.update(this.current_category_id, true);
+                    this._router.navigate(['/editor/' + res['data']['article_id']]);
+                    this._category_db.update(this.current_category.category_id, new Options({ flush: true }));
                 });
         } else {
             this._http.post('/middle/article', {
-                article_id: this.article_id,
+                article_id: this.current_article.article_id,
                 title: this.title,
                 content: this.content,
-                category_id: this.current_category_id,
+                category_id: this.current_category.category_id,
             }).subscribe(
                 res => {
+                    this._article_db.current_article = new ArticleData(res['data']);
                     this.snack_bar.show('Save Article Successfully.', 'OK', null);
-                    this.article_object['title'] = this.title;
-                    this.article_object['content'] = this.content;
-                    this.article_object['category_id'] = this.current_category_id;
-                    window.sessionStorage.setItem('article-' + this.article_id, JSON.stringify(this.article_object));
                 });
         }
 
     }
 
     publish_article() {
-
         this._http.post('/middle/article/publish-state', {
-            article_id: this.article_id,
+            article_id: this._article_db.current_article.article_id,
             publish_status: 1
         }).subscribe(
             res => {
@@ -314,21 +246,9 @@ export class EditorComponent implements OnInit, OnDestroy {
     }
 
     delete_article() {
-        this._article_db.remove(this.article_id);
-        this._category_db.update(this.current_category_id, true);
+        this._article_db.remove(this._article_db.current_article.article_id);
+        this._category_db.update(this.current_category.category_id, new Options({ flush: true }));
         this._router.navigate(['/home']);
-    }
-
-    query_categories() {
-        this._http.get('/middle/category').subscribe(
-            res => {
-                if (res['data']) {
-                    this.categories = res['data'];
-                } else {
-                    this.categories = [];
-                }
-            }
-        );
     }
 
     select_file(event) {
@@ -347,7 +267,7 @@ export class EditorComponent implements OnInit, OnDestroy {
 
     upload_file(event) {
         const file = new FormData(this.image_form.nativeElement);
-        this.article_status = 'modified';
+        this._article_status = 'modified';
         this.image_upload.nativeElement.value = '';
         const req = new HttpRequest('PUT', '/middle/file', file, {
             reportProgress: true,
@@ -367,7 +287,6 @@ export class EditorComponent implements OnInit, OnDestroy {
                     const content = `![${next.body['data']['file_name']}](${file_path})\n`;
 
                     this.content = left + content + right;
-                    // this.content_ref.nativeElement.focus();
                     setTimeout(() => {
                         const pos = content_index + content.length;
                         this.content_ref.nativeElement.setSelectionRange(pos, pos);
@@ -375,47 +294,37 @@ export class EditorComponent implements OnInit, OnDestroy {
                     this.progress_bar.color = 'accent';
                     this.progress_state = 'inactive';
                     setTimeout(() => { this.progress_value = 0; }, 200);
-
                 }
-
             },
             error => {
             }
         );
     }
 
-    set_content_rows_plus(event) {
-        this.content_rows += 1;
+    save_button_click() {
+        if (this._article_status === 'modified') {
+            this.save_article();
+            this._article_status = 'saved';
+        } else if (this._article_status === 'saved') {
+            this.publish_article();
+            this._article_status = 'published';
+        } else if (this._article_status === 'published') {
+            this._router.navigate(['/article/' + this._article_db.current_article.article_id]);
+        }
     }
 
-    set_content_rows(event) {
-        this.content_rows = this.content_ref.nativeElement.style.height.slice(0, -2) / 28 - 2;
-    }
-
-    figure_modify_button() {
-        if (this.article_status === 'modified') {
+    save_button_icon() {
+        if (this._article_status === 'modified') {
             return 'save';
-        } else if (this.article_status === 'saved') {
+        } else if (this._article_status === 'saved') {
             return 'publish';
-        } else if (this.article_status === 'published') {
+        } else if (this._article_status === 'published') {
             return 'description';
         }
     }
 
-    modify_button_move() {
-        if (this.article_status === 'modified') {
-            this.save_article();
-            this.article_status = 'saved';
-        } else if (this.article_status === 'saved') {
-            this.publish_article();
-            this.article_status = 'published';
-        } else if (this.article_status === 'published') {
-            this._router.navigate(['/article/' + this.article_id]);
-        }
-    }
-
-    modify_button_info() {
-        switch (this.article_status) {
+    save_button_outlet() {
+        switch (this._article_status) {
             case 'modified':
                 return '保存文章 (ctrl + S)';
             case 'saved':
@@ -427,7 +336,23 @@ export class EditorComponent implements OnInit, OnDestroy {
         }
     }
 
-    get_button_info() {
+    preview_button_click(event) {
+        if (this.tab_select === 1) {
+            this.tab_select = 0;
+        } else if (this.tab_select === 0) {
+            this.tab_select = 1;
+        }
+    }
+
+    preview_button_icon() {
+        if (this.tab_select === 0) {
+            return 'remove_red_eye';
+        } else if (this.tab_select === 1) {
+            return 'mode_edit';
+        }
+    }
+
+    preview_button_outlet() {
         switch (this.tab_select) {
             case 0:
                 return '预览文章 (ctrl + →)';
@@ -438,13 +363,12 @@ export class EditorComponent implements OnInit, OnDestroy {
         }
     }
 
-    category_change(event) {
-        this.article_status = 'modified';
+    article_change(event) {
+        this._article_status = 'modified';
     }
 
-    save_action(event) {
-        event.preventDefault();
-        return false;
+    unsaved() {
+        return this._article_status === 'modified' ? '●' : '';
     }
 
     boss_key(event) {
@@ -467,13 +391,11 @@ export class EditorComponent implements OnInit, OnDestroy {
             this.content_ref.nativeElement.blur();
             this.tab_select = 1;
         } else if (event.key === 'ArrowUp') {
-            console.log(event);
             this.goto_top(null);
         } else if (event.key === 'ArrowDown') {
-            console.log(event);
             this.goto_bottom(null);
         } else if (event.key === 's') {
-            this.modify_button_move();
+            this.save_button_click();
         } else if (event.key === 'p') {
             this.select_file_click(null);
         }

@@ -7,6 +7,7 @@ import {
     MatMenuModule,
     MatCardModule,
     MatTableModule,
+    MatChipsModule,
     MatButtonModule,
     MatIconModule,
     MatListModule,
@@ -15,6 +16,8 @@ import {
     MatInputModule,
     MatDialogModule
 } from '@angular/material';
+
+import { SortablejsModule } from 'angular-sortablejs';
 
 import { HomeComponent, AddCategoryComponent } from './home.component';
 import { HomeRoutingModule } from './home-routing.module';
@@ -27,6 +30,7 @@ import { HomeRoutingModule } from './home-routing.module';
         MatMenuModule,
         MatCardModule,
         MatTableModule,
+        MatChipsModule,
         MatButtonModule,
         MatListModule,
         MatIconModule,
@@ -35,7 +39,8 @@ import { HomeRoutingModule } from './home-routing.module';
         MatInputModule,
         MatDialogModule,
         HttpClientModule,
-        HomeRoutingModule
+        HomeRoutingModule,
+        SortablejsModule.forRoot({ animation: 150 })
     ],
     entryComponents: [
         AddCategoryComponent

@@ -1,4 +1,4 @@
-<div (window:keydown)="boss_key($event)" class="container editor-container" #editorContainer [@childrenAppear]="editor_exists" (window:mousemove)="show_nav_button($event)">
+<div (window:keydown)="boss_key($event)" class="container editor-container" #editorContainer [@pageAppear]="page_appear" (window:mousemove)="show_nav_button($event)">
     <mat-card>
         <div class="editor-title-container">
             <input [(ngModel)]="title" class="editor-title" placeholder="Untitled" maxlength="50" #titleRef/>
@@ -8,7 +8,7 @@
         </div>
         <div class="category-editor">
             <mat-form-field>
-                <mat-select [(ngModel)]="current_category_id" (change)="category_change($event)">
+                <mat-select [(ngModel)]="current_category.category_id" (change)="article_change($event)">
                     <mat-option *ngFor="let category of categories" [value]="category.category_id">
                         {{ category.category_name }}
                     </mat-option>
@@ -20,7 +20,7 @@
             <mat-progress-bar #progressBar color="accent" mode="determinate" [value]="progress_value"> </mat-progress-bar>
         </div>
         <mat-tab-group MatTabGroup dynamicHeight="true" [selectedIndex]="tab_select" (selectedIndexChange)="select_change($event)">
-            <mat-tab label="{{ article_status === 'modified' ? '●' : ''}} Editor">
+            <mat-tab label="{{ unsaved() }} Editor">
                 <div class="input-test" id="tab1">
                     <mat-input-container class="editor-input">
                         <textarea matInput matTextareaAutosize [(ngModel)]="content" [matAutosizeMinRows]="content_rows" #contentRef></textarea>
@@ -34,12 +34,12 @@
             </mat-tab>
         </mat-tab-group>
 
-        <button #navHome mat-fab color="primary" (click)="modify_button_move($event)" class="markdown-showup" *ngIf="true" [matTooltip]="modify_button_info()" matTooltipPosition="left">
-                <mat-icon class="big-icon">{{ figure_modify_button() }}</mat-icon></button>
+        <button #navHome mat-fab color="primary" (click)="save_button_click($event)" class="markdown-showup" *ngIf="true" [matTooltip]="save_button_outlet()" matTooltipPosition="left">
+                <mat-icon class="big-icon">{{ save_button_icon() }}</mat-icon></button>
         <button #navAddImage mat-fab color="primary" (click)="select_file_click($event)" class="markdown-showup" *ngIf="true" matTooltip="插入图片 (ctrl + P)" matTooltipPosition="left">
                 <mat-icon class="big-icon">insert_photo</mat-icon></button>
-        <button #navView mat-fab color="primary" (click)="toggle_select($event)" class="markdown-showup" *ngIf="true" [matTooltip]="get_button_info()" matTooltipPosition="left">
-                <mat-icon class="big-icon">{{ figure_button_name() }}</mat-icon></button>
+        <button #navView mat-fab color="primary" (click)="preview_button_click($event)" class="markdown-showup" *ngIf="true" [matTooltip]="preview_button_outlet()" matTooltipPosition="left">
+                <mat-icon class="big-icon">{{ preview_button_icon() }}</mat-icon></button>
         <button #navTop mat-fab color="primary" (click)="goto_top($event)" class="markdown-showup" *ngIf="true" matTooltip="回到顶部 (ctrl + ↑)" matTooltipPosition="left">
                 <mat-icon class="big-icon">arrow_upward</mat-icon></button>
 

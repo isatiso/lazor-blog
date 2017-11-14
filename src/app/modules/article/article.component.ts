@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, OnDestroy, AfterContentInit, ViewChild } from '@angular/core';
+import { Component, Inject, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { Router, ActivatedRoute, NavigationExtras } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
@@ -7,7 +7,7 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { MarkdownDirective } from 'directive/markdown.directive';
 import { ArticleDatabaseService } from 'service/article-database/article-database.service';
 import { CategoryDatabaseService } from 'service/category-database/category-database.service';
-import { Article } from 'public/data-struct-definition';
+import { Article, ArticleData } from 'public/data-struct-definition';
 
 declare var Prism: any;
 
@@ -23,23 +23,18 @@ declare var Prism: any;
             state('inactive', style({
                 opacity: 0,
             })),
-            transition('void => active', animate('300ms ease-in')),
-            transition('inactive => active', animate('300ms ease-in'))
+            transition('void <=> active', animate('300ms ease-in')),
+            transition('inactive <=> active', animate('300ms ease-in'))
         ])
     ]
 })
 export class ArticleComponent implements OnInit, OnDestroy {
 
-    article_exists = 'active';
-    render_latex = false;
-    article_id: string;
-    content: string;
-    title: string;
-    article_create_time: number;
-    article_user_name: string;
-    category_id: string;
+    public article_exists = 'active';
+    public render_latex: any;
     private nav_zone_width = 125;
     private right_nav_show = false;
+
     @ViewChild('navEditor') nav_editor;
     @ViewChild('navTop') nav_top;
     @ViewChild('navHome') nav_home;
@@ -61,18 +56,17 @@ export class ArticleComponent implements OnInit, OnDestroy {
         return this._category_db.next;
     }
 
+    get current_article() {
+        return this._article_db.current_article;
+    }
+
     ngOnInit() {
-        document.body.scrollTop = 0;
+        document.scrollingElement.scrollTop = 0;
+        const article_id = this._activate_route.params['value']['id'];
         this.article_exists = 'active';
-        this.article_id = this._activate_route.params['value']['id'];
-        this._article_db.fetch(this.article_id).subscribe(
-            data => {
-                this.category_id = data['category_id'];
-                this.content = data['content'];
-                this.title = data['title'];
-                this.article_create_time = data['create_time'] * 1000;
-                this.article_user_name = data['username'];
-                this.render_latex = true;
+        this._article_db.fetch(article_id).subscribe(
+            res => {
+                this.render_latex = article_id;
             }
         );
     }
@@ -82,18 +76,18 @@ export class ArticleComponent implements OnInit, OnDestroy {
     }
 
     show_nav_button(event) {
-        if (event.type !== 'mousemove') {
+        if (event.type !== 'mousemove' || event.x >= event.view.innerWidth || event.x < 0) {
             return event;
         }
 
-        if (event.view.innerWidth - this.nav_zone_width / 3 <= event.x && event.x <= event.view.innerWidth) {
+        if (event.x >= event.view.innerWidth - this.nav_zone_width * 0.33 ) {
             if (!this.right_nav_show) {
                 this.right_nav_show = true;
                 this.nav_editor._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5)';
                 this.nav_top._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5) translateY(-60px)';
                 this.nav_home._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5) translateY(60px)';
             }
-        } else if (event.view.innerWidth - this.nav_zone_width * 1.5 > event.x) {
+        } else if (event.x < event.view.innerWidth - this.nav_zone_width * 1.5 ) {
             if (this.right_nav_show) {
                 this.right_nav_show = false;
                 this.nav_editor._elementRef.nativeElement.style.transform = 'translateX(80%)';
@@ -103,17 +97,17 @@ export class ArticleComponent implements OnInit, OnDestroy {
         }
     }
 
-    goto_editor(event) {
-        this._router.navigate(['/editor/' + this.article_id]);
+    go_editor(event) {
+        this._router.navigate(['/editor/' + this.current_article.article_id]);
     }
 
-    goto_top(event) {
-        let total_height = document.body.scrollTop;
+    go_top(event) {
+        let total_height = document.scrollingElement.scrollTop;
         const delta = total_height / 15;
         if (total_height > 0) {
             const interval_handler = setInterval(() => {
                 total_height -= delta;
-                document.body.scrollTop = total_height;
+                document.scrollingElement.scrollTop = total_height;
                 if (total_height <= 0) {
                     clearInterval(interval_handler);
                 }
@@ -121,7 +115,7 @@ export class ArticleComponent implements OnInit, OnDestroy {
         }
     }
 
-    goto_home(event) {
+    go_home(event) {
         this._router.navigate(['/home/']);
     }
 
@@ -141,7 +135,13 @@ export class ArticleComponent implements OnInit, OnDestroy {
 
     }
 
-
+    change(article_id) {
+        this.article_exists = 'inactive';
+        setTimeout(() => {
+            this._router.navigate(['/article/' + article_id]).then(() => { this.ngOnInit(); });
+            document.scrollingElement.scrollTop = 0;
+        }, 300);
+    }
 }
 
 @Component({

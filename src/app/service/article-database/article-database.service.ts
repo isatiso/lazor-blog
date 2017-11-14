@@ -5,18 +5,19 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { AsyncSubject } from 'rxjs/AsyncSubject';
 
 import { CategoryDatabaseService } from 'service/category-database/category-database.service';
-import { Article, ArticleData } from 'public/data-struct-definition';
+import { Article, ArticleData, Options } from 'public/data-struct-definition';
 
 @Injectable()
 export class ArticleDatabaseService {
-    current_article_data: BehaviorSubject<ArticleData> = new BehaviorSubject<ArticleData>(null);
-    current_article_id = '';
+    current_article_data: BehaviorSubject<ArticleData>;
 
     constructor(
         private _http: HttpClient,
         private _router: Router,
         private _category_db: CategoryDatabaseService
-    ) { }
+    ) {
+        this.current_article_data = new BehaviorSubject<ArticleData>(new ArticleData({}));
+    }
 
     get current_article(): ArticleData {
         return this.current_article_data.value;
@@ -24,12 +25,22 @@ export class ArticleDatabaseService {
 
     set current_article(source: ArticleData) {
         this.current_article_data.next(source);
-        this._category_db.find_last_and_next(this.current_article);
+        this._category_db.find_last_and_next(this.current_article.article_id);
     }
 
     fetch(article_id: string) {
+
         const dataExchange: AsyncSubject<Article> = new AsyncSubject<Article>();
         const cache_info = window.sessionStorage.getItem('article-' + article_id);
+
+        const update_data = data => {
+            const options = new Options({article_id: article_id});
+            this._category_db.update(data['category_id'], options);
+            dataExchange.next(data);
+            dataExchange.complete();
+            this.current_article = new ArticleData(data);
+        };
+
         if (!cache_info) {
             this._http.get('/middle/article?article_id=' + article_id).subscribe(
                 res => {
@@ -43,11 +54,7 @@ export class ArticleDatabaseService {
                         return;
                     } else {
                         window.sessionStorage.setItem('article-' + article_id, JSON.stringify(res['data']));
-                        this._category_db.update(res['data']['category_id']);
-                        dataExchange.next(res['data']);
-                        dataExchange.complete();
-                        this.current_article = res['data'];
-                        this.current_article_id = this.current_article.article_id;
+                        update_data(res['data']);
                     }
                 },
                 error => {
@@ -55,11 +62,7 @@ export class ArticleDatabaseService {
             );
         } else {
             const data = JSON.parse(cache_info);
-            this._category_db.update(data['category_id']);
-            dataExchange.next(data);
-            dataExchange.complete();
-            this.current_article = data;
-            this.current_article_id = this.current_article.article_id;
+            update_data(data);
         }
 
         return dataExchange;

@@ -19,16 +19,12 @@ import 'rxjs/add/operator/mergeMap';
     animations: [
         trigger('navBarAnimation', [
             state('active', style({
-                // color: '#000000',
-                // transform: 'translateY(0)',
                 opacity: 1,
             })),
             transition('void <=> active', animate('300ms ease-in'))
         ]),
         trigger('childrenAppear', [
             state('active', style({
-                // color: '#000000',
-                // transform: 'translateY(0)',
                 opacity: 1,
             })),
             transition('void <=> active', animate('300ms ease-in'))
@@ -43,7 +39,6 @@ export class AppComponent implements OnInit {
     height_limit = 0;
     client_width = 0;
     navbarWidth = 0;
-    current_user: string;
     constructor(
         private el: ElementRef,
         private router: Router,
@@ -54,6 +49,14 @@ export class AppComponent implements OnInit {
         private _category_db: CategoryDatabaseService,
         public nav_profile: NavProfileService,
     ) { }
+
+    get current_user(): string {
+        if (this._account.data) {
+            return this._account.data.user_name;
+        } else {
+            return 'Menu';
+        }
+    }
 
     ngOnInit() {
         window.sessionStorage.clear();
@@ -76,7 +79,6 @@ export class AppComponent implements OnInit {
                     this.height_limit = 0;
                 }
             });
-        this.current_user = window.localStorage.getItem('user_name');
     }
 
     is_logged() {

@@ -5,8 +5,11 @@ html {
     width: 100%;
     height: 100%;
     display: block;
+    padding: 0;
+    margin: 0;
     body {
         width: 100%;
+        // height: calc(100% - 209px);
         height: 100%;
         display: block;
         padding: 0;
@@ -20,7 +23,7 @@ html {
     margin: 0;
     height: 4px;
     width: 100%;
-    background-color: map-get($accent, 900);
+    background-color: map-get($accent, 500);
     margin-top: 10px;
     margin-bottom: 10px;
 }
