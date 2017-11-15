@@ -80,14 +80,14 @@ export class ArticleComponent implements OnInit, OnDestroy {
             return event;
         }
 
-        if (event.x >= event.view.innerWidth - this.nav_zone_width * 0.33 ) {
+        if (event.x >= event.view.innerWidth - this.nav_zone_width * 0.33) {
             if (!this.right_nav_show) {
                 this.right_nav_show = true;
                 this.nav_editor._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5)';
                 this.nav_top._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5) translateY(-60px)';
                 this.nav_home._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5) translateY(60px)';
             }
-        } else if (event.x < event.view.innerWidth - this.nav_zone_width * 1.5 ) {
+        } else if (event.x < event.view.innerWidth - this.nav_zone_width * 1.5) {
             if (this.right_nav_show) {
                 this.right_nav_show = false;
                 this.nav_editor._elementRef.nativeElement.style.transform = 'translateX(80%)';
@@ -127,9 +127,7 @@ export class ArticleComponent implements OnInit, OnDestroy {
                     src: window['current_image']
                 }
             }).afterClosed().subscribe(
-                res => {
-                }
-                );
+                res => { });
             window['current_image'] = null;
         }
 

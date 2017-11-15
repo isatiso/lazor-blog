@@ -5,31 +5,29 @@
                 Hi, {{ user_name }}
             </p>
             <p class="create-button">
-
                 <button mat-raised-button class="create-article" color="primary" routerLink="/editor/new-article">写新文章</button>
+                <mat-slide-toggle class="can-sort" color="primary" [checked]="can_sort" (change)="set_sortable($event)">Surprise！</mat-slide-toggle>
             </p>
         </div>
         <div class="divider"></div>
         <div class="content-container">
             <div class="category-list">
-                <ul *ngIf="categories.length; else emptyInfo" [sortablejs]="categories">
+                <ul *ngIf="categories.length; else emptyInfo" [sortablejs]="categories" [sortablejsOptions]="category_sort_options">
                     <li *ngFor="let category of categories;" class="category-item" (click)="set_step(category)">
-                        <mat-card [@lightCategory]="is_current(category)" [@showOptions]="show_options(category)">
+                        <mat-card [@showOptions]="show_options(category)" [@sortState]="can_sort">
                             {{ category.category_name }}
                         </mat-card>
                         <div class="options-button">
                             <div class="spacer"></div>
                             <div class="button-container">
-                                <div class="button">
-                                    <button mat-icon-button class="modify-button" color="primary" (click)="modify_category($event, category)">
+                                <div class="helper"></div>
+                                <button mat-icon-button class="modify-button" color="primary" (click)="modify_category($event, category)">
                                         <mat-icon>mode_edit</mat-icon>
                                     </button>
-                                </div>
-                                <div class="button" *ngIf="category.category_type">
-                                    <button mat-icon-button class="delete-button" color="warn" (click)="delete_category(category.category_id)">
+                                <button *ngIf="category.category_type" mat-icon-button class="delete-button" color="warn" (click)="delete_category($event, category.category_id)">
                                         <mat-icon>delete</mat-icon>
                                     </button>
-                                </div>
+
                             </div>
                         </div>
                     </li>
@@ -50,20 +48,16 @@
                         Article
                     </div>
                 </div>
-                <ul [sortablejs]="article_list" [sortablejsOptions]="sortable_options">
-                    <li *ngFor="let article of article_list" class="article-item">
+                <ul [sortablejs]="article_list" [sortablejsOptions]="article_sort_options" class="sortable">
+                    <li *ngFor="let article of article_list" class="article-item" [@sortState]="can_sort">
                         <div class="helper"></div>
-                        <!-- <button mat-button routerLink="/article/{{article.article_id}}" color="primary">
-                            {{ article.title }}
-                        </button> -->
-                        <mat-chip-list>
+                        <mat-chip-list [@loadArticle]="load_article">
                             <mat-chip routerLink="/article/{{article.article_id}}" selected="true" color="primary">
                                 {{ article.title }}
                             </mat-chip>
                         </mat-chip-list>
                     </li>
                 </ul>
-
             </div>
         </div>
     </mat-card>

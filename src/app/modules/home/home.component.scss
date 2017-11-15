@@ -12,6 +12,7 @@ sans-serif;
         position: absolute;
         right: 3%;
         top: 20px;
+        mat-slide-toggle,
         button {
             font-family: $fun_font;
             font-size: 20px;
@@ -21,8 +22,15 @@ sans-serif;
             &.add-category {
                 top: -20px;
             }
+            &.can-sort {
+                font-size: 20px;
+                color: rgba(0, 0, 0, 0.56);
+                top: 78px;
+                right: 130px;
+            }
             &.create-article {
-                top: 20px;
+                top: 70px;
+                right: 0px;
             }
         }
     }
@@ -40,7 +48,8 @@ sans-serif;
         font-family: $fun_font;
         padding-top: 0;
         flex: 4;
-        width: 400px;
+        width: 20%;
+        max-width: 250px;
         ul {
             list-style: none;
             padding: 0;
@@ -48,14 +57,15 @@ sans-serif;
             padding-left: 0px;
             li.category-item {
                 height: 52px;
+                margin-top: 4px;
                 position: relative;
-                background-color: map-get($accent, 300);
-                border-radius: 4px;
-                // box-shadow: ;
                 .mat-card {
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    overflow: hidden;
                     text-align: left;
-                    z-index: 10;
-                    background-color: map-get($accent, 200);
+                    z-index: 1;
+                    background-color: #fff;
                     opacity: 0.99;
                     font-family: $fun_font;
                     font-size: 20px;
@@ -65,19 +75,36 @@ sans-serif;
                 text-align: right;
                 .options-button {
                     width: 100%;
+                    height: 52px;
                     position: absolute;
+                    border-radius: 5px;
+                    background-color: map-get($accent, 300);
                     display: flex;
-                    top: 7px;
+                    top: 0px;
+                    box-shadow: inset -1px -1px 10px rgba(0, 0, 0, 0.30);
                     .spacer {
                         flex: 3;
+                        height: 52px;
                     }
                     .button-container {
                         flex: 2;
                         display: flex;
                         text-align: center;
-                        .button {
+                        padding-left: 10px;
+                        padding-right: 10px;
+                        height: 52px;
+                        .helper {
+                            height: 100%;
+                            display: inline-block;
+                            vertical-align: middle;
+                        }
+                        button {
+                            height: 52px;
+                            width: 36px;
                             z-index: 0;
                             flex: auto;
+                            display: inline-block;
+                            vertical-align: middle;
                         }
                     }
                 }
@@ -116,18 +143,24 @@ sans-serif;
         flex: 14;
         text-align: left;
         ul {
+            background-color: #ddd;
             list-style: none;
             padding: 0;
             margin: 0;
             padding-left: 0px;
-            .helper {
-                display: inline-block;
-                height: 100%;
-                vertical-align: middle;
-            }
-            .mat-chip-list {
-                display: inline-block;
-                vertical-align: middle;
+            li {
+                background-color: #ffffff;
+                .helper {
+                    display: inline-block;
+                    height: 100%;
+                    vertical-align: middle;
+                }
+                .mat-chip-list {
+                    transform: translateX(-80px);
+                    opacity: 0;
+                    display: inline-block;
+                    vertical-align: middle;
+                }
             }
         }
     }

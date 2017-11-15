@@ -27,23 +27,38 @@ import { ArticleData, Category, Options } from 'public/data-struct-definition';
             transition('void <=> active', animate('300ms ease-in')),
             transition('inactive <=> active', animate('300ms ease-in'))
         ]),
-        trigger('lightCategory', [
+        trigger('sortState', [
             state('1', style({
-                backgroundColor: '#d0d0d0',
+                borderRadius: '5px',
+                backgroundColor: '#e0f7fa'
             })),
             state('0', style({
-                backgroundColor: '#f0f0f0',
+                borderRadius: '0px',
+                backgroundColor: '#fff'
             })),
-            transition('1 <=> 0', animate('300ms ease-in'))
+            transition('1 <=> 0', animate('200ms linear'))
+        ]),
+        trigger('loadArticle', [
+            state('1', style({
+                transform: 'translateX(0)',
+                opacity: 1
+            })),
+            transition('void => 1', animate('200ms ease')),
+            transition('0 => 1', animate('200ms ease'))
         ]),
         trigger('showOptions', [
-            state('1', style({
-                transform: 'translateX(-40%)',
+            state('options', style({
+                transform: 'translateX(-45%)',
             })),
-            state('0', style({
+            state('current', style({
+                transform: 'translateX(-5%)',
+            })),
+            state('none', style({
                 transform: 'translateX(0)',
             })),
-            transition('1 <=> 0', animate('100ms ease'))
+            transition('* <=> *', animate('200ms ease')),
+            // transition('current <=> options', animate('200ms ease')),
+            // transition('options <=> none', animate('200ms ease')),
         ]),
     ]
 })
@@ -52,14 +67,40 @@ export class HomeComponent implements OnInit, OnDestroy {
     page_appear = 'active';
     displayedColumns = ['title'];
     dataSource: CategorySource | null;
-    sortable_options: SortablejsOptions = {
+    can_sort: boolean;
+    load_article: boolean;
+    article_sort_options_data: SortablejsOptions = {
+        animation: 50,
+        disabled: false,
         onStart: event => {
-            this._category_db.clear_push_order();
+            event.item.style.opacity = 0;
+            this._category_db.clear_push_article_order();
         },
         onEnd: event => {
-            this._category_db.push_order();
+            event.item.style.opacity = 1;
+            this._category_db.push_article_order();
         },
     };
+
+    category_sort_options_data: SortablejsOptions = {
+        animation: 50,
+        disabled: false,
+        onStart: event => {
+            event.item.style.opacity = 0;
+            this._category_db.clear_push_article_order();
+        },
+        onEnd: event => {
+            event.item.style.opacity = 1;
+            this._category_db.push_category_order();
+        },
+    };
+
+    sortable_disabled_data: SortablejsOptions = {
+        disabled: true
+    };
+
+    article_sort_options: SortablejsOptions;
+    category_sort_options: SortablejsOptions;
 
     constructor(
         private _http_client: HttpClient,
@@ -89,22 +130,15 @@ export class HomeComponent implements OnInit, OnDestroy {
         document.scrollingElement.scrollTop = 0;
         this.page_appear = 'active';
         this.dataSource = new CategorySource(this._category_db, 'home');
+        this.article_sort_options = this.sortable_disabled_data;
+        this.category_sort_options = this.sortable_disabled_data;
+        this.can_sort = false;
+        this.load_article = true;
         this.query_category();
-        console.log(this);
     }
 
     ngOnDestroy() {
         this.page_appear = 'inactive';
-    }
-
-    set_step(category) {
-        if (!this.is_current(category)) {
-            this._category_db.current_category.show_options = 0;
-            this._category_db.update(category['category_id']);
-        } else {
-            this.toggle_button();
-        }
-
     }
 
     is_current(category) {
@@ -112,15 +146,42 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     show_options(category) {
-        return this.is_current(category) && this._category_db.current_category.show_options === 1;
+        if (!this.can_sort && this.is_current(category)) {
+            if (this._category_db.current_category.show_options === 1) {
+                return 'options';
+            } else {
+                return 'current';
+            }
+        } else {
+            return 'none';
+        }
+    }
+
+    set_step(category) {
+        if (!this.is_current(category)) {
+            this._category_db.current_category.show_options = 0;
+            this._category_db.update(category['category_id']);
+            this.load_article = false;
+            setTimeout(() => { this.load_article = true; }, 0);
+        } else {
+            this.toggle_button();
+        }
+    }
+
+    set_sortable(event) {
+        if (event.checked) {
+            this.article_sort_options = this.article_sort_options_data;
+            this.category_sort_options = this.category_sort_options_data;
+            this.can_sort = true;
+        } else {
+            this.article_sort_options = this.sortable_disabled_data;
+            this.category_sort_options = this.sortable_disabled_data;
+            this.can_sort = false;
+        }
     }
 
     toggle_button() {
-        if (this._category_db.current_category.show_options === 1) {
-            this._category_db.current_category.show_options = 0;
-        } else {
-            this._category_db.current_category.show_options = 1;
-        }
+        this._category_db.current_category.show_options ^= 1;
     }
 
     query_category() {
@@ -137,8 +198,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     add_category(category_name) {
-        console.log(this);
-        console.log(category_name);
         if (category_name) {
             this._http_client.put(
                 '/middle/category', { category_name: category_name }
@@ -150,6 +209,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     modify_category(event, category) {
+        event.stopPropagation();
+        event.preventDefault();
         this.dialog.open(AddCategoryComponent, {
             data: {
                 name: category.category_name,
@@ -157,42 +218,36 @@ export class HomeComponent implements OnInit, OnDestroy {
             }
         }).afterClosed().subscribe(
             res => {
-                if (res) {
-                    this._http_client.post(
-                        '/middle/category', {
-                            category_id: category.category_id,
-                            category_name: res
-                        }
-                    ).subscribe(
-                        update_category_data => {
-                            this.query_category();
-                        });
-                }
+                if (!res) { return; }
+
+                this._http_client.post(
+                    '/middle/category', {
+                        category_id: category.category_id,
+                        category_name: res
+                    }
+                ).subscribe(
+                    update_category_data => {
+                        this.query_category();
+                    });
             });
+
+        return false;
     }
 
-    delete_category(category_id) {
+    delete_category(event, category_id) {
+        event.stopPropagation();
+        event.preventDefault();
         if (!category_id) {
             return;
         }
-        this._http_client.delete('/middle/category?category_id=' + category_id).subscribe(
+        this._http_client.delete(
+            '/middle/category?category_id=' + category_id
+        ).subscribe(
             res => {
                 this.query_category();
-            }
-        );
+            });
+        return false;
     }
-
-    move_up(category) {
-
-    }
-
-    move_down(category) {
-
-    }
-
-
-
-
 }
 
 @Component({

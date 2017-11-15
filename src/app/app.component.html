@@ -25,25 +25,26 @@
             <button mat-button class="nav-font" [matMenuTriggerFor]="menu">
                 <span class="entry-button">{{ current_user }} <mat-icon>fingerprint</mat-icon></span>
             </button>
-            <mat-menu #menu="matMenu">
+            <mat-menu #menu="matMenu" xPosition="before">
                 <button mat-menu-item *ngIf="!is_logged()" routerLink="/auth"><span>Auth</span></button>
+                <button mat-menu-item *ngIf="is_logged()" (click)="edit_profile($event)"><span>Profile</span></button>
                 <button mat-menu-item *ngIf="is_logged()" (click)="log_out($event)"><span>Log Out</span></button>
             </mat-menu>
         </div>
     </mat-toolbar>
-    <div class="nav-bg"></div>
+    <div class="nav-bg "></div>
     <router-outlet></router-outlet>
-    <router-outlet name="footer"></router-outlet>
+    <router-outlet name="footer "></router-outlet>
 
 </div>
 <footer>
-    <div class="footer-container">
-        <mat-grid-list cols="4" rowHeight="45px">
-            <mat-grid-tile colspan="4">
-                Powered by Angular ©2010-2017. Code licensed under an&nbsp;<a href="license" title="License text">MIT-style License</a>.
+    <div class="footer-container ">
+        <mat-grid-list cols="4 " rowHeight="45px ">
+            <mat-grid-tile colspan="4 ">
+                Powered by Angular ©2010-2017. Code licensed under an&nbsp;<a href="license " title="License text ">MIT-style License</a>.
             </mat-grid-tile>
-            <mat-grid-tile colspan="4">
-                <span class="text-caption"> </span> Version: 0.1.0&nbsp;<a href="http://www.miitbeian.gov.cn/">粤ICP备17088879号</a>
+            <mat-grid-tile colspan="4 ">
+                <span class="text-caption "> </span> Version: 0.1.0&nbsp;<a href="http://www.miitbeian.gov.cn/ ">粤ICP备17088879号</a>
             </mat-grid-tile>
         </mat-grid-list>
     </div>

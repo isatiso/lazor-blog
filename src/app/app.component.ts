@@ -1,7 +1,8 @@
-import { Component, ElementRef, OnInit, OnChanges, AfterViewInit, AfterViewChecked, HostListener } from '@angular/core';
+import { Component, ElementRef, Inject, OnInit, OnChanges, AfterViewInit, AfterViewChecked, HostListener } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { HttpClient } from '@angular/common/http';
+import { MatSnackBar, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 import { NavBgDirective } from 'directive/nav-bg.directive';
 import { NavProfileService } from 'service/nav-profile/nav-profile.service';
@@ -45,6 +46,7 @@ export class AppComponent implements OnInit {
         private _http: HttpClient,
         private activatedRoute: ActivatedRoute,
         private _account: AccountService,
+        public dialog: MatDialog,
         private _article_db: ArticleDatabaseService,
         private _category_db: CategoryDatabaseService,
         public nav_profile: NavProfileService,
@@ -90,6 +92,15 @@ export class AppComponent implements OnInit {
         return event;
     }
 
+    edit_profile() {
+        this.dialog.open(ProfileComponent, {
+            data: {
+                name: this._account.data.user_name,
+                placeholder: 'Enter a New Name'
+            }
+        }).afterClosed().subscribe(data => { this._account.update_username(data.name); });
+    }
+
     log_out(event) {
         this._http.delete('/middle/user').subscribe(
             res => {
@@ -97,5 +108,25 @@ export class AppComponent implements OnInit {
             }
         );
         this.router.navigate(['/auth']);
+    }
+}
+
+@Component({
+    selector: 'la-profile',
+    templateUrl: './profile.component.html',
+    styleUrls: ['./app.component.scss']
+})
+export class ProfileComponent {
+    public name = '';
+    constructor(
+        public dialogRef: MatDialogRef<ProfileComponent>,
+        @Inject(MAT_DIALOG_DATA) public data: any,
+    ) { }
+
+    submit(event) {
+        if (event.type === 'keyup' && event.key === 'Enter') {
+            this.dialogRef.close(this.data);
+            return false;
+        }
     }
 }

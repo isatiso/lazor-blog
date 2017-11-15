@@ -13,6 +13,7 @@ import {
     MatListModule,
     MatGridListModule,
     MatExpansionModule,
+    MatSlideToggleModule,
     MatInputModule,
     MatDialogModule
 } from '@angular/material';
@@ -36,11 +37,12 @@ import { HomeRoutingModule } from './home-routing.module';
         MatIconModule,
         MatGridListModule,
         MatExpansionModule,
+        MatSlideToggleModule,
         MatInputModule,
         MatDialogModule,
         HttpClientModule,
         HomeRoutingModule,
-        SortablejsModule.forRoot({ animation: 150 })
+        SortablejsModule.forRoot({ })
     ],
     entryComponents: [
         AddCategoryComponent

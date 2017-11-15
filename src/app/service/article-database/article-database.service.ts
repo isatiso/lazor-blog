@@ -25,6 +25,9 @@ export class ArticleDatabaseService {
 
     set current_article(source: ArticleData) {
         this.current_article_data.next(source);
+        window.sessionStorage.setItem(
+            'article-' + this.current_article.article_id,
+            JSON.stringify(source));
         this._category_db.find_last_and_next(this.current_article.article_id);
     }
 
@@ -34,7 +37,7 @@ export class ArticleDatabaseService {
         const cache_info = window.sessionStorage.getItem('article-' + article_id);
 
         const update_data = data => {
-            const options = new Options({article_id: article_id});
+            const options = new Options({ article_id: article_id });
             this._category_db.update(data['category_id'], options);
             dataExchange.next(data);
             dataExchange.complete();

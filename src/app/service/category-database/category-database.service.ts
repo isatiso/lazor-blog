@@ -15,7 +15,8 @@ export class CategoryDatabaseService {
     last_data: BehaviorSubject<ArticleData> = new BehaviorSubject<ArticleData>(null);
     next_data: BehaviorSubject<ArticleData> = new BehaviorSubject<ArticleData>(null);
     current_category_data: Category;
-    settimeout_handler: any;
+    category_settimeout_handler: any;
+    article_settimeout_handler: any;
 
     constructor(
         private _http: HttpClient
@@ -165,14 +166,14 @@ export class CategoryDatabaseService {
         }
     }
 
-    push_order() {
-        clearTimeout(this.settimeout_handler);
-        this.settimeout_handler = setTimeout(() => {
+    push_article_order() {
+        clearTimeout(this.article_settimeout_handler);
+        this.article_settimeout_handler = setTimeout(() => {
             const order_list = this.home_list.map(
                 item => {
                     return item.article_id;
                 });
-            this._http.post('/middle/category/order', {
+            this._http.post('/middle/article/order', {
                 category_id: this.current_category.category_id,
                 order_list: order_list
             }).subscribe(
@@ -191,8 +192,37 @@ export class CategoryDatabaseService {
         }, 800);
     }
 
-    clear_push_order() {
-        clearTimeout(this.settimeout_handler);
+    push_category_order() {
+        clearTimeout(this.article_settimeout_handler);
+        this.article_settimeout_handler = setTimeout(() => {
+            const order_list = this.category_list.map(
+                item => {
+                    return item.category_id;
+                });
+            this._http.post('/middle/category/order', {
+                order_list: order_list
+            }).subscribe(
+                res => {
+                    console.log(this.category_list);
+                    this.category_list = order_list.map(item => {
+                        return this.category_list.find(category => {
+                            return category.category_id === item;
+                        });
+                    });
+                    window.sessionStorage.setItem('category-list', JSON.stringify(this.category_list));
+                    console.log(this.category_list);
+                },
+                error => {
+                });
+        }, 800);
+    }
+
+    clear_push_article_order() {
+        clearTimeout(this.article_settimeout_handler);
+    }
+
+    clear_push_category_order() {
+        clearTimeout(this.category_settimeout_handler);
     }
 
     shuffle(limit: number) {

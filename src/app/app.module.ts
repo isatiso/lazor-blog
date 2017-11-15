@@ -1,19 +1,22 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { FormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
-import { 
-    MatSnackBar, 
-    MatToolbarModule, 
-    MatButtonModule, 
-    MatGridListModule, 
-    MatMenuModule, 
-    MatIconModule, 
+import {
+    MatSnackBar,
+    MatToolbarModule,
+    MatButtonModule,
+    MatInputModule,
+    MatGridListModule,
+    MatMenuModule,
+    MatDialogModule,
+    MatIconModule,
     MatSnackBarModule
 } from '@angular/material';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from 'app-routing.module';
-import { AppComponent } from 'app.component';
+import { AppComponent, ProfileComponent } from 'app.component';
 import { NavBgDirective } from 'directive/nav-bg.directive';
 import { MarkdownDirective } from 'directive/markdown.directive';
 import { NavProfileService } from 'service/nav-profile/nav-profile.service';
@@ -28,14 +31,18 @@ import { ArticleOwnerGuard } from 'guard/article-owner.guard';
 @NgModule({
     declarations: [
         AppComponent,
+        ProfileComponent,
         NavBgDirective
     ],
     imports: [
         BrowserModule,
+        FormsModule,
         HttpClientModule,
         MatToolbarModule,
         MatButtonModule,
+        MatInputModule,
         MatGridListModule,
+        MatDialogModule,
         MatIconModule,
         MatMenuModule,
         MatSnackBarModule,
@@ -53,6 +60,9 @@ import { ArticleOwnerGuard } from 'guard/article-owner.guard';
         MatSnackBar,
         AuthGuard,
         ArticleOwnerGuard],
+    entryComponents: [
+        ProfileComponent
+    ],
     bootstrap: [AppComponent]
 })
 export class AppModule { }
