@@ -17,6 +17,7 @@ export class CategoryDatabaseService {
     current_category_data: Category;
     category_settimeout_handler: any;
     article_settimeout_handler: any;
+    init_status = false;
 
     constructor(
         private _http: HttpClient
@@ -51,7 +52,6 @@ export class CategoryDatabaseService {
     }
 
     set home_list(source: ArticleData[]) {
-        // console.log('set home_list', source);
         this.home_list_data.next(source);
     }
 
@@ -91,27 +91,38 @@ export class CategoryDatabaseService {
         const cache_info = window.sessionStorage.getItem('category_list');
         const update_data = data => {
             this.category_list = data;
-            console.log(data);
             if (!this.current_category.category_id) {
                 this.current_category = this.category_list[0];
-                this.update(this.current_category['category_id'], new Options({
-                    flush: true,
-                    article_id: options['article_id']
-                }));
-            } else {
-                this.update(this.current_category.category_id, new Options({
-                    flush: true,
-                    article_id: options['article_id']
-                }));
+            } else if (data.findIndex(item => item.category_id === this.current_category['category_id']) === -1) {
+                this.current_category = this.category_list[0];
             }
+            this.update(this.current_category.category_id, new Options({
+                flush: true,
+                article_id: options['article_id']
+            }));
+            this.init_status = true;
+        };
+
+        const assemble_data = (data) => {
+            const order_list = data['order_list'];
+            const category_list: Array<object> = data['category_list'];
+            if (order_list && order_list.length) {
+                category_list.sort((a, b) => {
+                    const a_index = order_list.findIndex(item => item === a['category_id']);
+                    const b_index = order_list.findIndex(item => item === b['category_id']);
+                    return a_index - b_index;
+                });
+            }
+            return category_list;
         };
 
         if (options.flush || !cache_info) {
             this._http.get('/middle/category').subscribe(
                 res => {
                     if (res['data']) {
-                        window.sessionStorage.setItem('category_list', JSON.stringify(res['data']));
-                        update_data(res['data']);
+                        const data = assemble_data(res['data']);
+                        window.sessionStorage.setItem('category_list', JSON.stringify(data));
+                        update_data(data);
                     }
                 },
                 error => {
@@ -135,6 +146,19 @@ export class CategoryDatabaseService {
             }
         };
 
+        const assemble_data = (data) => {
+            const order_list = data['order_list'];
+            const article_list: Array<object> = data['article_list'];
+            if (order_list && order_list.length) {
+                article_list.sort((a, b) => {
+                    const a_index = order_list.findIndex(item => item === a['article_id']);
+                    const b_index = order_list.findIndex(item => item === b['article_id']);
+                    return a_index - b_index;
+                });
+            }
+            return article_list;
+        };
+
         if (!this.category_list.length) {
             this.pull(new Options({ flush: true, article_id: options.article_id }));
         } else {
@@ -154,8 +178,9 @@ export class CategoryDatabaseService {
             if (options.flush || !cache_info) {
                 this._http.get('/middle/article/user-list?category_id=' + category_id).subscribe(
                     res => {
-                        window.sessionStorage.setItem('category-' + category_id, JSON.stringify(res['data']));
-                        update_data(res['data']);
+                        const data = assemble_data(res['data']);
+                        window.sessionStorage.setItem('category-' + category_id, JSON.stringify(data));
+                        update_data(data);
                     },
                     error => {
                     }
@@ -178,14 +203,13 @@ export class CategoryDatabaseService {
                 order_list: order_list
             }).subscribe(
                 res => {
-                    console.log(this.home_list);
                     this.home_list = order_list.map(item => {
                         return this.home_list.find(article => {
                             return article.article_id === item;
                         });
                     });
                     window.sessionStorage.setItem('category-' + this.current_category.category_id, JSON.stringify(this.home_list));
-                    console.log(this.home_list);
+
                 },
                 error => {
                 });
@@ -203,14 +227,12 @@ export class CategoryDatabaseService {
                 order_list: order_list
             }).subscribe(
                 res => {
-                    console.log(this.category_list);
                     this.category_list = order_list.map(item => {
                         return this.category_list.find(category => {
                             return category.category_id === item;
                         });
                     });
                     window.sessionStorage.setItem('category-list', JSON.stringify(this.category_list));
-                    console.log(this.category_list);
                 },
                 error => {
                 });
@@ -228,7 +250,7 @@ export class CategoryDatabaseService {
     shuffle(limit: number) {
         this._http.get('/middle/article/index-list?limit=' + limit).subscribe(
             res => {
-                this.index_list.next(res['data']);
+                this.index_list.next(res['data']['article_list']);
             },
             error => {
             }

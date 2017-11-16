@@ -98,7 +98,11 @@ export class AppComponent implements OnInit {
                 name: this._account.data.user_name,
                 placeholder: 'Enter a New Name'
             }
-        }).afterClosed().subscribe(data => { this._account.update_username(data.name); });
+        }).afterClosed().subscribe(data => {
+            if (data) {
+                this._account.update_username(data.name);
+            }
+        });
     }
 
     log_out(event) {

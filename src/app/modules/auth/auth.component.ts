@@ -17,7 +17,7 @@ import { Account } from 'public/data-struct-definition';
                 color: '#000000',
                 opacity: 1,
             })),
-            transition('void => *', animate('500ms ease-in'))
+            transition('void => *', animate('300ms cubic-bezier(0, 1, 1, 1)'))
         ]),
         trigger('childrenAppear', [
             state('active', style({
@@ -26,7 +26,7 @@ import { Account } from 'public/data-struct-definition';
             state('inactive', style({
                 opacity: 0,
             })),
-            transition('* => active', animate('300ms ease-in'))
+            transition('* => active', animate('300ms cubic-bezier(0, 1, 1, 1)'))
         ]),
     ]
 })

@@ -15,7 +15,7 @@ import {
 } from '@angular/material';
 
 import { EditorRoutingModule } from './editor-routing.module';
-import { EditorComponent, InputComponent } from './editor.component';
+import { EditorComponent, InputComponent, WarningComponent } from './editor.component';
 import { MarkdownModule } from 'directive/markdown.module';
 
 @NgModule({
@@ -35,8 +35,13 @@ import { MarkdownModule } from 'directive/markdown.module';
         EditorRoutingModule
     ],
     entryComponents: [
-        InputComponent
+        InputComponent,
+        WarningComponent
     ],
-    declarations: [EditorComponent, InputComponent]
+    declarations: [
+        EditorComponent,
+        InputComponent,
+        WarningComponent
+    ]
 })
 export class EditorModule { }

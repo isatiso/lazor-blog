@@ -10,6 +10,7 @@ import { Article, ArticleData, Options } from 'public/data-struct-definition';
 @Injectable()
 export class ArticleDatabaseService {
     current_article_data: BehaviorSubject<ArticleData>;
+    on_edit_data: BehaviorSubject<ArticleData>;
 
     constructor(
         private _http: HttpClient,
@@ -17,6 +18,7 @@ export class ArticleDatabaseService {
         private _category_db: CategoryDatabaseService
     ) {
         this.current_article_data = new BehaviorSubject<ArticleData>(new ArticleData({}));
+        this.on_edit_data = new BehaviorSubject<ArticleData>(new ArticleData({}));
     }
 
     get current_article(): ArticleData {
@@ -54,7 +56,6 @@ export class ArticleDatabaseService {
                             }
                         };
                         this._router.navigate(['/error'], navigationExtras);
-                        return;
                     } else {
                         window.sessionStorage.setItem('article-' + article_id, JSON.stringify(res['data']));
                         update_data(res['data']);

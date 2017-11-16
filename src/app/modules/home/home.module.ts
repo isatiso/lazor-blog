@@ -20,7 +20,7 @@ import {
 
 import { SortablejsModule } from 'angular-sortablejs';
 
-import { HomeComponent, AddCategoryComponent } from './home.component';
+import { HomeComponent, AddCategoryComponent, WarningComponent } from './home.component';
 import { HomeRoutingModule } from './home-routing.module';
 
 @NgModule({
@@ -42,11 +42,16 @@ import { HomeRoutingModule } from './home-routing.module';
         MatDialogModule,
         HttpClientModule,
         HomeRoutingModule,
-        SortablejsModule.forRoot({ })
+        SortablejsModule.forRoot({})
     ],
     entryComponents: [
-        AddCategoryComponent
+        AddCategoryComponent,
+        WarningComponent
     ],
-    declarations: [HomeComponent, AddCategoryComponent]
+    declarations: [
+        HomeComponent,
+        AddCategoryComponent,
+        WarningComponent
+    ]
 })
 export class HomeModule { }

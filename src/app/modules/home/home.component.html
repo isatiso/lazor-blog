@@ -7,6 +7,7 @@
             <p class="create-button">
                 <button mat-raised-button class="create-article" color="primary" routerLink="/editor/new-article">写新文章</button>
                 <mat-slide-toggle class="can-sort" color="primary" [checked]="can_sort" (change)="set_sortable($event)">Surprise！</mat-slide-toggle>
+                <span *ngIf="can_sort" class="can-sort-info" [@infoAppear]="1">Now You Can Drag And Sort!</span>
             </p>
         </div>
         <div class="divider"></div>
@@ -24,7 +25,7 @@
                                 <button mat-icon-button class="modify-button" color="primary" (click)="modify_category($event, category)">
                                         <mat-icon>mode_edit</mat-icon>
                                     </button>
-                                <button *ngIf="category.category_type" mat-icon-button class="delete-button" color="warn" (click)="delete_category($event, category.category_id)">
+                                <button *ngIf="category.category_type" mat-icon-button class="delete-button" color="warn" (click)="delete_confirm($event, category.category_id)">
                                         <mat-icon>delete</mat-icon>
                                     </button>
 

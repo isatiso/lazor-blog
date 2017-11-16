@@ -4,7 +4,7 @@
             <input [(ngModel)]="title" class="editor-title" placeholder="Untitled" maxlength="50" #titleRef/>
         </div>
         <div class="dash-board">
-            <button mat-raised-button color="warn" (click)="delete_article()">Delete</button>
+            <button mat-raised-button color="warn" (click)="delete_confirm($event)">Delete</button>
         </div>
         <div class="category-editor">
             <mat-form-field>

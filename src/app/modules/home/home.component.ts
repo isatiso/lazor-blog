@@ -24,8 +24,8 @@ import { ArticleData, Category, Options } from 'public/data-struct-definition';
             state('inactive', style({
                 opacity: 0,
             })),
-            transition('void <=> active', animate('300ms ease-in')),
-            transition('inactive <=> active', animate('300ms ease-in'))
+            transition('void <=> active', animate('300ms cubic-bezier(0, 1, 1, 1)')),
+            transition('inactive <=> active', animate('300ms cubic-bezier(0, 1, 1, 1)'))
         ]),
         trigger('sortState', [
             state('1', style({
@@ -36,15 +36,22 @@ import { ArticleData, Category, Options } from 'public/data-struct-definition';
                 borderRadius: '0px',
                 backgroundColor: '#fff'
             })),
-            transition('1 <=> 0', animate('200ms linear'))
+            transition('1 <=> 0', animate('200ms ease-in'))
         ]),
         trigger('loadArticle', [
             state('1', style({
                 transform: 'translateX(0)',
                 opacity: 1
             })),
-            transition('void => 1', animate('200ms ease')),
-            transition('0 => 1', animate('200ms ease'))
+            transition('void => 1', animate('200ms cubic-bezier(0, 1, 1, 1)')),
+            transition('0 => 1', animate('200ms cubic-bezier(0, 1, 1, 1)'))
+        ]),
+        trigger('infoAppear', [
+            state('1', style({
+                opacity: 1
+            })),
+            transition('void <=> 1', animate('200ms cubic-bezier(0, 1, 1, 1)')),
+            // transition('0 => 1', animate('200ms cubic-bezier(0, 1, 1, 1)'))
         ]),
         trigger('showOptions', [
             state('options', style({
@@ -56,9 +63,7 @@ import { ArticleData, Category, Options } from 'public/data-struct-definition';
             state('none', style({
                 transform: 'translateX(0)',
             })),
-            transition('* <=> *', animate('200ms ease')),
-            // transition('current <=> options', animate('200ms ease')),
-            // transition('options <=> none', animate('200ms ease')),
+            transition('* <=> *', animate('200ms cubic-bezier(0, 1, 1, 1)')),
         ]),
     ]
 })
@@ -234,9 +239,23 @@ export class HomeComponent implements OnInit, OnDestroy {
         return false;
     }
 
-    delete_category(event, category_id) {
+    delete_confirm(event, category_id) {
         event.stopPropagation();
         event.preventDefault();
+        this.dialog.open(WarningComponent, {
+            data: {
+                msg: '删除分类以及分类中所有的文章'
+            }
+        }).afterClosed().subscribe(res => {
+            console.log(res);
+            if (res) {
+                this.delete_category(category_id);
+            }
+        });
+        return false;
+    }
+
+    delete_category(category_id) {
         if (!category_id) {
             return;
         }
@@ -246,7 +265,6 @@ export class HomeComponent implements OnInit, OnDestroy {
             res => {
                 this.query_category();
             });
-        return false;
     }
 }
 
@@ -265,6 +283,26 @@ export class AddCategoryComponent {
     submit(event) {
         if (event.type === 'keyup' && event.key === 'Enter') {
             this.dialogRef.close(this.data.name);
+            return false;
+        }
+    }
+}
+
+@Component({
+    selector: 'la-warning',
+    templateUrl: '../../public/warning.component.html',
+    styleUrls: ['./home.component.scss']
+})
+export class WarningComponent {
+    public name = '';
+    constructor(
+        public dialogRef: MatDialogRef<WarningComponent>,
+        @Inject(MAT_DIALOG_DATA) public data: any,
+    ) { }
+
+    submit(event) {
+        if (event.type === 'keyup' && event.key === 'Enter') {
+            this.dialogRef.close(false);
             return false;
         }
     }

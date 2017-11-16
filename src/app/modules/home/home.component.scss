@@ -28,10 +28,26 @@ sans-serif;
                 top: 78px;
                 right: 130px;
             }
+            &.can-sort-info {
+                font-size: 20px;
+                color: rgba(0, 0, 0, 0.56);
+                top: 78px;
+                right: 250px;
+            }
             &.create-article {
                 top: 70px;
                 right: 0px;
             }
+        }
+        .can-sort-info {
+            position: absolute;
+            font-family: $fun_font;
+            font-size: 20px;
+            color: rgba(0, 0, 0, 0.46);
+            top: 32px;
+            right: -7px;
+            width: 300px;
+            opacity: 0;
         }
     }
     .home-title {
@@ -156,7 +172,7 @@ sans-serif;
                     vertical-align: middle;
                 }
                 .mat-chip-list {
-                    transform: translateX(-80px);
+                    transform: translateX(-100px);
                     opacity: 0;
                     display: inline-block;
                     vertical-align: middle;

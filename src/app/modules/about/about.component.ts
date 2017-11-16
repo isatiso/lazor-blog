@@ -13,8 +13,8 @@ import { trigger, state, style, animate, transition } from '@angular/animations'
             state('inactive', style({
                 opacity: 0,
             })),
-            transition('void <=> active', animate('300ms ease-in')),
-            transition('inactive <=> active', animate('300ms ease-in'))
+            transition('void <=> active', animate('300ms cubic-bezier(0, 1, 1, 1)')),
+            transition('inactive <=> active', animate('300ms cubic-bezier(0, 1, 1, 1)'))
         ]),
     ]
 })

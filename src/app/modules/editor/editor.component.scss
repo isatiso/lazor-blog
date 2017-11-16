@@ -27,7 +27,7 @@ monospace;
 .markdown-showup {
     z-index: 10;
     position: fixed;
-    transition: transform 200ms ease-out;
+    transition: transform 200ms cubic-bezier(0, 1, 1, 1);
     transform: translateX(80%);
     top: 48%;
     right: 0;

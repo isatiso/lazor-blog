@@ -36,6 +36,7 @@ export class ArticleOwnerGuard implements CanActivate {
         next: ActivatedRouteSnapshot,
         state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
 
+        console.log(next.params);
         if (next.params.id === 'new-article') {
             return true;
         }
@@ -43,6 +44,7 @@ export class ArticleOwnerGuard implements CanActivate {
         return this._http.get('/middle/guard/owner?article_id=' + next.params.id).map(
             data => {
                 if (data['result'] !== 1) {
+                    console.log(data);
                     const message = 'You can\'t edit other\'s article.';
                     this.raiseSnackBar(message, 'OK', () => {
                     });

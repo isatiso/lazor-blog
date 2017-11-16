@@ -48,6 +48,42 @@ html {
     font-size: 1.5em;
 }
 
+.text-primary {
+    color: map-get($primary, 500);
+}
+
+.text-accent {
+    color: map-get($accent, 500);
+}
+
+.text-warn {
+    color: map-get($warn, 500);
+}
+
+.text-giant {
+    font-size: 48px;
+}
+
+.text-large {
+    font-size: 36px;
+}
+
+.text-normal-plus {
+    font-size: 24px;
+}
+
+.text-normal {
+    font-size: 18px;
+}
+
+.text-mini {
+    font-size: 14px;
+}
+
+.text-nano {
+    font-size: 10px;
+}
+
 footer {
     background-color: map-get($primary, 500);
     background-image: url(/assets/image/abs.png);

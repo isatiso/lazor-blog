@@ -26,7 +26,7 @@ export class ArticleData {
         this.category_name = article['category_name'] || '';
         this.category_type = article['category_type'] || '';
         this.publish_status = article['publish_status'] || 0;
-        this.title = article['title'] || 'Untitled';
+        this.title = article['title'] || '';
         this.content = article['content'] || '';
         this.author = article['author'] || '';
         this.email = article['email'];

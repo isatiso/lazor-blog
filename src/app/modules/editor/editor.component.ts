@@ -24,7 +24,7 @@ declare var Prism: any;
             state('inactive', style({
                 opacity: 0,
             })),
-            transition('* => active', animate('300ms ease-in'))
+            transition('* => active', animate('300ms cubic-bezier(0, 1, 1, 1)'))
         ]),
         trigger('progressAppear', [
             state('active', style({
@@ -33,7 +33,7 @@ declare var Prism: any;
             state('inactive', style({
                 opacity: 0,
             })),
-            transition('* <=> active', animate('200ms ease-out'))
+            transition('* <=> active', animate('200ms cubic-bezier(0, 1, 1, 1)'))
         ]),
     ]
 })
@@ -71,21 +71,21 @@ export class EditorComponent implements OnInit, OnDestroy {
     ) { }
 
     get content(): string {
-        return this._article_db.current_article.content;
+        return this.current_article.content;
     }
 
     set content(value: string) {
-        this._article_db.current_article_data.value.content = value;
+        this.current_article.content = value;
         this._article_status = 'modified';
         this.remove_extra_lines();
     }
 
     get title(): string {
-        return this._article_db.current_article.title;
+        return this.current_article.title;
     }
 
     set title(value: string) {
-        this._article_db.current_article_data.value.title = value;
+        this.current_article.title = value;
         this._article_status = 'modified';
     }
 
@@ -102,11 +102,19 @@ export class EditorComponent implements OnInit, OnDestroy {
     }
 
     get current_article(): ArticleData {
-        return this._article_db.current_article;
+        if (this._activate_route.params['value']['id'] === 'new-article') {
+            return this._article_db.on_edit_data.value;
+        } else {
+            return this._article_db.current_article;
+        }
     }
 
     set current_article(source: ArticleData) {
-        this._article_db.current_article = source;
+        if (this._activate_route.params['value']['id'] === 'new-article') {
+            this._article_db.on_edit_data.next(source);
+        } else {
+            this._article_db.current_article = source;
+        }
     }
 
     ngOnInit() {
@@ -116,7 +124,9 @@ export class EditorComponent implements OnInit, OnDestroy {
         const article_id = this._activate_route.params['value']['id'];
 
         this._nav_zone_width = Math.max((total_width - editor_width) / 2, 50);
-        this._category_db.pull(new Options({ flush: true }));
+        if (!this._category_db.init_status) {
+            this._category_db.pull(new Options({ flush: true }));
+        }
         this._article_status = 'saved';
         this.page_appear = 'active';
 
@@ -125,6 +135,8 @@ export class EditorComponent implements OnInit, OnDestroy {
                 data => {
                 }
             );
+        } else {
+            // this._article_db.on_edit_data.next(new ArticleData({}));
         }
 
         this.remove_extra_lines();
@@ -188,7 +200,7 @@ export class EditorComponent implements OnInit, OnDestroy {
     }
 
     show_nav_button(event) {
-        if (event.view.innerWidth - this._nav_zone_width / 3 <= event.x && event.x <= event.view.innerWidth) {
+        if (event.view.innerWidth - this._nav_zone_width <= event.x && event.x <= event.view.innerWidth) {
             if (!this._nav_show) {
                 this._nav_show = true;
                 this.nav_top._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5) translateY(-120px)';
@@ -196,7 +208,7 @@ export class EditorComponent implements OnInit, OnDestroy {
                 this.nav_add_image._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5)';
                 this.nav_home._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5) translateY(60px)';
             }
-        } else if (event.view.innerWidth - this._nav_zone_width > event.x) {
+        } else if (event.view.innerWidth - this._nav_zone_width * 3 > event.x) {
             if (this._nav_show) {
                 this._nav_show = false;
                 this.nav_view._elementRef.nativeElement.style.transform = 'translateX(80%)';
@@ -215,10 +227,11 @@ export class EditorComponent implements OnInit, OnDestroy {
                 category_id: this.current_category.category_id,
             }).subscribe(
                 res => {
-                    this._article_db.current_article = new ArticleData(res['data']);
+                    this._article_db.fetch(res['data']['article_id']);
+                    this._article_db.on_edit_data.next(new ArticleData({}));
                     this.snack_bar.show('Save Article Successfully.', 'OK', null);
-                    this._router.navigate(['/editor/' + res['data']['article_id']]);
                     this._category_db.update(this.current_category.category_id, new Options({ flush: true }));
+                    this._router.navigate(['/editor/' + res['data']['article_id']]);
                 });
         } else {
             this._http.post('/middle/article', {
@@ -243,6 +256,22 @@ export class EditorComponent implements OnInit, OnDestroy {
             res => {
                 this.snack_bar.show('Publish Article Successfully.', 'OK', null);
             });
+    }
+
+    delete_confirm(event) {
+        event.stopPropagation();
+        event.preventDefault();
+        this.dialog.open(WarningComponent, {
+            data: {
+                msg: '彻底删除当前文章'
+            }
+        }).afterClosed().subscribe(res => {
+            console.log(res);
+            if (res) {
+                this.delete_article();
+            }
+        });
+        return false;
     }
 
     delete_article() {
@@ -403,8 +432,6 @@ export class EditorComponent implements OnInit, OnDestroy {
     }
 }
 
-
-
 @Component({
     selector: 'la-input',
     templateUrl: './input.component.html',
@@ -420,6 +447,26 @@ export class InputComponent {
     submit(event) {
         if (event.type === 'keyup' && event.key === 'Enter') {
             this.dialogRef.close(this.data.name);
+            return false;
+        }
+    }
+}
+
+@Component({
+    selector: 'la-warning',
+    templateUrl: '../../public/warning.component.html',
+    styleUrls: ['./editor.component.scss']
+})
+export class WarningComponent {
+    public name = '';
+    constructor(
+        public dialogRef: MatDialogRef<WarningComponent>,
+        @Inject(MAT_DIALOG_DATA) public data: any,
+    ) { }
+
+    submit(event) {
+        if (event.type === 'keyup' && event.key === 'Enter') {
+            this.dialogRef.close(false);
             return false;
         }
     }
