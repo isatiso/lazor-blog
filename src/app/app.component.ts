@@ -106,7 +106,7 @@ export class AppComponent implements OnInit {
         });
     }
 
-    log_out(event) {
+    log_out() {
         this._http.delete('/middle/user').subscribe(
             res => {
                 this._account.data = null;
