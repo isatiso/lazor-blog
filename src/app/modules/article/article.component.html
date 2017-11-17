@@ -1,4 +1,4 @@
-<div class="container article-container" [@childrenAppear]="article_exists" (window:mousemove)="show_nav_button($event)">
+<div class="container article-container" [@pageAppear]="page_appear" (window:mousemove)="show_nav_button($event)" (window:keydown)="boss_key($event)">
     <mat-card>
         <div class="title">
             {{ current_article.title }}
@@ -10,17 +10,17 @@
         </div>
         <div class="divider"></div>
         <markdown [data]="current_article.content" [renderLatex]="render_latex" (click)="preview_image($event)"></markdown>
-        <button #navHome mat-fab color="primary" (click)="go_home($event)" class="markdown-showup" *ngIf="true">
+        <button #navHome mat-fab color="primary" (click)="go_home($event)" class="markdown-showup" *ngIf="true" matTooltip="回到主页 (ctrl + 0)" matTooltipPosition="left">
             <mat-icon class="big-icon">account_balance</mat-icon></button>
-        <button #navEditor mat-fab color="primary" (click)="go_editor($event)" class="markdown-showup" *ngIf="true">
+        <button #navEditor mat-fab color="primary" (click)="go_editor($event)" class="markdown-showup" *ngIf="true" matTooltip="编辑文章 (ctrl + E)" matTooltipPosition="left">
             <mat-icon class="big-icon">mode_edit</mat-icon></button>
-        <button #navTop mat-fab color="primary" (click)="go_top($event)" class="markdown-showup" *ngIf="true">
+        <button #navTop mat-fab color="primary" (click)="go_top($event)" class="markdown-showup" *ngIf="true" matTooltip="回到顶部 (ctrl + ↑)" matTooltipPosition="left">
             <mat-icon class="big-icon">arrow_upward</mat-icon></button>
         <div class="last-next">
-            <a *ngIf="last_article" class="last" (click)="change(last_article.article_id)">上一篇: {{ last_article.title }}</a>
+            <a *ngIf="last_article" class="last" (click)="go_last($event)">上一篇: {{ last_article.title }}</a>
             <span *ngIf="!last_article" class="last">上一篇: 没有了</span>
             <span class="spacer"> </span>
-            <a *ngIf="next_article" class="next" (click)="change(next_article.article_id)">下一篇: {{ next_article.title }}</a>
+            <a *ngIf="next_article" class="next" (click)="go_next($event)">下一篇: {{ next_article.title }}</a>
             <span *ngIf="!next_article" class="next">下一篇: 没有了</span>
         </div>
     </mat-card>

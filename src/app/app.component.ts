@@ -56,12 +56,13 @@ export class AppComponent implements OnInit {
         if (this._account.data) {
             return this._account.data.user_name;
         } else {
-            return 'Menu';
+            return '';
         }
     }
 
     ngOnInit() {
         window.sessionStorage.clear();
+        this._account.update_user_info();
         if (this.router.url === '/home' || this.router.url === '/') {
             this.height_limit = 276;
         }

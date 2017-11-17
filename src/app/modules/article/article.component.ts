@@ -7,7 +7,10 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { MarkdownDirective } from 'directive/markdown.directive';
 import { ArticleDatabaseService } from 'service/article-database/article-database.service';
 import { CategoryDatabaseService } from 'service/category-database/category-database.service';
-import { Article, ArticleData } from 'public/data-struct-definition';
+import { ScrollorService } from 'service/scrollor//scrollor.service';
+import { PreviewComponent } from 'component/preview/preview.component';
+import { Article, ArticleData, Options } from 'public/data-struct-definition';
+
 
 declare var Prism: any;
 
@@ -16,22 +19,23 @@ declare var Prism: any;
     templateUrl: './article.component.html',
     styleUrls: ['./article.component.scss'],
     animations: [
-        trigger('childrenAppear', [
-            state('active', style({
+        trigger('pageAppear', [
+            state('1', style({
                 opacity: 1,
             })),
-            state('inactive', style({
+            state('0', style({
                 opacity: 0,
             })),
-            transition('void <=> active', animate('300ms cubic-bezier(0, 1, 1, 1)')),
-            transition('inactive <=> active', animate('300ms cubic-bezier(0, 1, 1, 1)'))
+            transition('void => 1', animate('300ms cubic-bezier(0, 1, 1, 1)')),
+            transition('1 => 0', animate('200ms ease-in')),
+            transition('0 => 1', animate('200ms ease-out'))
         ])
     ]
 })
-export class ArticleComponent implements OnInit, OnDestroy {
+export class ArticleComponent implements OnInit {
 
-    public article_exists = 'active';
     public render_latex: any;
+    public page_appear: number;
     private nav_zone_width = 125;
     private right_nav_show = false;
 
@@ -45,6 +49,7 @@ export class ArticleComponent implements OnInit, OnDestroy {
         private _activate_route: ActivatedRoute,
         private _article_db: ArticleDatabaseService,
         private _category_db: CategoryDatabaseService,
+        private _scrollor: ScrollorService,
         public dialog: MatDialog,
     ) { }
 
@@ -62,17 +67,14 @@ export class ArticleComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         document.scrollingElement.scrollTop = 0;
+        this.page_appear = 1;
         const article_id = this._activate_route.params['value']['id'];
-        this.article_exists = 'active';
-        this._article_db.fetch(article_id).subscribe(
+        const flush = Boolean(this._activate_route.queryParams['value']['from'] === 'editor');
+        this._article_db.fetch(article_id, new Options({ flush: flush })).subscribe(
             res => {
                 this.render_latex = article_id;
             }
         );
-    }
-
-    ngOnDestroy() {
-        this.article_exists = 'inactive';
     }
 
     show_nav_button(event) {
@@ -97,26 +99,32 @@ export class ArticleComponent implements OnInit, OnDestroy {
         }
     }
 
-    go_editor(event) {
+    go_editor(event?) {
         this._router.navigate(['/editor/' + this.current_article.article_id]);
     }
 
-    go_top(event) {
-        let total_height = document.scrollingElement.scrollTop;
-        const delta = total_height / 15;
-        if (total_height > 0) {
-            const interval_handler = setInterval(() => {
-                total_height -= delta;
-                document.scrollingElement.scrollTop = total_height;
-                if (total_height <= 0) {
-                    clearInterval(interval_handler);
-                }
-            }, 15);
+    go_top(event?) {
+        this._scrollor.goto_top();
+    }
+
+    go_bottom(event?) {
+        this._scrollor.goto_bottom();
+    }
+
+    go_last(event?) {
+        if (this.last_article) {
+            this.change(this.last_article.article_id);
         }
     }
 
-    go_home(event) {
-        this._router.navigate(['/home/']);
+    go_next(event?) {
+        if (this.next_article) {
+            this.change(this.next_article.article_id);
+        }
+    }
+
+    go_home(event?) {
+        this._router.navigate(['/home']);
     }
 
     preview_image(event) {
@@ -134,38 +142,40 @@ export class ArticleComponent implements OnInit, OnDestroy {
     }
 
     change(article_id) {
-        this.article_exists = 'inactive';
+        this.page_appear = 0;
         setTimeout(() => {
             this._router.navigate(['/article/' + article_id]).then(() => { this.ngOnInit(); });
             document.scrollingElement.scrollTop = 0;
         }, 300);
     }
+
+    boss_key(event) {
+        const access_key = [
+            'ArrowLeft',
+            'ArrowRight',
+            'ArrowUp',
+            'ArrowDown',
+            'e',
+            '0'
+        ];
+
+        if (!event.ctrlKey || access_key.indexOf(event.key) === -1) {
+            return event;
+        }
+        if (event.key === 'ArrowLeft') {
+            this.go_last();
+        } else if (event.key === 'ArrowRight') {
+            this.go_next();
+        } else if (event.key === 'ArrowUp') {
+            this.go_top(null);
+        } else if (event.key === 'ArrowDown') {
+            this.go_bottom(null);
+        } else if (event.key === 'e') {
+            this.go_editor();
+        } else if (event.key === '0') {
+            this.go_home();
+        }
+        event.preventDefault();
+    }
 }
 
-@Component({
-    selector: 'la-preview',
-    templateUrl: './preview.component.html',
-    styleUrls: ['./article.component.scss']
-})
-export class PreviewComponent implements OnInit {
-    public name = '';
-
-    @ViewChild('Image') image;
-
-    constructor(
-        public dialogRef: MatDialogRef<PreviewComponent>,
-        @Inject(MAT_DIALOG_DATA) public data: any,
-    ) { }
-
-    ngOnInit() {
-        setTimeout(() => {
-            this.dialogRef.updateSize(
-                this.image.nativeElement.naturalWidth + 48 + 'px',
-                this.image.nativeElement.naturalHeight + 48 + 'px');
-        }, 0);
-    }
-
-    submit(event) {
-        this.dialogRef.close();
-    }
-}

@@ -15,20 +15,22 @@
                     </svg>
                 <span class="home-button">Star-T</span>
             </a>
-            <a mat-button routerLink="/home" class="nav-font">
-                <span class="nav-button">Home</span>
-            </a>
-            <a mat-button routerLink="/about" class="nav-font">
-                <span class="nav-button">About</span>
-            </a>
+            <button mat-button routerLink="/home" class="nav-font">
+                <span class="nav-button">主页</span>
+            </button>
+            <button mat-button routerLink="/about" class="nav-font">
+                <span class="nav-button">关于</span>
+            </button>
             <span class="nav-spacer"></span>
-            <button mat-button class="nav-font" [matMenuTriggerFor]="menu">
+            <button *ngIf="is_logged(); else optionMenu" mat-button class="nav-font" [matMenuTriggerFor]="menu">
                 <span class="entry-button">{{ current_user }} <mat-icon>fingerprint</mat-icon></span>
             </button>
+            <ng-template #optionMenu>
+                <button mat-button class="nav-font" routerLink="/auth"><span class="entry-button">登陆 <mat-icon>fingerprint</mat-icon></span></button>
+            </ng-template>
             <mat-menu #menu="matMenu" xPosition="before">
-                <button mat-menu-item *ngIf="!is_logged()" routerLink="/auth"><span>Auth</span></button>
-                <button mat-menu-item *ngIf="is_logged()" (click)="edit_profile($event)"><span>Profile</span></button>
-                <button mat-menu-item *ngIf="is_logged()" (click)="log_out($event)"><span>Log Out</span></button>
+                <button mat-menu-item (click)="edit_profile($event)"><span>个人资料</span></button>
+                <button mat-menu-item (click)="log_out($event)"><span>安全退出</span></button>
             </mat-menu>
         </div>
     </mat-toolbar>

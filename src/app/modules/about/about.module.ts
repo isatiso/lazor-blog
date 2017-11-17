@@ -6,11 +6,11 @@ import { AboutRoutingModule } from './about-routing.module';
 import { AboutComponent } from './about.component';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    MatCardModule,
-    AboutRoutingModule
-  ],
-  declarations: [AboutComponent]
+    imports: [
+        CommonModule,
+        MatCardModule,
+        AboutRoutingModule
+    ],
+    declarations: [AboutComponent]
 })
 export class AboutModule { }

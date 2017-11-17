@@ -1,15 +1,35 @@
 .title {
     padding-bottom: 0;
     margin-bottom: 0;
+    height: 30px;
+    .tab-info {
+        position: absolute;
+    }
 }
 
 .long-input {
-    width: 30%;
+    width: 340px;
     min-width: 340px;
 }
 
-.big-box {
-    margin: 20px;
+.tab-content-container {
+    display: flex;
+    .big-box {
+        flex: 4;
+        margin: 20px;
+    }
+    .info-box {
+        flex: 6;
+        font-family: Zcool_fun, Arial, Helvetica, sans-serif;
+        margin: 20px;
+        .title {
+            margin-top: 0;
+        }
+        .message {
+            margin-top: 0;
+            margin-left: 20px;
+        }
+    }
 }
 
 .divider {

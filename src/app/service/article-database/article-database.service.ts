@@ -33,20 +33,24 @@ export class ArticleDatabaseService {
         this._category_db.find_last_and_next(this.current_article.article_id);
     }
 
-    fetch(article_id: string) {
+    fetch(article_id: string, options?: Options) {
+
+        if (!options) {
+            options = new Options({});
+        }
 
         const dataExchange: AsyncSubject<Article> = new AsyncSubject<Article>();
         const cache_info = window.sessionStorage.getItem('article-' + article_id);
 
         const update_data = data => {
-            const options = new Options({ article_id: article_id });
-            this._category_db.update(data['category_id'], options);
+            const update_options = new Options({ flush: options.flush, article_id: article_id });
+            this._category_db.update_view(data['category_id'], update_options);
             dataExchange.next(data);
             dataExchange.complete();
             this.current_article = new ArticleData(data);
         };
 
-        if (!cache_info) {
+        if (options.flush || !cache_info) {
             this._http.get('/middle/article?article_id=' + article_id).subscribe(
                 res => {
                     if (!res['result'] && res['status'] === 4004) {

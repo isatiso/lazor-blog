@@ -165,7 +165,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     set_step(category) {
         if (!this.is_current(category)) {
             this._category_db.current_category.show_options = 0;
-            this._category_db.update(category['category_id']);
+            this._category_db.update_home(category['category_id']);
             this.load_article = false;
             setTimeout(() => { this.load_article = true; }, 0);
         } else {
@@ -247,7 +247,6 @@ export class HomeComponent implements OnInit, OnDestroy {
                 msg: '删除分类以及分类中所有的文章'
             }
         }).afterClosed().subscribe(res => {
-            console.log(res);
             if (res) {
                 this.delete_category(category_id);
             }

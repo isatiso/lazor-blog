@@ -31,11 +31,12 @@
         max-width: 1680px;
         width: 100%;
         .nav-spacer {
-            flex: 1 1 auto;
+            flex: auto;
         }
         .nav-font {
             font-family: Lato, Raleway, Arial, Helvetica, Zcool_fun, sans-serif;
             font-size: 1.2em;
+            flex: initial;
             .home-button {
                 font-weight: bolder;
                 font-style: italic;

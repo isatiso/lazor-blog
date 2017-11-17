@@ -4,7 +4,7 @@
             <input [(ngModel)]="title" class="editor-title" placeholder="Untitled" maxlength="50" #titleRef/>
         </div>
         <div class="dash-board">
-            <button mat-raised-button color="warn" (click)="delete_confirm($event)">Delete</button>
+            <button mat-raised-button color="warn" (click)="delete_confirm($event)">删除文章</button>
         </div>
         <div class="category-editor">
             <mat-form-field>
@@ -20,14 +20,14 @@
             <mat-progress-bar #progressBar color="accent" mode="determinate" [value]="progress_value"> </mat-progress-bar>
         </div>
         <mat-tab-group MatTabGroup dynamicHeight="true" [selectedIndex]="tab_select" (selectedIndexChange)="select_change($event)">
-            <mat-tab label="{{ unsaved() }} Editor">
+            <mat-tab label="{{ unsaved() }} 编辑">
                 <div class="input-test" id="tab1">
                     <mat-input-container class="editor-input">
                         <textarea matInput matTextareaAutosize [(ngModel)]="content" [matAutosizeMinRows]="content_rows" #contentRef></textarea>
                     </mat-input-container>
                 </div>
             </mat-tab>
-            <mat-tab label="View">
+            <mat-tab label="预览">
                 <div id="tab2">
                     <markdown [data]="content" [renderLatex]="render_latex"></markdown>
                 </div>
@@ -40,7 +40,7 @@
                 <mat-icon class="big-icon">insert_photo</mat-icon></button>
         <button #navView mat-fab color="primary" (click)="preview_button_click($event)" class="markdown-showup" *ngIf="true" [matTooltip]="preview_button_outlet()" matTooltipPosition="left">
                 <mat-icon class="big-icon">{{ preview_button_icon() }}</mat-icon></button>
-        <button #navTop mat-fab color="primary" (click)="goto_top($event)" class="markdown-showup" *ngIf="true" matTooltip="回到顶部 (ctrl + ↑)" matTooltipPosition="left">
+        <button #navTop mat-fab color="primary" (click)="go_top($event)" class="markdown-showup" *ngIf="true" matTooltip="回到顶部 (ctrl + ↑)" matTooltipPosition="left">
                 <mat-icon class="big-icon">arrow_upward</mat-icon></button>
 
     </mat-card>

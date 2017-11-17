@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 
 @Component({
@@ -6,30 +6,19 @@ import { trigger, state, style, animate, transition } from '@angular/animations'
     templateUrl: './about.component.html',
     styleUrls: ['./about.component.scss'],
     animations: [
-        trigger('childrenAppear', [
-            state('active', style({
+        trigger('pageAppear', [
+            state('1', style({
                 opacity: 1,
             })),
-            state('inactive', style({
-                opacity: 0,
-            })),
-            transition('void <=> active', animate('300ms cubic-bezier(0, 1, 1, 1)')),
-            transition('inactive <=> active', animate('300ms cubic-bezier(0, 1, 1, 1)'))
+            transition('* <=> 1', animate('300ms cubic-bezier(0, 1, 1, 1)')),
         ]),
     ]
 })
-export class AboutComponent implements OnInit, OnDestroy {
+export class AboutComponent implements OnInit {
 
-    about_exists = 'active';
     constructor() { }
 
     ngOnInit() {
         document.scrollingElement.scrollTop = 0;
-        this.about_exists = 'active';
     }
-
-    ngOnDestroy() {
-        this.about_exists = 'inactive';
-    }
-
 }

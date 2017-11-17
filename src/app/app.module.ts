@@ -25,6 +25,7 @@ import { AccountService } from 'service/account/account.service';
 import { CategoryDatabaseService } from 'service/category-database/category-database.service';
 import { ArticleDatabaseService } from 'service/article-database/article-database.service';
 import { SnackBarService } from 'service/snack-bar/snack-bar.service';
+import { ScrollorService } from 'service/scrollor//scrollor.service';
 import { AuthGuard } from 'guard/auth.guard';
 import { ArticleOwnerGuard } from 'guard/article-owner.guard';
 
@@ -58,6 +59,7 @@ import { ArticleOwnerGuard } from 'guard/article-owner.guard';
         SnackBarService,
         HttpClient,
         MatSnackBar,
+        ScrollorService,
         AuthGuard,
         ArticleOwnerGuard],
     entryComponents: [

@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { MatSnackBar } from '@angular/material';
 import { Router } from '@angular/router';
 
 import { Observable } from 'rxjs/Observable';
@@ -17,25 +16,12 @@ export class AuthGuard implements CanActivate {
     constructor(
         private _http: HttpClient,
         private _router: Router,
-        private _snack_bar: MatSnackBar,
         private _account: AccountService
     ) { }
-
-    raiseSnackBar(message: string, action_name: string, action) {
-        const snack_ref = this._snack_bar.open(
-            message,
-            action_name,
-            {
-                duration: 2000,
-            }
-        );
-        snack_ref.onAction().subscribe(action);
-    }
 
     canActivate(
         next: ActivatedRouteSnapshot,
         state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
-        // const result = new BehaviorSubject<boolean>();
         const url = state.url;
 
         return this._http.get('/middle/guard/auth').map(

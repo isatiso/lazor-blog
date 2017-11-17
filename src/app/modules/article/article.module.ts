@@ -1,10 +1,17 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatCardModule, MatButtonModule, MatDialogModule, MatIconModule } from '@angular/material';
+import {
+    MatCardModule,
+    MatButtonModule,
+    MatDialogModule,
+    MatIconModule,
+    MatTooltipModule,
+} from '@angular/material';
 import { HttpClientModule } from '@angular/common/http';
 
-import { ArticleComponent, PreviewComponent } from './article.component';
+import { ArticleComponent } from './article.component';
 import { ArticleRoutingModule } from './article-routing.module';
+import { PreviewComponent } from 'component/preview/preview.component';
 import { MarkdownModule } from 'directive/markdown.module';
 
 @NgModule({
@@ -14,6 +21,7 @@ import { MarkdownModule } from 'directive/markdown.module';
         MatCardModule,
         MatButtonModule,
         MatIconModule,
+        MatTooltipModule,
         MatDialogModule,
         HttpClientModule,
         ArticleRoutingModule

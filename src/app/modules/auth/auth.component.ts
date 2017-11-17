@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 
 import { AccountService } from 'service/account/account.service';
+import { SnackBarService } from 'service/snack-bar/snack-bar.service';
 import { Account } from 'public/data-struct-definition';
 
 @Component({
@@ -13,11 +14,13 @@ import { Account } from 'public/data-struct-definition';
     styleUrls: ['./auth.component.scss'],
     animations: [
         trigger('tab', [
-            state('0', style({
-                color: '#000000',
+            state('1', style({
                 opacity: 1,
             })),
-            transition('void => *', animate('300ms cubic-bezier(0, 1, 1, 1)'))
+            state('0', style({
+                opacity: 0,
+            })),
+            transition('* <=> *', animate('300ms ease-out'))
         ]),
         trigger('childrenAppear', [
             state('active', style({
@@ -54,7 +57,7 @@ export class AuthComponent implements OnInit, OnDestroy {
     constructor(
         private _http: HttpClient,
         private _router: Router,
-        private _snack_bar: MatSnackBar,
+        private _snack_bar: SnackBarService,
         private _account: AccountService,
     ) { }
 
@@ -76,17 +79,6 @@ export class AuthComponent implements OnInit, OnDestroy {
         this.auth_exists = 'inactive';
     }
 
-    raiseSnackBar(message: string, action_name: string, action) {
-        const snack_ref = this._snack_bar.open(
-            message,
-            action_name,
-            {
-                duration: 2000,
-            }
-        );
-        snack_ref.onAction().subscribe(action);
-    }
-
     select_change(event) {
         this.tab_select = event;
     }
@@ -105,11 +97,13 @@ export class AuthComponent implements OnInit, OnDestroy {
             }).subscribe(
             data => {
                 if (data['result'] === 1) {
-                    this._router.navigate(['/home']);
                     this._account.data = data['data'];
+                    this._router.navigate(['/home']);
+                } else if (data['status'] === 3002) {
+                    this._snack_bar.show('Inactivated account, connect author to active your account.', 'OK');
+                    return false;
                 } else {
-                    this.raiseSnackBar(data['msg'], 'OK', () => {
-                    });
+                    this._snack_bar.show(data['msg'], 'OK');
                     return false;
                 }
             });
@@ -131,8 +125,7 @@ export class AuthComponent implements OnInit, OnDestroy {
             not_regular = true;
         }
         if (not_regular) {
-            this.raiseSnackBar(message, 'OK', () => {
-            });
+            this._snack_bar.show(message, 'OK');
             return false;
         }
         this._http.put(
@@ -144,12 +137,10 @@ export class AuthComponent implements OnInit, OnDestroy {
             }).subscribe(
             data => {
                 if (data['result'] === 1) {
-                    this.raiseSnackBar('Sign Up Successfully.', 'OK', () => {
-                    });
+                    this._snack_bar.show('Sign Up Successfully.', 'OK');
                     this.tab_select = 0;
                 } else {
-                    this.raiseSnackBar(data['msg'], 'OK', () => {
-                    });
+                    this._snack_bar.show(data['msg'], 'OK');
                     return false;
                 }
             });

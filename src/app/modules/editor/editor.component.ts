@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewChild, Inject } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, NavigationExtras } from '@angular/router';
 import { HttpClient, HttpRequest, HttpEventType, HttpResponse } from '@angular/common/http';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { MatSnackBar, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
@@ -8,6 +8,7 @@ import { MarkdownDirective } from 'directive/markdown.directive';
 import { ArticleDatabaseService } from 'service/article-database/article-database.service';
 import { CategoryDatabaseService } from 'service/category-database/category-database.service';
 import { SnackBarService } from 'service/snack-bar/snack-bar.service';
+import { ScrollorService } from 'service/scrollor//scrollor.service';
 import { ArticleData, Category, Options } from 'public/data-struct-definition';
 
 declare var Prism: any;
@@ -63,6 +64,7 @@ export class EditorComponent implements OnInit, OnDestroy {
     constructor(
         private _http: HttpClient,
         private _router: Router,
+        private _scrollor: ScrollorService,
         private _activate_route: ActivatedRoute,
         private _article_db: ArticleDatabaseService,
         private _category_db: CategoryDatabaseService,
@@ -154,38 +156,15 @@ export class EditorComponent implements OnInit, OnDestroy {
         }, 100);
     }
 
-    goto_top(event) {
-        let total_height = document.scrollingElement.scrollTop;
-        const delta = total_height / 15;
-        if (total_height > 0) {
-            const interval_handler = setInterval(() => {
-                total_height -= delta;
-                document.scrollingElement.scrollTop = total_height;
-                if (total_height <= 0) {
-                    clearInterval(interval_handler);
-                }
-            }, 15);
-        }
+    go_top(event?) {
+        this._scrollor.goto_top();
     }
 
-    goto_bottom(event) {
-        const scroll_height = document.scrollingElement.scrollHeight;
-        const client_height = document.scrollingElement.clientHeight;
-        const scroll_range = scroll_height - client_height;
-        let total_height = document.scrollingElement.scrollTop;
-        const delta = (scroll_range - total_height) / 15;
-        if (total_height < scroll_range) {
-            const interval_handler = setInterval(() => {
-                total_height += delta;
-                document.scrollingElement.scrollTop = total_height;
-                if (total_height >= scroll_range) {
-                    clearInterval(interval_handler);
-                }
-            }, 15);
-        }
+    go_bottom(event?) {
+        this._scrollor.goto_bottom();
     }
 
-    goto_home(event) {
+    go_home(event) {
         this._router.navigate(['/home']);
     }
 
@@ -230,7 +209,7 @@ export class EditorComponent implements OnInit, OnDestroy {
                     this._article_db.fetch(res['data']['article_id']);
                     this._article_db.on_edit_data.next(new ArticleData({}));
                     this.snack_bar.show('Save Article Successfully.', 'OK', null);
-                    this._category_db.update(this.current_category.category_id, new Options({ flush: true }));
+                    this._category_db.update_home(this.current_category.category_id, new Options({ flush: true }));
                     this._router.navigate(['/editor/' + res['data']['article_id']]);
                 });
         } else {
@@ -266,7 +245,6 @@ export class EditorComponent implements OnInit, OnDestroy {
                 msg: '彻底删除当前文章'
             }
         }).afterClosed().subscribe(res => {
-            console.log(res);
             if (res) {
                 this.delete_article();
             }
@@ -276,7 +254,7 @@ export class EditorComponent implements OnInit, OnDestroy {
 
     delete_article() {
         this._article_db.remove(this._article_db.current_article.article_id);
-        this._category_db.update(this.current_category.category_id, new Options({ flush: true }));
+        this._category_db.update_home(this.current_category.category_id, new Options({ flush: true }));
         this._router.navigate(['/home']);
     }
 
@@ -338,7 +316,10 @@ export class EditorComponent implements OnInit, OnDestroy {
             this.publish_article();
             this._article_status = 'published';
         } else if (this._article_status === 'published') {
-            this._router.navigate(['/article/' + this._article_db.current_article.article_id]);
+            const params: NavigationExtras = {
+                queryParams: { 'from': 'editor' },
+            };
+            this._router.navigate(['/article/' + this._article_db.current_article.article_id], params);
         }
     }
 
@@ -420,9 +401,9 @@ export class EditorComponent implements OnInit, OnDestroy {
             this.content_ref.nativeElement.blur();
             this.tab_select = 1;
         } else if (event.key === 'ArrowUp') {
-            this.goto_top(null);
+            this.go_top(null);
         } else if (event.key === 'ArrowDown') {
-            this.goto_bottom(null);
+            this.go_bottom(null);
         } else if (event.key === 's') {
             this.save_button_click();
         } else if (event.key === 'p') {

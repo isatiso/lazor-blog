@@ -1,69 +1,83 @@
 <div class="container auth-container" [@childrenAppear]="auth_exists">
     <mat-card>
         <p class="title">
-            <span style="opacity: 0" *ngIf="tab_select" [@tab]="!tab_select">Sign Up a New Account.</span>
-            <span style="opacity: 0" *ngIf="!tab_select" [@tab]="tab_select">Sign In Your Account.</span>
+            <span class="tab-info" style="opacity: 0" [@tab]="!tab_select">欢迎加入Lazor Blog</span>
+            <span class="tab-info" style="opacity: 0" [@tab]="tab_select">欢迎登陆Lazor Blog</span>
         </p>
         <div class="divider"></div>
         <mat-tab-group MatTabGroup [dynamicHeight]="dynamic_height" [selectedIndex]="tab_select" (selectedIndexChange)="select_change($event)" disableRipple="false" class="mat-editor">
-            <mat-tab label="Sign In">
-                <div class="big-box" (keydown)="signIn($event)">
-                    <p>
+            <mat-tab label="登陆">
+                <div class="tab-content-container">
+                    <div class="big-box" (keydown)="signIn($event)">
                         <mat-input-container class="long-input">
                             <mat-placeholder>
-                                Enter Your Email or Username
+                                邮箱/用户名
                                 <mat-icon>mode_edit</mat-icon>
                             </mat-placeholder>
                             <input matInput [(ngModel)]="sign_in_data.name" />
-                            <!-- <input matInput [matTooltip]="form_data.email_tooltip" [matTooltipPosition]="position" [(ngModel)]="sign_in_data.email" /> -->
                         </mat-input-container>
                         <br/>
                         <mat-input-container class="long-input ">
                             <mat-placeholder>
-                                Enter Your Password
+                                密码
                                 <mat-icon>mode_edit</mat-icon>
                             </mat-placeholder>
                             <input matInput [(ngModel)]="sign_in_data.password" type="password" />
-                            <!-- <input matInput [matTooltip]="form_data.pass_tooltip" [matTooltipPosition]="position" [(ngModel)]="user_data.password" type="password" /> -->
                         </mat-input-container>
-                    </p>
-                    <button mat-raised-button color="primary" (click)="signIn($event)">Submit</button>
+                        <div>
+                            <button mat-raised-button color="primary" (click)="signIn($event)">提交</button>
+                        </div>
+                    </div>
+                    <div class="info-box">
+                        <p class="text-normal">
+                            注册说明：
+                        </p>
+                        <p class="text-normal-plus message">
+                            由于服务器资源有限，注册后请发邮件给作者进行激活。
+                        </p>
+                    </div>
                 </div>
             </mat-tab>
-            <mat-tab label="Sign Up">
-                <div class="big-box" (keydown)="signUp($event)">
-                    <p>
+            <mat-tab label="注册">
+                <div class="tab-content-container">
+                    <div class="big-box" (keydown)="signUp($event)">
                         <mat-input-container class="long-input">
                             <mat-placeholder>
-                                Enter Your User Name
+                                用户名
                                 <mat-icon>mode_edit</mat-icon>
                             </mat-placeholder>
                             <input matInput [(ngModel)]="sign_up_data.username" />
-                            <!-- <input matInput [matTooltip]="form_data.email_tooltip" [matTooltipPosition]="position" [(ngModel)]="sign_in_data.email" /> -->
                         </mat-input-container>
                         <br/>
                         <mat-input-container class="long-input">
                             <mat-placeholder>
-                                Enter Your Email
+                                邮箱
                                 <mat-icon>mode_edit</mat-icon>
                             </mat-placeholder>
                             <input matInput [(ngModel)]="sign_up_data.email" />
-                            <!-- <input matInput [matTooltip]="form_data.email_tooltip" [matTooltipPosition]="position" [(ngModel)]="sign_in_data.email" /> -->
                         </mat-input-container>
                         <br/>
                         <mat-input-container class="long-input ">
                             <mat-placeholder>
-                                Enter Your Password
+                                密码
                                 <mat-icon>mode_edit</mat-icon>
                             </mat-placeholder>
                             <input matInput [(ngModel)]="sign_up_data.password" type="password" />
-                            <!-- <input matInput [matTooltip]="form_data.pass_tooltip" [matTooltipPosition]="position" [(ngModel)]="user_data.password" type="password" /> -->
                         </mat-input-container>
-                    </p>
-                    <button mat-raised-button color="primary" (click)="signUp($event)">Submit</button>
+                        <div>
+                            <button mat-raised-button color="primary" (click)="signUp($event)">提交</button>
+                        </div>
+                    </div>
+                    <div class="info-box">
+                        <p class="text-normal">
+                            注册说明：
+                        </p>
+                        <p class="text-normal-plus message">
+                            由于服务器资源有限，注册后请发邮件给作者进行激活。
+                        </p>
+                    </div>
                 </div>
             </mat-tab>
         </mat-tab-group>
-
     </mat-card>
 </div>

@@ -5,12 +5,15 @@ import { DataSource } from '@angular/cdk/table';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 
+import { AccountService } from 'service/account/account.service';
 import { ArticleData, Category, Options } from 'public/data-struct-definition';
+
 
 @Injectable()
 export class CategoryDatabaseService {
     category_list_data: BehaviorSubject<Category[]> = new BehaviorSubject<Category[]>([]);
     home_list_data: BehaviorSubject<ArticleData[]> = new BehaviorSubject<ArticleData[]>([]);
+    view_list_data: BehaviorSubject<ArticleData[]> = new BehaviorSubject<ArticleData[]>([]);
     index_list: BehaviorSubject<ArticleData[]> = new BehaviorSubject<ArticleData[]>([]);
     last_data: BehaviorSubject<ArticleData> = new BehaviorSubject<ArticleData>(null);
     next_data: BehaviorSubject<ArticleData> = new BehaviorSubject<ArticleData>(null);
@@ -20,7 +23,8 @@ export class CategoryDatabaseService {
     init_status = false;
 
     constructor(
-        private _http: HttpClient
+        private _http: HttpClient,
+        private _account: AccountService
     ) {
         const data = window.sessionStorage.getItem('current_category');
         if (data) {
@@ -53,6 +57,14 @@ export class CategoryDatabaseService {
 
     set home_list(source: ArticleData[]) {
         this.home_list_data.next(source);
+    }
+
+    get view_list(): ArticleData[] {
+        return this.view_list_data.value;
+    }
+
+    set view_list(source: ArticleData[]) {
+        this.view_list_data.next(source);
     }
 
     get last(): ArticleData {
@@ -93,10 +105,10 @@ export class CategoryDatabaseService {
             this.category_list = data;
             if (!this.current_category.category_id) {
                 this.current_category = this.category_list[0];
-            } else if (data.findIndex(item => item.category_id === this.current_category['category_id']) === -1) {
+            } else if (data.findIndex(el => el.category_id === this.current_category['category_id']) === -1) {
                 this.current_category = this.category_list[0];
             }
-            this.update(this.current_category.category_id, new Options({
+            this.update_home(this.current_category.category_id, new Options({
                 flush: true,
                 article_id: options['article_id']
             }));
@@ -108,8 +120,8 @@ export class CategoryDatabaseService {
             const category_list: Array<object> = data['category_list'];
             if (order_list && order_list.length) {
                 category_list.sort((a, b) => {
-                    const a_index = order_list.findIndex(item => item === a['category_id']);
-                    const b_index = order_list.findIndex(item => item === b['category_id']);
+                    const a_index = order_list.findIndex(el => el === a['category_id']);
+                    const b_index = order_list.findIndex(el => el === b['category_id']);
                     return a_index - b_index;
                 });
             }
@@ -134,16 +146,14 @@ export class CategoryDatabaseService {
         }
     }
 
-    update(category_id: string, options = new Options({})) {
+    update_home(category_id: string, options = new Options({})) {
+
 
         const update_data = (data) => {
             this.home_list = data.map(
                 item => {
                     return new ArticleData(item);
                 });
-            if (options.article_id) {
-                this.find_last_and_next(options.article_id);
-            }
         };
 
         const assemble_data = (data) => {
@@ -151,8 +161,8 @@ export class CategoryDatabaseService {
             const article_list: Array<object> = data['article_list'];
             if (order_list && order_list.length) {
                 article_list.sort((a, b) => {
-                    const a_index = order_list.findIndex(item => item === a['article_id']);
-                    const b_index = order_list.findIndex(item => item === b['article_id']);
+                    const a_index = order_list.findIndex(el => el === a['article_id']);
+                    const b_index = order_list.findIndex(el => el === b['article_id']);
                     return a_index - b_index;
                 });
             }
@@ -188,6 +198,47 @@ export class CategoryDatabaseService {
             } else {
                 update_data(JSON.parse(cache_info));
             }
+        }
+    }
+
+    update_view(category_id: string, options = new Options({})) {
+
+        const update_data = (data) => {
+            this.view_list = data.map(
+                item => {
+                    return new ArticleData(item);
+                });
+            if (options.article_id) {
+                this.find_last_and_next(options.article_id);
+            }
+        };
+
+        const assemble_data = (data) => {
+            const order_list = data['order_list'];
+            const article_list: Array<object> = data['article_list'];
+            if (order_list && order_list.length) {
+                article_list.sort((a, b) => {
+                    const a_index = order_list.findIndex(el => el === a['article_id']);
+                    const b_index = order_list.findIndex(el => el === b['article_id']);
+                    return a_index - b_index;
+                });
+            }
+            return article_list;
+        };
+
+        const cache_info = window.sessionStorage.getItem('category-' + category_id);
+        if (options.flush || !cache_info) {
+            this._http.get('/middle/article/user-list?category_id=' + category_id).subscribe(
+                res => {
+                    const data = assemble_data(res['data']);
+                    window.sessionStorage.setItem('category-' + category_id, JSON.stringify(data));
+                    update_data(data);
+                },
+                error => {
+                }
+            );
+        } else {
+            update_data(JSON.parse(cache_info));
         }
     }
 
@@ -258,14 +309,13 @@ export class CategoryDatabaseService {
     }
 
     find_last_and_next(article_id: string) {
-        const length = this.home_list.length;
-        const current_index = this.home_list.findIndex(ele => {
-            return ele.article_id === article_id;
+        const length = this.view_list.length;
+        const current_index = this.view_list.findIndex(el => {
+            return el.article_id === article_id;
         });
-
         if (current_index !== -1) {
-            this.next = current_index === 0 ? null : this.home_list[current_index - 1];
-            this.last = current_index === length - 1 ? null : this.home_list[current_index + 1];
+            this.next = current_index === 0 ? null : this.view_list[current_index - 1];
+            this.last = current_index === length - 1 ? null : this.view_list[current_index + 1];
         } else {
             this.next = null;
             this.last = null;
