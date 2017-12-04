@@ -3,16 +3,6 @@
     opacity: 0;
 }
 
-.divider {
-    padding: 0;
-    margin: 0;
-    height: 4px;
-    width: 100%;
-    background-color: map-get($mat-teal, 300);
-    margin-top: 30px;
-    margin-bottom: 40px;
-}
-
 .container {
     padding: 30px;
     margin: 0 auto;
@@ -23,20 +13,7 @@
 }
 
 .title {
-    font-family: Zcool_fun, Raleway, Arial, Helvetica, sans-serif;
+    font-family: $font-banner;
     font-size: 56px;
     padding-bottom: 20px;
-}
-
-.content {
-    font-family: Raleway, Arial, Helvetica, sans-serif;
-    font-size: 1.5em;
-}
-
-a.link {
-    color: map-get($mat-teal, 500);
-    text-decoration: none;
-    &:hover {
-        color: map-get($mat-orange, 500);
-    }
 }

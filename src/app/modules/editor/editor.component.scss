@@ -1,14 +1,5 @@
 @import '../../../assets/scss/material_theming.scss';
 $config: mat-typography-config();
-$code_font: Monaco,
-Inconsolata,
-Consolas,
-Andale Mono,
-monospace;
-.unicorn-title {
-    @include mat-typography-level-to-styles($config, title);
-}
-
 .editor-input {
     width: calc(100% - 40px);
     padding-left: 20px;
@@ -18,7 +9,7 @@ monospace;
     width: 100%;
     font-size: 48px;
     border: none;
-    font-family: Zcool_fun, Raleway, Arial, Helvetica, sans-serif;
+    font-family: $font-title;
     &:focus {
         outline: none;
     }
@@ -27,14 +18,22 @@ monospace;
 .markdown-showup {
     z-index: 10;
     position: fixed;
-    transition: transform 200ms cubic-bezier(0, 1, 1, 1);
-    transform: translateX(80%);
-    top: 48%;
-    right: 0;
+    bottom: 25px;
+    right: 25px;
+}
+
+.markdown-option {
+    z-index: 9;
+    position: fixed;
+    bottom: 33px;
+    right: 33px;
+    .mat-icon {
+        color: white;
+    }
 }
 
 .input-test textarea {
-    font-family: $code_font;
+    font-family: $font-code;
     font-size: 20px;
     line-height: 28px;
 }
@@ -44,14 +43,14 @@ monospace;
 .dash-board {
     position: absolute;
     right: 3%;
-    top: 117px;
+    top: 102px;
     z-index: 9;
 }
 
 .category-editor {
     position: absolute;
-    right: 13%;
-    top: 105px;
+    right: 20px;
+    top: 90px;
     z-index: 9;
 }
 
@@ -60,9 +59,9 @@ monospace;
 }
 
 .divider {
-    height: 20px;
     width: 100%;
     background-color: #ffffff;
+    margin-top: 0;
     opacity: 0;
 }
 

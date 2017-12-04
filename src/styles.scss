@@ -8,9 +8,11 @@ html {
     padding: 0;
     margin: 0;
     body {
+        -webkit-font-smoothing: antialiased;
+        -moz-font-smoothing: antialiased;
         width: 100%;
-        // height: calc(100% - 209px);
-        height: 100%;
+        height: calc(100% - 64px);
+        // height: 100%;
         display: block;
         padding: 0;
         margin: 0;
@@ -37,14 +39,24 @@ html {
     max-width: 1280px;
 }
 
+.banner {
+    font-family: $font-banner;
+    z-index: 100;
+    margin: 0;
+    padding-top: 75px;
+    color: map-get($primary, 50);
+    font-size: 5em;
+    font-weight: normal;
+}
+
 .title {
-    font-family: Zcool_fun, Raleway, Arial, Helvetica, sans-serif;
+    font-family: $font-title;
     font-size: 48px;
     padding-bottom: 20px;
 }
 
 .content {
-    font-family: Raleway, Arial, Helvetica, sans-serif;
+    font-family: $font-content;
     font-size: 1.5em;
 }
 
@@ -102,3 +114,13 @@ mat-dialog-container.mat-dialog-container {
 .sortable-ghost {
     opacity: 1;
 }
+
+// .icon {
+//     width: 16px;
+//     height: 16px;
+//     display: inline-block;
+//     background-repeat: no-repeat;
+//     background-image: url(assets/image/favicon.svg);
+//     background-position: 0 0;
+// }
+

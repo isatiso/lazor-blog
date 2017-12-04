@@ -4,87 +4,112 @@
 // have to load a single css file for Angular Material in your app.
 // Be sure that you only ever include this mixin once!
 @include mat-core();
-$code_font:Monaco,
-Inconsolata,
-Consolas,
-Andale Mono,
-monospace;
+@font-face {
+    font-family: 'ul font';
+    src: url('/assets/image/list.svg') format('svg');
+    content: '\f309';
+    font-weight: normal;
+    font-style: normal;
+}
+
 markdown {
     margin: 0 auto;
-    font-family: Raleway, Arial, Helvetica, Microsoft YaHei, sans-serif;
-    color: #444444;
-    line-height: 1;
-    // padding: 30px;
+    .md-strong {
+        font-weight: bold;
+    }
+    .md-italic {
+        font-style: italic;
+    }
     .md-image {
         width: 100%;
         text-align: center;
-        padding-top: 10px;
-        padding-bottom: 10px;
+        -ms-transform-origin: 30px 0;
         img {
             max-width: 80%;
-            // min-width: 40%;
+            min-width: 20%;
+            transition: background 400ms cubic-bezier(.25, .8, .25, 1), box-shadow 280ms cubic-bezier(.4, 0, .2, 1);
+            box-shadow: 0 3px 1px -2px rgba(0, 0, 0, .2), 0 2px 2px 0 rgba(0, 0, 0, .14), 0 1px 5px 0 rgba(0, 0, 0, .12);
+            &:active {
+                box-shadow: 0 5px 5px -3px rgba(0, 0, 0, .2), 0 8px 10px 1px rgba(0, 0, 0, .14), 0 3px 14px 2px rgba(0, 0, 0, .12);
+            }
         }
     }
-    @media screen and (min-width: 1000px) {
-        body {
-            width: 842px;
-            margin: 10px auto;
+    .head-1 {
+        width: 100%;
+        h1 {
+            width: fit-content;
+            margin: 36px 0;
+            margin-left: 5px;
+            padding: 10px 20px 10px 20px;
+            color: map-get($accent, 900);
+            font-weight: 400;
+            font-family: $font-title;
+            font-size: 36px;
+            line-height: 42px;
+            background-color: map-get($primary, 50); // border-radius: 20px;
+            transition: background 400ms cubic-bezier(.25, .8, .25, 1), box-shadow 280ms cubic-bezier(.4, 0, .2, 1);
+            box-shadow: 0 3px 1px -2px rgba(0, 0, 0, .2), 0 2px 2px 0 rgba(0, 0, 0, .14), 0 1px 5px 0 rgba(0, 0, 0, .12);
+            &:active {
+                box-shadow: 0 5px 5px -3px rgba(0, 0, 0, .2), 0 8px 10px 1px rgba(0, 0, 0, .14), 0 3px 14px 2px rgba(0, 0, 0, .12);
+            }
         }
     }
-    h1,
-    h2,
-    h3,
-    h4 {
-        color: #111111;
-        font-weight: 400;
-        margin-top: 1em;
+    .head-2 {
+        h2 {
+            color: #111111;
+            margin: 30px 0;
+            font-weight: normal;
+            font-family: $font-title;
+            padding: 0;
+            font-size: 36px;
+            line-height: 36px;
+            border-bottom: 1px solid #EFEAEA;
+            padding-bottom: 10px;
+        }
     }
-    h1,
-    h2,
-    h3,
-    h4,
-    h5 {
-        font-family: Raleway, Arial, Helvetica, Microsoft YaHei, sans-serif;
-        font-weight: bolder;
+    .head-3 {
+        h3 {
+            color: #111111;
+            font-weight: 400;
+            margin: 24px 0;
+            font-family: $font-content;
+            font-weight: bolder;
+            padding: 0;
+            font-size: 24px;
+            line-height: 30px;
+        }
     }
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    dl {
-        margin-bottom: 16px;
-        padding: 0;
+    .head-4 {
+        h4 {
+            color: #111111;
+            font-weight: 400;
+            margin-top: 1em;
+            font-family: $font-content;
+            font-weight: bolder;
+            margin-bottom: 16px;
+            padding: 0;
+            font-size: 21px;
+            line-height: 26px;
+        }
     }
-    p {
-        margin-top: 8px;
-        margin-bottom: 8px;
-        line-height: 28px;
+    .head-5 {
+        h5 {
+            font-family: $font-content;
+            font-weight: bolder;
+            margin-bottom: 16px;
+            padding: 0;
+            font-size: 18px;
+            line-height: 23px;
+        }
     }
-    h1 {
-        font-size: 36px;
-        line-height: 42px;
-    }
-    h2 {
-        font-size: 30px;
-        line-height: 36px;
-    }
-    h1,
-    h2 {
-        border-bottom: 1px solid #EFEAEA;
-        padding-bottom: 10px;
-    }
-    h3 {
-        font-size: 24px;
-        line-height: 30px;
-    }
-    h4 {
-        font-size: 21px;
-        line-height: 26px;
-    }
-    h5 {
-        font-size: 18px;
-        line-height: 23px;
+    &>p {
+        font-family: $font-content;
+        width: 90%;
+        margin: 10px auto;
+        margin-bottom: 25px;
+        font-size: 20px;
+        line-height: 34px;
+        box-sizing: border-box;
     }
     a {
         color: map-get($mat-teal, 500);
@@ -92,69 +117,200 @@ markdown {
         padding: 0;
         vertical-align: baseline;
         text-decoration: none;
+        &:hover {
+            text-decoration: none;
+            color: map-get($mat-orange, 500);
+        }
     }
-    a:hover {
-        text-decoration: none;
-        color: map-get($mat-orange, 500);
-    }
-    ul,
-    ol {
-        padding: 0;
-        padding-left: 18px;
-        margin: 0;
-    }
-    li {
-        line-height: 32px;
-    }
-    p,
-    ul,
-    ol {
-        font-size: 16px;
-        line-height: 24px;
-    }
+    ol,
     ul {
-        padding-top: 20px;
-        padding-left: 50px;
-        padding-bottom: 20px;
-    }
-    ol ol,
-    ul ol {
-        list-style-type: lower-roman;
-    }
-    code,
-    pre {
-        font-family: $code_font;
-        background-color: map-get($primary, 50);
-        color: inherit;
-    }
-    code {
-        font-family: $code_font;
-        margin: 0 2px;
-    }
-    pre {
-        font-family: $code_font;
-        line-height: 1.7em;
-        overflow: auto;
-        padding: 6px 10px;
-        border: 1px solid map-get($primary, 100);
-        border-left: 5px solid map-get($primary, 500);
-        border-radius: 0px 10px 10px 0px / 0px 10px 10px 0px;
-    }
-    pre>code {
-        font-family: $code_font;
-        border: 0;
-        display: inline;
-        max-width: initial;
-        padding: 0;
+        padding: 10px 48px;
         margin: 0;
-        overflow: initial;
-        line-height: 1.6em;
-        font-size: 1em;
-        white-space: pre;
-        background: 0 0;
+        list-style: none;
+        box-sizing: border-box;
+        &>li {
+            min-height: 56px;
+            margin: 0;
+            margin-top: 16px;
+            &>p>.text:first-of-type,
+            &>.text:first-of-type {
+                position: relative;
+                padding: 7px 15px;
+                padding-left: 36px;
+                font-size: 18px;
+                line-height: 32px;
+                background: map-get($accent, 100);
+                display: block;
+                color: #444;
+                &:before {
+                    content: "";
+                    position: absolute;
+                    left: -1.3em;
+                    top: 50%;
+                    margin-top: -1.3em;
+                    background: map-get($primary, 300);
+                    color: map-get($primary, 50);
+                    height: 26px;
+                    width: 26px;
+                    line-height: 26px;
+                    border: 10px solid #fff;
+                    text-align: center;
+                    font-weight: bold;
+                    border-radius: 12px; // transition: 200ms cubic-bezier(.25, .8, .25, 1);
+                    // transition: 500ms cubic-bezier(.25, .8, .25, 1);
+                } // &:hover {
+                //     &:before {
+                //         border-radius: 46px;
+                //     }
+                // }
+            }
+            &>p>.text:not(:first-of-type),
+            &>.text:not(:first-of-type) {
+                margin-top: 20px;
+                margin-left: 20px;
+                font-size: 22px;
+                line-height: inherit;
+                display: block;
+                font-family: $font-list-text;
+            }
+        }
+        ol,
+        ul {
+            padding-right: 0;
+            margin-top: 0;
+        }
+        .list-level-2 {
+            &>p>.text:first-of-type,
+            &>.text:first-of-type {
+                &:before {
+                    background-color: map-get($mat-cyan, 500);
+                }
+            }
+        }
+        .list-level-3 {
+            &>p>.text:first-of-type,
+            &>.text:first-of-type {
+                &:before {
+                    background-color: map-get($mat-light-blue, 500);
+                }
+            }
+        }
+        .list-level-4 {
+            &>p>.text:first-of-type,
+            &>.text:first-of-type {
+                &:before {
+                    background-color: map-get($mat-indigo, 400);
+                }
+            }
+        }
+        .list-level-5 {
+            &>p>.text:first-of-type,
+            &>.text:first-of-type {
+                &:before {
+                    background-color: map-get($mat-purple, 400);
+                }
+            }
+        }
+        .list-level-6 {
+            &>p>.text:first-of-type,
+            &>.text:first-of-type {
+                &:before {
+                    background-color: map-get($mat-pink, 400);
+                }
+            }
+        }
     }
-    code {
-        color: #666555;
+    ol {
+        counter-reset: li;
+        &>li {
+            &>p>.text:first-of-type,
+            &>.text:first-of-type {
+                &:before {
+                    counter-increment: li;
+                    content: counter(li);
+                    height: 36px;
+                    width: 36px;
+                    line-height: 36px;
+                    border: .3em solid #fff;
+                    border-radius: 36px;
+                }
+            }
+        }
+    }
+    code.inline-code {
+        font-family: $font-code;
+        margin: 0 2px;
+        font-size: inherit;
+        padding: 3px 10px;
+        color: inherit;
+        line-height: 32px;
+        height: 32px;
+        background-color: map-get($primary, 50);
+    }
+    .code-block {
+        width: 100%;
+        margin: 40px 0;
+        pre {
+            position: relative;
+            width: 80%;
+            margin: 0 auto;
+            background-color: map-get($accent, 100);
+            color: inherit;
+            font-family: $font-code;
+            padding: 25px 25px;
+            .outline {
+                position: absolute;
+                display: inline-block;
+                top: 0px;
+                right: 0px;
+                background-color: map-get($primary, 50);
+                color: rgba(0, 0, 0, 0.54);
+                font-size: 12px;
+                font-weight: 500;
+                padding: 8px 10px 9px 16px;
+                border-radius: 0 0 0 10px;
+                box-shadow: 0 3px 1px -2px rgba(0, 0, 0, .2),
+                0 2px 2px 0 rgba(0, 0, 0, .14),
+                0 1px 5px 0 rgba(0, 0, 0, .12);
+            }
+            code {
+                font-family: $font-code;
+                border: 0;
+                max-width: initial;
+                padding: 0;
+                margin: 0;
+                display: block;
+                overflow-x: auto;
+                overflow-y: hidden;
+                line-height: 28px;
+                font-size: 16px;
+                white-space: pre;
+                background: 0 0;
+            }
+            transition: background 400ms cubic-bezier(.25,
+            .8,
+            .25,
+            1),
+            box-shadow 280ms cubic-bezier(.4,
+            0,
+            .2,
+            1);
+            box-shadow: 0 3px 1px -2px rgba(0,
+            0,
+            0,
+            .2),
+            0 2px 2px 0 rgba(0,
+            0,
+            0,
+            .14),
+            0 1px 5px 0 rgba(0,
+            0,
+            0,
+            .12);
+            &:active {
+                box-shadow: 0 5px 5px -3px rgba(0, 0, 0, .2), 0 8px 10px 1px rgba(0, 0, 0, .14), 0 3px 14px 2px rgba(0, 0, 0, .12);
+            }
+        }
     }
     aside {
         display: block;
@@ -162,34 +318,59 @@ markdown {
         width: 390px;
     }
     blockquote {
-        padding: 0 0 0 2em;
-        margin: 0;
-        margin-top: 10px;
-        padding: 10px;
-        padding-right: 20px;
-        border-left: 5px solid map-get($primary, 500);
-        background-color: map-get($primary, 50);
-        font-style: italic;
-    }
-    blockquote cite {
-        font-size: 14px;
-        line-height: 20px;
-        color: #bfbfbf;
-    }
-    blockquote cite:before {
-        content: '\2014 \00A0';
-    }
-    blockquote p {
-        color: #666;
+        padding: 12px;
+        max-width: 80%;
+        margin: 0 auto;
+        margin-top: 8px;
+        margin-bottom: 18px;
+        padding: 15px;
+        padding-left: 30px;
+        background: map-get($primary, 50);
+        border-left: 8px solid #b2dfdb;
+        border-radius: 0 0 0 25px;
+        transition: background 400ms cubic-bezier(.25, .8, .25, 1),
+        box-shadow 280ms cubic-bezier(.4, 0, .2, 1);
+        box-shadow: 0 3px 1px -2px rgba(0, 0, 0, .2),
+        0 2px 2px 0 rgba(0, 0, 0, .14),
+        0 1px 5px 0 rgba(0, 0, 0, .12);
+        &:active {
+            box-shadow: 0 5px 5px -3px rgba(0, 0, 0, .2), 0 8px 10px 1px rgba(0, 0, 0, .14), 0 3px 14px 2px rgba(0, 0, 0, .12);
+        }
+        cite {
+            font-size: 14px;
+            line-height: 20px;
+            color: #bfbfbf;
+            &:before {
+                content: '\2014 \00A0';
+            }
+        }
+        p {
+            &:first-of-type {
+                margin-top: 0;
+            }
+            margin: 0;
+            margin-top: 26px;
+            color: map-get($accent, 700);
+            text-indent: 0;
+            font-size: 20px;
+            line-height: 1.5em;
+            font-family: $font-quote-text;
+        }
+        .code-block {
+            margin-top: 26px;
+            margin-bottom: 0;
+        }
     }
     hr {
-        text-align: left;
-        color: #999;
-        height: 2px;
         padding: 0;
         margin: 16px 0;
-        background-color: #e7e7e7;
-        border: 0 none;
+        border-style: inset;
+        border-width: 1px;
+        border-bottom: 1px solid #EFEAEA;
+    }
+    dl {
+        margin-bottom: 16px;
+        padding: 0;
     }
     dl {
         padding: 0;
@@ -209,46 +390,35 @@ markdown {
         margin-left: 0;
     }
     table {
-        *border-collapse: collapse;
-        /* IE7 and lower */
         border-spacing: 0;
-        width: 100%;
-    }
-    table {
+        display: table;
         border: solid #ccc 1px;
-        margin: 0;
-        margin-top: 20px;
-        margin-bottom: 20px;
-    }
-    table thead {
-        background: #f7f7f7;
-    }
-    table thead tr:hover {
-        background: #f7f7f7
-    }
-    table tr:hover {
-        background: #fbf8e9;
-        -o-transition: all 0.1s ease-in-out;
-        -webkit-transition: all 0.1s ease-in-out;
-        -moz-transition: all 0.1s ease-in-out;
-        -ms-transition: all 0.1s ease-in-out;
-        transition: all 0.1s ease-in-out;
-    }
-    table td,
-    .table th {
-        border-left: 1px solid #ccc;
-        border-top: 1px solid #ccc;
-        padding: 10px;
-        text-align: left;
-    }
-    table th {
-        border-top: none;
-        text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
-        padding: 5px;
-        border-left: 1px solid #ccc;
-    }
-    table td:first-child,
-    table th:first-child {
-        border-left: none;
+        margin: 20px auto;
+        width: 80%;
+        thead {
+            background: #f7f7f7;
+            line-height: 2em;
+        }
+        tr:hover {
+            background: #fbf8e9;
+            transition: all 0.1s ease-in-out;
+        }
+        td,
+        th {
+            border-left: 1px solid #ccc;
+            border-top: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            border-top: none;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
+            padding: 10px;
+            border-left: 1px solid #ccc;
+        }
+        td:first-child,
+        th:first-child {
+            border-left: none;
+        }
     }
 }

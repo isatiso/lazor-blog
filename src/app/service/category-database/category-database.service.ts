@@ -14,10 +14,12 @@ export class CategoryDatabaseService {
     category_list_data: BehaviorSubject<Category[]> = new BehaviorSubject<Category[]>([]);
     home_list_data: BehaviorSubject<ArticleData[]> = new BehaviorSubject<ArticleData[]>([]);
     view_list_data: BehaviorSubject<ArticleData[]> = new BehaviorSubject<ArticleData[]>([]);
-    index_list: BehaviorSubject<ArticleData[]> = new BehaviorSubject<ArticleData[]>([]);
+    index_article_list: BehaviorSubject<ArticleData[]> = new BehaviorSubject<ArticleData[]>([]);
+    index_category_list: BehaviorSubject<Category[]> = new BehaviorSubject<Category[]>([]);
     last_data: BehaviorSubject<ArticleData> = new BehaviorSubject<ArticleData>(null);
     next_data: BehaviorSubject<ArticleData> = new BehaviorSubject<ArticleData>(null);
     current_category_data: Category;
+    current_index_category: Category;
     category_settimeout_handler: any;
     article_settimeout_handler: any;
     init_status = false;
@@ -27,7 +29,8 @@ export class CategoryDatabaseService {
         private _account: AccountService
     ) {
         const data = window.sessionStorage.getItem('current_category');
-        if (data) {
+
+        if (data && data !== 'undefined') {
             const data_object = JSON.parse(data);
             this.current_category_data = data_object;
         } else {
@@ -148,7 +151,6 @@ export class CategoryDatabaseService {
 
     update_home(category_id: string, options = new Options({})) {
 
-
         const update_data = (data) => {
             this.home_list = data.map(
                 item => {
@@ -245,22 +247,13 @@ export class CategoryDatabaseService {
     push_article_order() {
         clearTimeout(this.article_settimeout_handler);
         this.article_settimeout_handler = setTimeout(() => {
-            const order_list = this.home_list.map(
-                item => {
-                    return item.article_id;
-                });
+            const order_list = this.home_list.map(item => item.article_id);
             this._http.post('/middle/article/order', {
                 category_id: this.current_category.category_id,
                 order_list: order_list
             }).subscribe(
                 res => {
-                    this.home_list = order_list.map(item => {
-                        return this.home_list.find(article => {
-                            return article.article_id === item;
-                        });
-                    });
-                    window.sessionStorage.setItem('category-' + this.current_category.category_id, JSON.stringify(this.home_list));
-
+                    this.clear_category_cache(this.current_category.category_id);
                 },
                 error => {
                 });
@@ -278,16 +271,15 @@ export class CategoryDatabaseService {
                 order_list: order_list
             }).subscribe(
                 res => {
-                    this.category_list = order_list.map(item => {
-                        return this.category_list.find(category => {
-                            return category.category_id === item;
-                        });
-                    });
-                    window.sessionStorage.setItem('category-list', JSON.stringify(this.category_list));
+                    this.clear_category_cache('list');
                 },
                 error => {
                 });
         }, 800);
+    }
+
+    clear_category_cache(category_id) {
+        window.sessionStorage.removeItem('category-' + category_id);
     }
 
     clear_push_article_order() {
@@ -298,14 +290,85 @@ export class CategoryDatabaseService {
         clearTimeout(this.category_settimeout_handler);
     }
 
-    shuffle(limit: number) {
-        this._http.get('/middle/article/index-list?limit=' + limit).subscribe(
-            res => {
-                this.index_list.next(res['data']['article_list']);
-            },
-            error => {
+    get_index_category_list(category_id?: string) {
+        const cache_info = window.sessionStorage.getItem('category-index');
+        if (!cache_info) {
+            this._http.get('/middle/category/index').subscribe(res => {
+                if (res) {
+                    window.sessionStorage.setItem('category-index', JSON.stringify(res['data']['category_list']));
+                    this.index_category_list.next(res['data']['category_list']);
+                    if (category_id) {
+                        this.shuffle(category_id);
+                    } else {
+                        if (res['data']['category_list'].length) {
+                            this.shuffle(res['data']['category_list'][0]['category_id']);
+                        }
+                    }
+                }
+            });
+        } else {
+            this.index_category_list.next(JSON.parse(cache_info));
+            if (JSON.parse(cache_info)) {
+                if (category_id) {
+                    this.shuffle(category_id);
+                } else {
+                    this.shuffle(JSON.parse(cache_info)[0]['category_id']);
+                }
             }
-        );
+        }
+    }
+
+    shuffle(category_id: string, options = new Options({})) {
+
+        const update_data = (data) => {
+            this.index_article_list.next(data.map(
+                item => {
+                    return new ArticleData(item);
+                }));
+        };
+
+        const assemble_data = (data) => {
+            const order_list = data['order_list'];
+            const article_list: Array<object> = data['article_list'];
+            if (order_list && order_list.length) {
+                article_list.sort((a, b) => {
+                    const a_index = order_list.findIndex(el => el === a['article_id']);
+                    const b_index = order_list.findIndex(el => el === b['article_id']);
+                    return a_index - b_index;
+                });
+            }
+            return article_list;
+        };
+
+        this.current_index_category = this.index_category_list.value.find(item => item.category_id === category_id);
+
+        if (!category_id) {
+            category_id = '';
+        }
+        const cache_info = window.sessionStorage.getItem('category-' + category_id);
+
+        const current_category = this.category_list.find(
+            ctg => {
+                return ctg['category_id'] === category_id;
+            });
+        if (!current_category) {
+            this.current_category = this.category_list[0];
+        } else {
+            this.current_category = current_category;
+        }
+        if (options.flush || !cache_info) {
+            this._http.get('/middle/article/user-list?category_id=' + category_id).subscribe(
+                res => {
+                    const data = assemble_data(res['data']);
+                    window.sessionStorage.setItem('category-' + category_id, JSON.stringify(data));
+                    update_data(data);
+                },
+                error => {
+                }
+            );
+        } else {
+            update_data(JSON.parse(cache_info));
+        }
     }
 
     find_last_and_next(article_id: string) {
@@ -337,7 +400,7 @@ export class CategorySource extends DataSource<any> {
             case 'home':
                 return this._db.home_list_data;
             case 'index':
-                return this._db.index_list;
+                return this._db.index_article_list;
             default:
                 return this._db.home_list_data;
         }

@@ -1,9 +1,4 @@
 @import '../../../assets/scss/material_theming.scss';
-$fun_font: Zcool_fun,
-Raleway,
-Arial,
-Helvetica,
-sans-serif;
 .header-area {
     margin: 0;
     padding: 0;
@@ -14,7 +9,7 @@ sans-serif;
         top: 20px;
         mat-slide-toggle,
         button {
-            font-family: $fun_font;
+            font-family: $font-title;
             font-size: 20px;
             position: absolute;
             right: -12px;
@@ -41,7 +36,7 @@ sans-serif;
         }
         .can-sort-info {
             position: absolute;
-            font-family: $fun_font;
+            font-family: $font-title;
             font-size: 20px;
             color: rgba(0, 0, 0, 0.46);
             top: 32px;
@@ -53,6 +48,7 @@ sans-serif;
     .home-title {
         margin: 0;
         padding: 0;
+        font-family: $font-title;
     }
 }
 
@@ -61,7 +57,7 @@ sans-serif;
     display: flex;
     justify-content: space-between;
     .category-list {
-        font-family: $fun_font;
+        font-family: $font-title;
         padding-top: 0;
         flex: 4;
         width: 20%;
@@ -83,7 +79,7 @@ sans-serif;
                     z-index: 1;
                     background-color: #fff;
                     opacity: 0.99;
-                    font-family: $fun_font;
+                    font-family: $font-title;
                     font-size: 20px;
                     padding: 15px;
                     padding-left: 20px;
@@ -129,23 +125,23 @@ sans-serif;
         .categoryaaa-item {
             background-color: map-get($accent, 300);
             mat-panel-title {
-                font-family: $fun_font;
+                font-family: $font-title;
                 font-size: 20px;
             }
             button {
                 margin-left: 10px;
-                font-family: $fun_font;
+                font-family: $font-title;
                 font-size: 20px;
             }
             .mate-menu-content .mat-menu-item {
-                font-family: $fun_font;
+                font-family: $font-title;
             }
         }
         .add-category-container {
             padding: 20px;
             text-align: center;
             .add-category {
-                font-family: $fun_font;
+                font-family: $font-title;
                 font-size: 20px;
                 width: 100%;
             }

@@ -12,7 +12,8 @@
         "paths": {
             "*": [
                 "*",
-                "app/*"
+                "app/*",
+                "app/public/*"
             ]
         },
         "typeRoots": [

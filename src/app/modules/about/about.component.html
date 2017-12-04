@@ -1,15 +1,8 @@
 <div class="container about-container" [@pageAppear]="1">
     <mat-card>
-        <div class="title">这是一个博客</div>
-        <div class="content">用过CSDN，也用过简书，但是CSDN广告太多，简书码农支持不好，总有些不爽的地方。后来一想，自己动手丰衣足食，索性自己搭了一个。</div>
-        <div class="divider"></div>
-        <div class="title">为什么不用Word Press或者Hexo</div>
-        <div class="content">其实两个都研究过，但是可定制性都不是特别好。基本上都属于静态页面生成器。</div>
-        <div class="divider"></div>
-        <div class="title">用什么搭的？</div>
-        <div class="content">前端Angular 4，后端Tornado Python3.6。<a class="link" target="_blank" href="https://github.com/isatiso">项目链接：https://github.com/isatiso</a></div>
-        <div class="divider"></div>
-        <div class="title">怎么写字？</div>
-        <div class="content">编辑器使用Markdown语法编辑，支持Latex公式语法。</div>
+        <div class="title">
+            关于 Lazor Blog
+        </div>
+        <markdown [data]="about_content.content" [renderLatex]="1" (click)="preview_image($event)"></markdown>
     </mat-card>
 </div>

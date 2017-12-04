@@ -75,7 +75,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     can_sort: boolean;
     load_article: boolean;
     article_sort_options_data: SortablejsOptions = {
-        animation: 50,
+        animation: 100,
         disabled: false,
         onStart: event => {
             event.item.style.opacity = 0;
@@ -88,7 +88,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     };
 
     category_sort_options_data: SortablejsOptions = {
-        animation: 50,
+        animation: 100,
         disabled: false,
         onStart: event => {
             event.item.style.opacity = 0;
@@ -119,7 +119,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         return this._category_db.category_list;
     }
 
-    set categoried(source: Category[]) {
+    set categories(source: Category[]) {
         this._category_db.category_list = source;
     }
 

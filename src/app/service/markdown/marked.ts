@@ -4,136 +4,242 @@
  * https://github.com/chjj/marked
  */
 
-;
-(function () {
-    /**
-     * Block-Level Grammar
-     */
+import 'prismjs/prism';
+import 'prismjs/components/prism-c';
+import 'prismjs/components/prism-cpp';
+import 'prismjs/components/prism-csharp';
+import 'prismjs/components/prism-css';
+import 'prismjs/components/prism-diff';
+import 'prismjs/components/prism-java';
+import 'prismjs/components/prism-javascript';
+import 'prismjs/components/prism-perl';
+import 'prismjs/components/prism-php';
+import 'prismjs/components/prism-sass';
+import 'prismjs/components/prism-scss';
+import 'prismjs/components/prism-typescript';
+import * as platform from 'platform';
+
+declare var Prism: any;
+
+Prism.languages.python = {
+    'triple-quoted-string': {
+        pattern: /"""[\s\S]+?"""|'''[\s\S]+?'''/,
+        alias: 'string'
+    },
+    'comment': {
+        pattern: /(^|[^\\])#.*/,
+        lookbehind: true
+    },
+    'string': {
+        pattern: /[rfbu]?("|')(?:\\\\|\\?[^\\\r\n])*?\1/,
+        greedy: true
+    },
+
+    'function': {
+        pattern: /((?:^|\s)def[ \t]+)[a-zA-Z_][a-zA-Z0-9_]*(?=\()/g,
+        lookbehind: true
+    },
+    'variable': {
+        pattern: /(?:(^|\s)def[ \t]+[a-zA-Z_][a-zA-Z0-9_]*\(.*[ ,(])[a-zA-Z_][a-zA-Z0-9_]*(?=[ ,)])(?:.*)(?=\))/,
+        // lookbehind: true
+    },
+    'builtin': /\b(?:class|def|from|import|lambda|dict|list|tuple|set|print|range)\b/,
+    'method': {
+        pattern: /(\.[a-zA-Z_][a-zA-Z0-9_]*(?=\())/,
+    },
+    'method2': {
+        pattern: /(?:[a-zA-Z_][a-zA-Z0-9_]*(?=\())/,
+    },
+    'class-name': {
+        pattern: /(\bclass\s+)[a-z0-9_]+/i,
+        lookbehind: true
+    },
+    'keyword': /\b(?:as|assert|async|await|break|continue|del|elif|else)\b/,
+    'keyword2': /\b(?:except|exec|finally|for|global|if|in|is|pass|raise|return|try|while|with|yield)\b/,
+    'boolean': /\b(?:True|False)\b/,
+    'number': /\b-?(?:0[bo])?(?:(?:\d|0x[\da-f])[\da-f]*\.?\d*|\.\d+)(?:e[+-]?\d+)?j?\b/i,
+    'operator': /[-+%=]=?|!=|\*\*?=?|\/\/?=?|<[<=>]?|>[=>]?|[&|^~]|\b(?:or|and|not)\b/,
+    'punctuation': /[{}[\];(),.:]/
+};
 
 
-    function replace(regex, opt) {
-        regex = regex.source;
-        opt = opt || '';
-        return function self(name, val) {
-            if (!name) {
-                return new RegExp(regex, opt);
-            }
-            val = val.source || val;
-            val = val.replace(/(^|[^\[])\^/g, '$1');
-            regex = regex.replace(name, val);
-            return self;
-        };
-    }
+function replace(regex, opt?): any {
+    regex = regex.source;
+    opt = opt || '';
+    return function self(name, val) {
+        if (!name) {
+            return new RegExp(regex, opt);
+        }
+        val = val.source || val;
+        val = val.replace(/(^|[^\[])\^/g, '$1');
+        regex = regex.replace(name, val);
+        return self;
+    };
+}
 
-    function noop() { }
-    noop.exec = noop;
-
-    function merge(obj) {
-        for (let i = 1; i < arguments.length; i++) {
-            let target = arguments[i];
-            for (let key in target) {
-                if (Object.prototype.hasOwnProperty.call(target, key)) {
-                    obj[key] = target[key];
-                }
+function merge(obj, ...insertObj) {
+    const out: any = Object.assign({}, obj);
+    for (let i = 0; i < insertObj.length; i++) {
+        const target = insertObj[i];
+        for (const key in target) {
+            if (Object.prototype.hasOwnProperty.call(target, key)) {
+                out[key] = target[key];
             }
         }
-        return obj;
+    }
+    return out;
+}
+
+/**
+ * Helpers
+ */
+
+function escape(html, encode?) {
+    return html
+        .replace(!encode ? /&(?!#?\w+;)/g : /&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function unescape(html) {
+    // explicitly match decimal, hex, and named HTML entities
+    return html.replace(/&(#(?:\d+)|(?:#x[0-9A-Fa-f]+)|(?:\w+));?/g, function (_, n) {
+        n = n.toLowerCase();
+        if (n === 'colon') {
+            return ':';
+        }
+        if (n.charAt(0) === '#') {
+            return n.charAt(1) === 'x' ?
+                String.fromCharCode(parseInt(n.substring(2), 16)) :
+                String.fromCharCode(+n.substring(1));
+        }
+        return '';
+    });
+}
+
+function count_str(regex, str) {
+    let code_edge;
+    for (let count = 0; ; count++) {
+        code_edge = /\n *```/gm.exec(str);
+        if (code_edge) {
+            str = str.substring(code_edge.index + code_edge[0].length);
+            continue;
+        }
+        return count;
+    }
+}
+
+class Noop {
+    constructor() {
+
     }
 
-    var block = {
-        newline: /^\n+/,
-        paragraph: /^((?:[^\n]+\n?(?!hr|heading|lheading|blockquote|tag|def))+)\n*/,
-        list: /^( *)(bull) [\s\S]+?(?:hr|def|\n{2,}(?! )(?!\1bull )\n*|\s*$)/,
-        html: /^ *(?:comment *(?:\n|\s*$)|closed *(?:\n{2,}|\s*$)|closing *(?:\n{2,}|\s*$))/,
-        def: /^ *\[([^\]]+)\]: *<?([^\s>]+)>?(?: +["(]([^\n]+)[")])? *(?:\n+|$)/,
-        item: /^( *)(bull) [^\n]*(?:\n(?!\1bull )[^\n]*)*/,
-        blockquote: /^( *>[^\n]+(\n(?!def)[^\n]+)*\n*)+/,
-        heading: /^ *(#{1,6}) *([^\n]+?) *#* *(?:\n+|$)/,
-        bullet: /(?:[*+-]|\d+\.)/,
-        code: /^( {4}[^\n]+\n*)+/,
-        lheading: /^([^\n]+)\n *(=|-){2,} *(?:\n+|$)/,
-        hr: /^( *[-*_]){3,} *(?:\n+|$)/,
-        text: /^[^\n]+/,
-        table: noop,
-        nptable: noop,
-        fences: noop,
+    exec() {
 
-    };
+    }
+}
 
-    block.item = replace(block.item, 'gm')
-        (/bull/g, block.bullet)
-        ();
+const noop = new Noop();
 
-    block.list = replace(block.list)
-        (/bull/g, block.bullet)
-        ('hr', /\n+(?=\1?(?:[-*_] *){3,}(?:\n+|$))/)
-        ('def', '\\n+(?=' + block.def.source + ')')
-        ();
+const block: any = {
+    newline: /^\n+/,
+    paragraph: /^((?:[^\n]+\n?(?!hr|heading|lheading|blockquote|tag|def))+)\n*/,
+    list: /^( *)(bull) [\s\S]+?(?:hr|def|\n{2,}(?! )(?!\1bull )\n*|\s*$)/,
+    html: /^ *(?:comment *(?:\n|\s*$)|closed *(?:\n{2,}|\s*$)|closing *(?:\n{2,}|\s*$))/,
+    def: /^ *\[([^\]]+)\]: *<?([^\s>]+)>?(?: +["(]([^\n]+)[")])? *(?:\n+|$)/,
+    item: /^( *)(bull) [^\n]*(?:\n(?!\1bull )[^\n]*)*/,
+    blockquote: /^( *>[^\n]+(\n(?!def)[^\n]+)*\n*)+/,
+    heading: /^ *(#{1,6}) *([^\n]+?) *#* *(?:\n+|$)/,
+    bullet: /(?:[*+-]|\d+\.)/,
+    code: /^( {4}[^\n]+\n*)+/,
+    lheading: /^([^\n]+)\n *(=|-){2,} *(?:\n+|$)/,
+    hr: /^( *[-*_]){3,} *(?:\n+|$)/,
+    text: /^[^\n]+/,
+    table: noop,
+    nptable: noop,
+    fences: noop,
+};
 
-    block.blockquote = replace(block.blockquote)
-        ('def', block.def)
-        ();
+block.item = replace(block.item, 'gm')(/bull/g, block.bullet)();
 
-    block._tag = '(?!(?:' +
-        'a|em|strong|small|s|cite|q|dfn|abbr|data|time|code' +
-        '|var|samp|kbd|sub|sup|i|b|u|mark|ruby|rt|rp|bdi|bdo' +
-        '|span|br|wbr|ins|del|img)\\b)\\w+(?!:/|[^\\w\\s@]*@)\\b';
+block.list = replace(block.list)
+    (/bull/g, block.bullet)
+    ('hr', /\n+(?=\1?(?:[-*_] *){3,}(?:\n+|$))/)
+    ('def', '\\n+(?=' + block.def.source + ')')
+    ();
 
-    block.html = replace(block.html)
-        ('comment', /<!--[\s\S]*?-->/)
-        ('closed', /<(tag)[\s\S]+?<\/\1>/)
-        ('closing', /<tag(?:"[^"]*"|'[^']*'|[^'">])*?>/)
-        (/tag/g, block._tag)
-        ();
+block.blockquote = replace(block.blockquote)
+    ('def', block.def)
+    ();
 
-    block.paragraph = replace(block.paragraph)
-        ('hr', block.hr)
-        ('heading', block.heading)
-        ('lheading', block.lheading)
-        ('blockquote', block.blockquote)
-        ('tag', '<' + block._tag)
-        ('def', block.def)
-        ();
+block._tag = '(?!(?:' +
+    'a|em|strong|small|s|cite|q|dfn|abbr|data|time|code' +
+    '|var|samp|kbd|sub|sup|i|b|u|mark|ruby|rt|rp|bdi|bdo' +
+    '|span|br|wbr|ins|del|img)\\b)\\w+(?!:/|[^\\w\\s@]*@)\\b';
 
-    /**
-     * Normal Block Grammar
-     */
+block.html = replace(block.html)
+    ('comment', /<!--[\s\S]*?-->/)
+    ('closed', /<(tag)[\s\S]+?<\/\1>/)
+    ('closing', /<tag(?:"[^"]*"|'[^']*'|[^'">])*?>/)
+    (/tag/g, block._tag)
+    ();
 
-    block.normal = merge({}, block);
+block.paragraph = replace(block.paragraph)
+    ('hr', block.hr)
+    ('heading', block.heading)
+    ('lheading', block.lheading)
+    ('blockquote', block.blockquote)
+    ('tag', '<' + block._tag)
+    ('def', block.def)
+    ();
 
-    /**
-     * GFM Block Grammar
-     */
+/**
+ * Normal Block Grammar
+ */
 
-    block.gfm = merge({}, block.normal, {
-        fences: /^ *(`{3,}|~{3,})[ \.]*(\S+)? *\n([\s\S]*?)\s*\1 *(?:\n+|$)/,
-        paragraph: /^/,
-        heading: /^ *(#{1,6}) +([^\n]+?) *#* *(?:\n+|$)/
-    });
+block.normal = merge({}, block);
 
-    block.gfm.paragraph = replace(block.paragraph)
-        ('(?!', '(?!' +
-        block.gfm.fences.source.replace('\\1', '\\2') + '|' +
-        block.list.source.replace('\\1', '\\3') + '|')
-        ();
+/**
+ * GFM Block Grammar
+ */
 
-    /**
-     * GFM + Tables Block Grammar
-     */
+block.gfm = merge({}, block.normal, {
+    fences: /^ *(`{3,}|~{3,})[ \.]*(\S+)? *\n([\s\S]*?)\s*\1 *(?:\n+|$)/,
+    paragraph: /^/,
+    heading: /^ *(#{1,6}) +([^\n]+?) *#* *(?:\n+|$)/
+});
 
-    block.tables = merge({}, block.gfm, {
-        nptable: /^ *(\S.*\|.*)\n *([-:]+ *\|[-| :]*)\n((?:.*\|.*(?:\n|$))*)\n*/,
-        table: /^ *\|(.+)\n *\|( *[-:]+[-| :]*)\n((?: *\|.*(?:\n|$))*)\n*/
-    });
+block.gfm.paragraph = replace(block.paragraph)
+    ('(?!', '(?!' +
+    block.gfm.fences.source.replace('\\1', '\\2') + '|' +
+    block.list.source.replace('\\1', '\\3') + '|')
+    ();
 
-    /**
-     * Block Lexer
-     */
+/**
+ * GFM + Tables Block Grammar
+ */
 
-    function Lexer(options) {
+block.tables = merge({}, block.gfm, {
+    nptable: /^ *(\S.*\|.*)\n *([-:]+ *\|[-| :]*)\n((?:.*\|.*(?:\n|$))*)\n*/,
+    table: /^ *\|(.+)\n *\|( *[-:]+[-| :]*)\n((?: *\|.*(?:\n|$))*)\n*/
+});
+
+/**
+ * Block Lexer
+ */
+class Lexer {
+
+    tokens: any;
+    options: any;
+    rules: any;
+    list_level: any;
+
+    constructor(options) {
         this.tokens = [];
         this.tokens.links = {};
-        this.options = options || marked.defaults;
+        this.options = options || defaults;
         this.rules = block.normal;
         this.list_level = 0;
 
@@ -144,28 +250,23 @@
                 this.rules = block.gfm;
             }
         }
+        // this.rules = block;
     }
-
-    /**
-     * Expose Block Rules
-     */
-
-    Lexer.rules = block;
 
     /**
      * Static Lex Method
      */
 
-    Lexer.lex = function (src, options) {
-        var lexer = new Lexer(options);
+    static lex(src, options) {
+        const lexer = new Lexer(options);
         return lexer.lex(src);
-    };
+    }
 
     /**
      * Preprocessing
      */
 
-    Lexer.prototype.lex = function (src) {
+    lex(src) {
         src = src
             .replace(/\r\n|\r/g, '\n')
             .replace(/\t/g, '    ')
@@ -173,15 +274,18 @@
             .replace(/\u2424/g, '\n');
 
         return this.token(src, true);
-    };
+    }
 
     /**
      * Lexing
      */
 
-    Lexer.prototype.token = function (src, top, bq) {
-        var src = src.replace(/^ +$/gm, ''),
-            next, loose, cap, bull, b, item, space, i, l;
+    token(src, top, bq?) {
+        src = src.replace(/^ +$/gm, '');
+        let cap: any = '';
+        let item: any = '';
+        let bull: any = '';
+        let next: any = '';
 
         while (src) {
             // newline
@@ -239,7 +343,7 @@
                     cells: cap[3].replace(/\n$/, '').split('\n')
                 };
 
-                for (i = 0; i < item.align.length; i++) {
+                for (let i = 0; i < item.align.length; i++) {
                     if (/^ *-+: *$/.test(item.align[i])) {
                         item.align[i] = 'right';
                     } else if (/^ *:-+: *$/.test(item.align[i])) {
@@ -251,7 +355,7 @@
                     }
                 }
 
-                for (i = 0; i < item.cells.length; i++) {
+                for (let i = 0; i < item.cells.length; i++) {
                     item.cells[i] = item.cells[i].split(/ *\| */);
                 }
 
@@ -290,6 +394,30 @@
 
                 cap = cap[0].replace(/^ *> ?/gm, '');
 
+                while (1) {
+                    const count = count_str(/\n *```/gm, cap);
+
+                    if (count % 2 !== 0) {
+                        let code_edge = /\n *``` *\n/gm.exec(src);
+                        if (code_edge) {
+                            const cut_length = code_edge.index + code_edge[0].length;
+                            cap += src.substring(0, cut_length);
+                            src = src.substring(cut_length);
+                        } else {
+                            break;
+                        }
+                        code_edge = this.rules.blockquote.exec(src);
+                        if (code_edge) {
+                            src = src.substring(code_edge[0].length);
+                            cap += code_edge[0].replace(/^ *> ?/gm, '');
+                        } else {
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+
                 // Pass `top` to keep the current
                 // "toplevel" state. This is exactly
                 // how markdown.pl works.
@@ -321,15 +449,14 @@
                 cap = cap[0].match(this.rules.item);
 
                 next = false;
-                l = cap.length;
-                i = 0;
+                const l = cap.length;
 
-                for (; i < l; i++) {
+                for (let i = 0; i < l; i++) {
                     item = cap[i];
 
                     // Remove the list item's bullet
                     // so it is seen as the next token.
-                    space = item.length;
+                    let space = item.length;
                     item = item.replace(/^ *([*+-]|\d+\.) +/, '');
 
                     // Outdent whatever the
@@ -344,7 +471,7 @@
                     // Determine whether the next list item belongs here.
                     // Backpedal if it does not belong in this list.
                     if (this.options.smartLists && i !== l - 1) {
-                        b = block.bullet.exec(cap[i + 1])[0];
+                        const b = block.bullet.exec(cap[i + 1])[0];
                         if (bull !== b && !(bull.length > 1 && b.length > 1)) {
                             src = cap.slice(i + 1).join('\n') + src;
                             i = l - 1;
@@ -354,10 +481,12 @@
                     // Determine whether item is loose or not.
                     // Use: /(^|\n)(?! )[^\n]+\n\n(?!\s*$)/
                     // for discount behavior.
-                    loose = next || /\n\n(?!\s*$)/.test(item);
+                    let loose = next || /\n\n(?!\s*$)/.test(item);
                     if (i !== l - 1) {
                         next = item.charAt(item.length - 1) === '\n';
-                        if (!loose) loose = next;
+                        if (!loose) {
+                            loose = next;
+                        }
                     }
 
                     this.tokens.push({
@@ -414,10 +543,10 @@
                     type: 'table',
                     header: cap[1].replace(/^ *| *\| *$/g, '').split(/ *\| */),
                     align: cap[2].replace(/^ *|\| *$/g, '').split(/ *\| */),
-                    cells: cap[3].replace(/(?: *\| *)?\n$/, '').split('\n')
+                    cells: cap[3].replace(/(?: *)?\n$/, '').split('\n')
                 };
 
-                for (i = 0; i < item.align.length; i++) {
+                for (let i = 0; i < item.align.length; i++) {
                     if (/^ *-+: *$/.test(item.align[i])) {
                         item.align[i] = 'right';
                     } else if (/^ *:-+: *$/.test(item.align[i])) {
@@ -429,7 +558,7 @@
                     }
                 }
 
-                for (i = 0; i < item.cells.length; i++) {
+                for (let i = 0; i < item.cells.length; i++) {
                     item.cells[i] = item.cells[i]
                         .replace(/^ *\| *| *\| *$/g, '')
                         .split(/ *\| */);
@@ -454,10 +583,11 @@
             // text
             if (cap = this.rules.text.exec(src)) {
                 // Top-level should never reach here.
+
                 src = src.substring(cap[0].length);
                 this.tokens.push({
                     type: 'text',
-                    text: `<span class="text">${cap[0]}</span>`
+                    text: `<span class="text">${cap[0]}</span>`,
                 });
                 continue;
             }
@@ -469,87 +599,96 @@
         }
 
         return this.tokens;
-    };
+    }
+}
 
-    /**
-     * Inline-Level Grammar
-     */
+/**
+ * Inline-Level Grammar
+ */
 
-    var inline = {
-        escape: /^\\([\\`*{}\[\]()#+\-.!_>])/,
-        autolink: /^<([^ >]+(@|:\/)[^ >]+)>/,
-        url: noop,
-        tag: /^<!--[\s\S]*?-->|^<\/?\w+(?:"[^"]*"|'[^']*'|[^'">])*?>/,
-        link: /^!?\[(inside)\]\(href\)/,
-        reflink: /^!?\[(inside)\]\s*\[([^\]]*)\]/,
-        nolink: /^!?\[((?:\[[^\]]*\]|[^\[\]])*)\]/,
-        strong: /^__([\s\S]+?)__(?!_)|^\*\*([\s\S]+?)\*\*(?!\*)/,
-        em: /^\b_((?:[^_]|__)+?)_\b|^\*((?:\*\*|[\s\S])+?)\*(?!\*)/,
-        code: /^(`+)\s*([\s\S]*?[^`])\s*\1(?!`)/,
-        br: /^ {2,}\n(?!\s*$)/,
-        del: noop,
-        text: /^[\s\S]+?(?=[\\<!\[_*`]| {2,}\n|$)/
-    };
+const inline = {
+    escape: /^\\([\\`*{}\[\]()#+\-.!_>])/,
+    autolink: /^<([^ >]+(@|:\/)[^ >]+)>/,
+    url: noop,
+    tag: /^<!--[\s\S]*?-->|^<\/?\w+(?:"[^"]*"|'[^']*'|[^'">])*?>/,
+    link: /^!?\[(inside)\]\(href\)/,
+    reflink: /^!?\[(inside)\]\s*\[([^\]]*)\]/,
+    nolink: /^!?\[((?:\[[^\]]*\]|[^\[\]])*)\]/,
+    strong: /^\*\*([\s\S]+?)\*\*(?!\*)/,
+    em: /^\*((?:\*\*|[\s\S])+?)\*(?!\*)/,
+    code: /^(`+)\s*([\s\S]*?[^`])\s*\1(?!`)/,
+    br: /^ {2,}\n(?!\s*$)/,
+    del: noop,
+    text: /^[\s\S]+?(?=[\\<!\[_*`]| {2,}\n|$)/
+};
 
-    inline._inside = /(?:\[[^\]]*\]|[^\[\]]|\](?=[^\[]*\]))*/;
-    inline._href = /\s*<?([\s\S]*?)>?(?:\s+['"]([\s\S]*?)['"])?\s*/;
+inline['_inside'] = /(?:\[[^\]]*\]|[^\[\]]|\](?=[^\[]*\]))*/;
+inline['_href'] = /\s*<?([\s\S]*?)>?(?:\s+['"]([\s\S]*?)['"])?\s*/;
 
-    inline.link = replace(inline.link)
-        ('inside', inline._inside)
-        ('href', inline._href)
-        ();
+inline.link = replace(inline.link)
+    ('inside', inline['_inside'])
+    ('href', inline['_href'])
+    ();
 
-    inline.reflink = replace(inline.reflink)
-        ('inside', inline._inside)
-        ();
+inline.reflink = replace(inline.reflink)
+    ('inside', inline['_inside'])
+    ();
 
-    /**
-     * Normal Inline Grammar
-     */
+/**
+ * Normal Inline Grammar
+ */
 
-    inline.normal = merge({}, inline);
+inline['normal'] = merge({}, inline);
 
-    /**
-     * Pedantic Inline Grammar
-     */
+/**
+ * Pedantic Inline Grammar
+ */
 
-    inline.pedantic = merge({}, inline.normal, {
-        strong: /^__(?=\S)([\s\S]*?\S)__(?!_)|^\*\*(?=\S)([\s\S]*?\S)\*\*(?!\*)/,
-        em: /^_(?=\S)([\s\S]*?\S)_(?!_)|^\*(?=\S)([\s\S]*?\S)\*(?!\*)/
-    });
+inline['pedantic'] = merge({}, inline['normal'], {
+    strong: /^__(?=\S)([\s\S]*?\S)__(?!_)|^\*\*(?=\S)([\s\S]*?\S)\*\*(?!\*)/,
+    em: /^_(?=\S)([\s\S]*?\S)_(?!_)|^\*(?=\S)([\s\S]*?\S)\*(?!\*)/
+});
 
-    /**
-     * GFM Inline Grammar
-     */
+/**
+ * GFM Inline Grammar
+ */
 
-    inline.gfm = merge({}, inline.normal, {
-        escape: replace(inline.escape)('])', '~|])')(),
-        url: /^(https?:\/\/[^\s<]+[^<.,:;"')\]\s])/,
-        del: /^~~(?=\S)([\s\S]*?\S)~~/,
-        text: replace(inline.text)
-            (']|', '~]|')
-            ('|', '|https?://|')
-            ()
-    });
+inline['gfm'] = merge({}, inline['normal'], {
+    escape: replace(inline.escape)('])', '~|])')(),
+    url: /^(https?:\/\/[^\s<]+[^<.,:;"')\]\s])/,
+    del: /^~~(?=\S)([\s\S]*?\S)~~/,
+    text: replace(inline.text)
+        (']|', '~]|')
+        ('|', '|https?://|')
+        ()
+});
 
-    /**
-     * GFM + Line Breaks Inline Grammar
-     */
+/**
+ * GFM + Line Breaks Inline Grammar
+ */
 
-    inline.breaks = merge({}, inline.gfm, {
-        br: replace(inline.br)('{2,}', '*')(),
-        text: replace(inline.gfm.text)('{2,}', '*')()
-    });
+inline['breaks'] = merge({}, inline['gfm'], {
+    br: replace(inline.br)('{2,}', '*')(),
+    text: replace(inline['gfm'].text)('{2,}', '*')()
+});
 
-    /**
-     * Inline Lexer & Compiler
-     */
+/**
+ * Inline Lexer & Compiler
+ */
 
-    function InlineLexer(links, options) {
-        this.options = options || marked.defaults;
+class InlineLexer {
+
+    options: any;
+    links: any;
+    rules: any;
+    renderer: any;
+    inLink: any;
+
+    constructor(links, options?, renderer?) {
+        this.options = options || defaults;
         this.links = links;
-        this.rules = inline.normal;
-        this.renderer = this.options.renderer || new Renderer;
+        this.rules = inline['normal'];
+        this.renderer = this.options.renderer || new Renderer();
         this.renderer.options = this.options;
 
         if (!this.links) {
@@ -559,40 +698,40 @@
 
         if (this.options.gfm) {
             if (this.options.breaks) {
-                this.rules = inline.breaks;
+                this.rules = inline['breaks'];
             } else {
-                this.rules = inline.gfm;
+                this.rules = inline['gfm'];
             }
         } else if (this.options.pedantic) {
-            this.rules = inline.pedantic;
+            this.rules = inline['pedantic'];
         }
+        this.rules = inline;
     }
 
-    /**
-     * Expose Inline Rules
-     */
 
-    InlineLexer.rules = inline;
 
     /**
      * Static Lexing/Compiling Method
      */
 
-    InlineLexer.output = function (src, links, options) {
-        var inline = new InlineLexer(links, options);
-        return inline.output(src);
-    };
+    static output(src, links, options) {
+        const inline_lexer = new InlineLexer(links, options);
+        return inline_lexer.output(src);
+    }
 
     /**
      * Lexing/Compiling
      */
 
-    InlineLexer.prototype.output = function (src) {
-        var out = '',
-            link, text, href, cap;
+    output(src) {
+        let out = '';
+        let link: any = '';
+        let text: any = '';
+        let href: any = '';
 
         while (src) {
             // escape
+            let cap: any = '';
             if (cap = this.rules.escape.exec(src)) {
                 src = src.substring(cap[0].length);
                 out += cap[1];
@@ -632,11 +771,17 @@
                     this.inLink = false;
                 }
                 src = src.substring(cap[0].length);
-                out += this.options.sanitize ?
-                    this.options.sanitizer ?
-                        this.options.sanitizer(cap[0]) :
-                        escape(cap[0]) :
-                    cap[0]
+                let tmp: any;
+                if (this.options.sanitize) {
+                    if (this.options.santizer) {
+                        tmp = this.options.santizer(cap[0]);
+                    } else {
+                        tmp = escape(cap[0]);
+                    }
+                } else {
+                    tmp = cap[0];
+                }
+                out += tmp;
                 continue;
             }
 
@@ -718,27 +863,29 @@
         }
 
         return out;
-    };
+    }
 
     /**
      * Compile Link
      */
 
-    InlineLexer.prototype.outputLink = function (cap, link) {
-        var href = escape(link.href),
-            title = link.title ? escape(link.title) : null;
+    outputLink(cap, link) {
+        const href = escape(link.href);
+        const title = link.title ? escape(link.title) : null;
 
         return cap[0].charAt(0) !== '!' ?
             this.renderer.link(href, title, this.output(cap[1])) :
             this.renderer.image(href, title, escape(cap[1]));
-    };
+    }
 
     /**
      * Smartypants Transformations
      */
 
-    InlineLexer.prototype.smartypants = function (text) {
-        if (!this.options.smartypants) return text;
+    smartypants(text) {
+        if (!this.options.smartypants) {
+            return text;
+        }
         return text
             // em-dashes
             .replace(/---/g, '\u2014')
@@ -754,20 +901,19 @@
             .replace(/"/g, '\u201d')
             // ellipses
             .replace(/\.{3}/g, '\u2026');
-    };
+    }
 
     /**
      * Mangle Links
      */
 
-    InlineLexer.prototype.mangle = function (text) {
-        if (!this.options.mangle) return text;
-        var out = '',
-            l = text.length,
-            i = 0,
-            ch;
+    mangle(text) {
+        if (!this.options.mangle) { return text; }
+        let out = '';
+        let ch: any = '';
+        const l = text.length;
 
-        for (; i < l; i++) {
+        for (let i = 0; i < l; i++) {
             ch = text.charCodeAt(i);
             if (Math.random() > 0.5) {
                 ch = 'x' + ch.toString(16);
@@ -776,45 +922,68 @@
         }
 
         return out;
-    };
+    }
 
-    /**
-     * Renderer
-     */
+}
 
-    function Renderer(options) {
+/**
+ * Renderer
+ */
+
+class Renderer {
+    options: any;
+
+    constructor(options?) {
         this.options = options || {};
     }
 
-    Renderer.prototype.code = function (code, lang, escaped) {
+    translate_lang(lang: string) {
+        switch (lang.toLowerCase()) {
+            case 'javascript':
+                return 'JavaScript';
+            case 'python':
+                return 'Python';
+            case 'html':
+                return 'HTML';
+            case 'sql':
+                return 'SQL';
+            case 'mongodb':
+                return 'MongoDB';
+            case 'css':
+                return 'CSS';
+            case 'plaintext':
+                return 'Plain Text';
+            default:
+                return lang;
+        }
+    }
+
+    code(code, lang, escaped) {
+        lang = lang && lang.toLowerCase() || 'plaintext';
         if (lang in Prism.languages) {
-            var out = Prism.highlight(code, Prism.languages[lang], lang);
+            const out = Prism.highlight(code, Prism.languages[lang], lang);
             if (out != null && out !== code) {
                 escaped = true;
                 code = out;
             }
         }
 
-        if (!lang) {
-            return '<pre><code>' +
-                (escaped ? code : escape(code, true)) +
-                '\n</code></pre>';
-        }
+        lang = this.translate_lang(lang);
 
         return `<div class="code-block"><pre><div class="outline">${escape(lang, true)}</div>` +
-            `<code class="${this.options.langPrefix}${escape(lang, true)}">` +
-            `${(escaped ? code : escape(code, true))}\n</code></pre></div>\n`;
-    };
+            `<code>${(escaped ? code : escape(code, true))}\n</code></pre></div>\n`;
+            // class="${this.options.langPrefix}${escape(lang, true)}"
+    }
 
-    Renderer.prototype.blockquote = function (quote) {
+    blockquote(quote) {
         return '<blockquote>\n' + quote + '</blockquote>\n';
-    };
+    }
 
-    Renderer.prototype.html = function (html) {
+    html(html) {
         return html;
-    };
+    }
 
-    Renderer.prototype.heading = function (text, level, raw) {
+    heading(text, level, raw) {
         return '<div class="head-' + level + '"><h' +
             level +
             ' id="' +
@@ -825,27 +994,27 @@
             '</h' +
             level +
             '></div>\n';
-    };
+    }
 
-    Renderer.prototype.hr = function () {
+    hr() {
         return '<hr/>\n';
-    };
+    }
 
-    Renderer.prototype.list = function (body, ordered) {
-        var type = ordered ? 'ol' : 'ul';
-        var class_name = ordered ? 'circle-list' : 'rect-list';
+    list(body, ordered) {
+        const type = ordered ? 'ol' : 'ul';
+        const class_name = ordered ? 'circle-list' : 'rect-list';
         return `<div class="${class_name}"><${type}>\n${body}</${type}></div>\n`;
-    };
+    }
 
-    Renderer.prototype.listitem = function (text, list_level) {
+    listitem(text, list_level) {
         return `<li class="list-level-${list_level}">${text}</li>\n`;
-    };
+    }
 
-    Renderer.prototype.paragraph = function (text) {
+    paragraph(text) {
         return `<p>${text}</p>\n`;
-    };
+    }
 
-    Renderer.prototype.table = function (header, body) {
+    table(header, body) {
         return '<table>\n' +
             '<thead>\n' +
             header +
@@ -854,45 +1023,46 @@
             body +
             '</tbody>\n' +
             '</table>\n';
-    };
+    }
 
-    Renderer.prototype.tablerow = function (content) {
+    tablerow(content) {
         return '<tr>\n' + content + '</tr>\n';
-    };
+    }
 
-    Renderer.prototype.tablecell = function (content, flags) {
-        var type = flags.header ? 'th' : 'td';
-        var tag = flags.align ?
+    tablecell(content, flags) {
+        const type = flags.header ? 'th' : 'td';
+        const tag = flags.align ?
             '<' + type + ' style="text-align:' + flags.align + '">' :
             '<' + type + '>';
         return tag + content + '</' + type + '>\n';
-    };
+    }
 
     // span level renderer
-    Renderer.prototype.strong = function (text) {
+    strong(text) {
         return '<span class="md-strong">' + text + '</span>';
-    };
+    }
 
-    Renderer.prototype.em = function (text) {
+    em(text) {
         return '<span class="md-italic">' + text + '</span>';
-    };
+    }
 
-    Renderer.prototype.codespan = function (text) {
+    codespan(text) {
         return '<code class="inline-code">' + text + '</code>';
-    };
+    }
 
-    Renderer.prototype.br = function () {
+    br() {
         return '<br/>';
-    };
+    }
 
-    Renderer.prototype.del = function (text) {
+    del(text) {
         return '<del>' + text + '</del>';
-    };
+    }
 
-    Renderer.prototype.link = function (href, title, text) {
+    link(href, title, text) {
+        let prot: any;
         if (this.options.sanitize) {
             try {
-                var prot = decodeURIComponent(unescape(href))
+                prot = decodeURIComponent(unescape(href))
                     .replace(/[^\w:]/g, '')
                     .toLowerCase();
             } catch (e) {
@@ -902,27 +1072,37 @@
                 return '';
             }
         }
-        return out = `<a target="_blank" href="${href}" ${title && `title="${title}"` || ''}>${text}</a>`;
-    };
+        return `<a target="_blank" href="${href}" ${title && `title="${title}"` || ''}>${text}</a>`;
+    }
 
-    Renderer.prototype.image = function (href, title, text) {
-        return `<div class="md-image"><img src="${href}" onclick="window.current_image='${href}'" alt="${text}" ${title && `title="${title}"` || ''}/></div>`;
-    };
+    image(href, title, text) {
+        return `<div class="md-image">` +
+            `<img src="${href}" onclick="window.current_image='${href}'" alt="${text}" ${title && `title="${title}"` || ''}/>` +
+            `</div>`;
+    }
 
-    Renderer.prototype.text = function (text) {
-        // return `<span class="text">${text}</span>`;
+    text(text) {
         return text;
-    };
+    }
+}
 
-    /**
-     * Parsing & Compiling
-     */
 
-    function Parser(options) {
+/**
+ * Parsing & Compiling
+ */
+
+class Parser {
+    tokens: any;
+    token: any;
+    options: any;
+    renderer: any;
+    inline: any;
+
+    constructor(options, renderer?) {
         this.tokens = [];
         this.token = null;
-        this.options = options || marked.defaults;
-        this.options.renderer = this.options.renderer || new Renderer;
+        this.options = options || defaults;
+        this.options.renderer = this.options.renderer || Renderer;
         this.renderer = this.options.renderer;
         this.renderer.options = this.options;
     }
@@ -930,63 +1110,58 @@
     /**
      * Static Parse Method
      */
-
-    Parser.parse = function (src, options, renderer) {
-        var parser = new Parser(options, renderer);
+    static parse(src, options?, renderer?) {
+        const parser = new Parser(options, renderer);
         return parser.parse(src);
-    };
+    }
 
     /**
      * Parse Loop
      */
-
-    Parser.prototype.parse = function (src) {
+    parse(src) {
         this.inline = new InlineLexer(src.links, this.options, this.renderer);
         this.tokens = src.reverse();
-
-        var out = '';
+        let out = '';
         while (this.next()) {
             out += this.tok();
         }
-
         return out;
-    };
-
+    }
     /**
      * Next Token
      */
 
-    Parser.prototype.next = function () {
+    next() {
         return this.token = this.tokens.pop();
-    };
+    }
 
     /**
      * Preview Next Token
      */
 
-    Parser.prototype.peek = function () {
+    peek() {
         return this.tokens[this.tokens.length - 1] || 0;
-    };
+    }
 
     /**
      * Parse Text Tokens
      */
 
-    Parser.prototype.parseText = function () {
-        var body = this.token.text;
+    parseText() {
+        let body = this.token.text;
 
         while (this.peek().type === 'text') {
             body += '\n' + this.next().text;
         }
 
         return this.inline.output(body);
-    };
+    }
 
     /**
      * Parse Current Token
      */
 
-    Parser.prototype.tok = function () {
+    tok() {
         switch (this.token.type) {
             case 'space':
                 {
@@ -1011,25 +1186,25 @@
                 }
             case 'table':
                 {
-                    var header = '',
-                        body = '',
-                        i, row, cell, flags, j;
+                    let header = '';
+                    let body = '';
+                    let cell: any;
 
                     // header
                     cell = '';
-                    for (i = 0; i < this.token.header.length; i++) {
-                        flags = { header: true, align: this.token.align[i] };
+                    for (let i = 0; i < this.token.header.length; i++) {
+                        const flags = { header: true, align: this.token.align[i] };
                         cell += this.renderer.tablecell(
                             this.inline.output(this.token.header[i]), { header: true, align: this.token.align[i] }
                         );
                     }
                     header += this.renderer.tablerow(cell);
 
-                    for (i = 0; i < this.token.cells.length; i++) {
-                        row = this.token.cells[i];
+                    for (let i = 0; i < this.token.cells.length; i++) {
+                        const row = this.token.cells[i];
 
                         cell = '';
-                        for (j = 0; j < row.length; j++) {
+                        for (let j = 0; j < row.length; j++) {
                             cell += this.renderer.tablecell(
                                 this.inline.output(row[j]), { header: false, align: this.token.align[j] }
                             );
@@ -1041,7 +1216,7 @@
                 }
             case 'blockquote_start':
                 {
-                    var body = '';
+                    let body = '';
 
                     while (this.next().type !== 'blockquote_end') {
                         body += this.tok();
@@ -1051,8 +1226,8 @@
                 }
             case 'list_start':
                 {
-                    var body = '',
-                        ordered = this.token.ordered;
+                    let body = '';
+                    const ordered = this.token.ordered;
 
                     while (this.next().type !== 'list_end') {
                         body += this.tok();
@@ -1062,9 +1237,9 @@
                 }
             case 'list_item_start':
                 {
-                    var body = '';
+                    let body = '';
                     const list_level = this.token.list_level;
-                    console.log(this.token);
+
                     while (this.next().type !== 'list_item_end') {
                         body += this.token.type === 'text' ? this.parseText() : this.tok();
                     }
@@ -1073,7 +1248,7 @@
                 }
             case 'loose_item_start':
                 {
-                    var body = '';
+                    let body = '';
                     const list_level = this.token.list_level;
                     while (this.next().type !== 'list_item_end') {
                         body += this.tok();
@@ -1083,7 +1258,7 @@
                 }
             case 'html':
                 {
-                    var html = !this.token.pre && !this.options.pedantic ?
+                    const html = !this.token.pre && !this.options.pedantic ?
                         this.inline.output(this.token.text) : this.token.text;
                     return this.renderer.html(html);
                 }
@@ -1096,67 +1271,89 @@
                     return this.renderer.paragraph(this.parseText());
                 }
         }
-    };
+    }
+}
 
-    /**
-     * Helpers
-     */
+const defaults: any = {
+    gfm: true,
+    tables: true,
+    breaks: false,
+    pedantic: false,
+    sanitize: false,
+    sanitizer: null,
+    mangle: true,
+    smartLists: true,
+    silent: false,
+    highlight: null,
+    langPrefix: 'lang-',
+    smartypants: false,
+    headerPrefix: '',
+    renderer: new Renderer(),
+    xhtml: false
+};
 
-    function escape(html, encode) {
-        return html
-            .replace(!encode ? /&(?!#?\w+;)/g : /&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;');
+/**
+ * Marked
+ */
+export class Marked {
+
+    options: any;
+    Parser: any;
+    parser: any;
+    Renderer: any;
+    Lexer: any;
+    lexer: any;
+    InlineLexer: any;
+    inlineLexer: any;
+    parse: any;
+    defaults: any = defaults;
+
+
+    constructor() {
+        this.options = this.setOptions();
+        this.Parser = Parser;
+        this.parser = Parser.parse;
+        this.Renderer = Renderer;
+        this.Lexer = Lexer;
+        this.lexer = Lexer.lex;
+        this.InlineLexer = InlineLexer;
+        this.inlineLexer = InlineLexer.output;
+        this.parse = this.render;
     }
 
-    function unescape(html) {
-        // explicitly match decimal, hex, and named HTML entities 
-        return html.replace(/&(#(?:\d+)|(?:#x[0-9A-Fa-f]+)|(?:\w+));?/g, function (_, n) {
-            n = n.toLowerCase();
-            if (n === 'colon') return ':';
-            if (n.charAt(0) === '#') {
-                return n.charAt(1) === 'x' ?
-                    String.fromCharCode(parseInt(n.substring(2), 16)) :
-                    String.fromCharCode(+n.substring(1));
-            }
-            return '';
-        });
+    setOptions(opt?) {
+        opt = merge(this.defaults, opt);
+        return opt;
     }
 
-
-    /**
-     * Marked
-     */
-
-    function marked(src, opt, callback) {
+    render(src, opt, callback) {
         if (callback || typeof opt === 'function') {
             if (!callback) {
                 callback = opt;
                 opt = null;
             }
 
-            opt = merge({}, marked.defaults, opt || {});
+            opt = merge({}, this.defaults, opt || {});
 
-            var highlight = opt.highlight,
-                tokens, pending, i = 0;
+            const highlight = opt.highlight;
+            let tokens: any;
+            let i = 0;
 
             try {
-                tokens = Lexer.lex(src, opt)
+                tokens = Lexer.lex(src, opt);
             } catch (e) {
                 return callback(e);
             }
 
-            pending = tokens.length;
+            let pending = tokens.length;
 
-            var done = function (err) {
+            const done = function (err?) {
                 if (err) {
                     opt.highlight = highlight;
                     return callback(err);
                 }
 
-                var out;
+                let out: any;
 
                 try {
                     out = Parser.parse(tokens, opt);
@@ -1177,7 +1374,9 @@
 
             delete opt.highlight;
 
-            if (!pending) return done();
+            if (!pending) {
+                return done();
+            }
 
             for (; i < tokens.length; i++) {
                 (function (token) {
@@ -1185,13 +1384,18 @@
                         return --pending || done();
                     }
                     return highlight(token.text, token.lang, function (err, code) {
-                        if (err) return done(err);
+                        if (err) {
+                            return done(err);
+                        }
                         if (code == null || code === token.text) {
                             return --pending || done();
                         }
                         token.text = code;
                         token.escaped = true;
-                        --pending || done();
+                        --pending;
+                        if (!pending) {
+                            done();
+                        }
                     });
                 })(tokens[i]);
             }
@@ -1199,11 +1403,13 @@
             return;
         }
         try {
-            if (opt) opt = merge({}, marked.defaults, opt);
+            if (opt) {
+                opt = merge({}, this.defaults, opt);
+            }
             return Parser.parse(Lexer.lex(src, opt), opt);
         } catch (e) {
             e.message += '\nPlease report this to https://github.com/chjj/marked.';
-            if ((opt || marked.defaults).silent) {
+            if ((opt || this.defaults).silent) {
                 return '<p>An error occured:</p><pre>' +
                     escape(e.message + '', true) +
                     '</pre>';
@@ -1211,58 +1417,4 @@
             throw e;
         }
     }
-
-    /**
-     * Options
-     */
-
-    marked.options = marked.setOptions = function (opt) {
-        merge(marked.defaults, opt);
-        return marked;
-    };
-
-    marked.defaults = {
-        gfm: true,
-        tables: true,
-        breaks: false,
-        pedantic: false,
-        sanitize: true,
-        sanitizer: null,
-        mangle: true,
-        smartLists: false,
-        silent: false,
-        highlight: null,
-        langPrefix: 'lang-',
-        smartypants: false,
-        headerPrefix: '',
-        renderer: new Renderer,
-        xhtml: false
-    };
-
-    /**
-     * Expose
-     */
-
-    marked.Parser = Parser;
-    marked.parser = Parser.parse;
-
-    marked.Renderer = Renderer;
-
-    marked.Lexer = Lexer;
-    marked.lexer = Lexer.lex;
-
-    marked.InlineLexer = InlineLexer;
-    marked.inlineLexer = InlineLexer.output;
-
-    marked.parse = marked;
-
-    this.marked = marked;
-    // if (typeof module !== 'undefined' && typeof exports === 'object') {
-    //     module.exports = marked;
-    // } else if (typeof define === 'function' && define.amd) {
-    //     define(function() { return marked; });
-    // } else {
-    //     this.marked = marked;
-    // }
-
-})();
+}

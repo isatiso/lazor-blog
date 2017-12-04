@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 
@@ -57,6 +57,7 @@ export class AuthComponent implements OnInit, OnDestroy {
     constructor(
         private _http: HttpClient,
         private _router: Router,
+        private _active_route: ActivatedRoute,
         private _snack_bar: SnackBarService,
         private _account: AccountService,
     ) { }
@@ -98,7 +99,10 @@ export class AuthComponent implements OnInit, OnDestroy {
             data => {
                 if (data['result'] === 1) {
                     this._account.data = data['data'];
-                    this._router.navigate(['/home']);
+                    this._active_route.queryParams.subscribe(
+                        params => {
+                            this._router.navigate([params['backurl'] || '/home']);
+                        });
                 } else if (data['status'] === 3002) {
                     this._snack_bar.show('Inactivated account, connect author to active your account.', 'OK');
                     return false;

@@ -16,7 +16,7 @@ import {
 
 import { EditorRoutingModule } from './editor-routing.module';
 import { EditorComponent, InputComponent, WarningComponent } from './editor.component';
-import { MarkdownModule } from 'directive/markdown.module';
+import { MarkdownModule } from 'public/markdown/markdown.module';
 
 @NgModule({
     imports: [

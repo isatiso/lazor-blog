@@ -1,8 +1,8 @@
 <div class="container auth-container" [@childrenAppear]="auth_exists">
     <mat-card>
         <p class="title">
-            <span class="tab-info" style="opacity: 0" [@tab]="!tab_select">欢迎加入Lazor Blog</span>
-            <span class="tab-info" style="opacity: 0" [@tab]="tab_select">欢迎登陆Lazor Blog</span>
+            <span class="tab-info" style="opacity: 0" [@tab]="!tab_select">欢迎登陆Lazor Blog</span>
+            <span class="tab-info" style="opacity: 0" [@tab]="tab_select">欢迎加入Lazor Blog</span>
         </p>
         <div class="divider"></div>
         <mat-tab-group MatTabGroup [dynamicHeight]="dynamic_height" [selectedIndex]="tab_select" (selectedIndexChange)="select_change($event)" disableRipple="false" class="mat-editor">

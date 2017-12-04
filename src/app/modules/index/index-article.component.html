@@ -1,0 +1,22 @@
+<div class="article-list">
+    <div class="article-item">
+        <div class="list-title">
+            文章列表
+        </div>
+    </div>
+    <ul *ngIf="article_list.length">
+        <li *ngFor="let article of article_list" class="article-item">
+            <div class="helper"></div>
+            <mat-chip-list [@loadArticle]="1">
+                <mat-chip routerLink="/article/{{article.article_id}}" selected="true" color="primary">
+                    {{ article.title }}
+                </mat-chip>
+            </mat-chip-list>
+        </li>
+    </ul>
+    <div class="nothing" *ngIf="!article_list.length">
+        <div class="nothing-content" [@loadArticle]="1">
+            该分类还没有上传文章
+        </div>
+    </div>
+</div>

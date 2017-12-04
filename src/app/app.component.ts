@@ -1,4 +1,4 @@
-import { Component, ElementRef, Inject, OnInit, OnChanges, AfterViewInit, AfterViewChecked, HostListener } from '@angular/core';
+import { Component, ElementRef, Inject, OnInit, OnChanges, AfterViewInit, AfterViewChecked, HostListener, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { HttpClient } from '@angular/common/http';
@@ -13,6 +13,11 @@ import { AccountService } from 'service/account/account.service';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/mergeMap';
+
+import * as platform from 'platform';
+
+import anime from 'animejs';
+
 @Component({
     selector: 'la-root',
     templateUrl: './app.component.html',
@@ -32,7 +37,7 @@ import 'rxjs/add/operator/mergeMap';
         ]),
     ]
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, AfterViewInit {
     navbar_exists = 'active';
     children_appear = 'active';
     title = 'Lazor Blog';
@@ -40,6 +45,8 @@ export class AppComponent implements OnInit {
     height_limit = 0;
     client_width = 0;
     navbarWidth = 0;
+    no_footer = false;
+
     constructor(
         private el: ElementRef,
         private router: Router,
@@ -52,6 +59,8 @@ export class AppComponent implements OnInit {
         public nav_profile: NavProfileService,
     ) { }
 
+    @ViewChild('siteLogo') site_logo;
+
     get current_user(): string {
         if (this._account.data) {
             return this._account.data.user_name;
@@ -62,10 +71,25 @@ export class AppComponent implements OnInit {
 
     ngOnInit() {
         window.sessionStorage.clear();
+        clearInterval(window['loading_holder']);
         this._account.update_user_info();
+        console.log('platform:', platform.name);
         if (this.router.url === '/home' || this.router.url === '/') {
             this.height_limit = 276;
         }
+
+        if ('serviceWorker' in navigator && 'PushManager' in window) {
+            navigator.serviceWorker.register(
+                'lazor-server.js', {
+                    scope: '/'
+                }).then(
+                registration => {
+                    return true;
+                }).catch(
+                error => { }
+                );
+        }
+
         this.router.events.filter(event => event instanceof NavigationEnd)
             .map(() => this.activatedRoute)
             .map(route => {
@@ -81,7 +105,40 @@ export class AppComponent implements OnInit {
                 } else {
                     this.height_limit = 0;
                 }
+                this.no_footer = data['noFooter'];
             });
+
+        const wrapperEl = document.querySelector('#loading-wrapper');
+        const wrapperBg = document.querySelector('#cover-background');
+
+        anime.timeline({
+            targets: [wrapperEl, wrapperBg],
+            opacity: 0,
+            duration: 1000,
+            easing: 'linear'
+        }).add({
+            opacity: 0,
+        }).add({
+            zIndex: -1,
+        });
+
+        setTimeout(() => {
+            wrapperEl.innerHTML = '';
+        }, 1000);
+    }
+
+    ngAfterViewInit() {
+        const logo_anime_handler = anime({
+            targets: this.site_logo.nativeElement,
+            rotate: [
+                { value: ['0turn', '7turn'], duration: 3000, easing: [0, 0.6, 1, 0.4] },
+                { value: ['7turn', '0turn'], duration: 3000, easing: [0, 0.6, 1, 0.4] },
+                { value: ['0turn', '-7turn'], duration: 3000, easing: [0, 0.6, 1, 0.4] },
+                { value: ['-7turn', '7turn'], duration: 3000, easing: [0, 0.6, 1, 0.4] },
+                { value: ['7turn', '0turn'], duration: 3000, easing: [0, 0.6, 1, 0.4] },
+            ],
+            loop: true
+        });
     }
 
     is_logged() {

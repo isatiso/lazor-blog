@@ -11,6 +11,7 @@ import { Article, ArticleData, Options } from 'public/data-struct-definition';
 export class ArticleDatabaseService {
     current_article_data: BehaviorSubject<ArticleData>;
     on_edit_data: BehaviorSubject<ArticleData>;
+    article_status = 'published';
 
     constructor(
         private _http: HttpClient,
@@ -39,7 +40,7 @@ export class ArticleDatabaseService {
             options = new Options({});
         }
 
-        const dataExchange: AsyncSubject<Article> = new AsyncSubject<Article>();
+        const dataExchange: AsyncSubject<ArticleData> = new AsyncSubject<ArticleData>();
         const cache_info = window.sessionStorage.getItem('article-' + article_id);
 
         const update_data = data => {

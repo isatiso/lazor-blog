@@ -5,6 +5,7 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { SnackBarService } from 'service/snack-bar/snack-bar.service';
 import { Account } from 'public/data-struct-definition';
+import { scheduleMicroTask } from '@angular/core/src/util';
 
 @Injectable()
 export class ScrollorService {
@@ -42,6 +43,34 @@ export class ScrollorService {
                     clearInterval(interval_handler);
                 }
             }, 15);
+        }
+    }
+
+    goto(from, to, steps: number = 15) {
+        // let current_scroll_top = document.scrollingElement.scrollTop;
+
+        if (from > to) {
+            const delta = (from - to) / steps;
+            if (from > to) {
+                const interval_handler = setInterval(() => {
+                    from -= delta;
+                    document.scrollingElement.scrollTop = from;
+                    if (from <= to) {
+                        clearInterval(interval_handler);
+                    }
+                }, 15);
+            }
+        } else if (from < to) {
+            const delta = (to - from) / steps;
+            if (from < to) {
+                const interval_handler = setInterval(() => {
+                    from += delta;
+                    document.scrollingElement.scrollTop = from;
+                    if (from >= to) {
+                        clearInterval(interval_handler);
+                    }
+                }, 15);
+            }
         }
     }
 }

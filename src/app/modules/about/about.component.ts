@@ -1,5 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { trigger, state, style, animate, transition } from '@angular/animations';
+import { MatDialog } from '@angular/material';
+
+import { AboutContent } from './about.md';
+import { PreviewComponent } from 'public/preview/preview.component';
 
 @Component({
     selector: 'la-about',
@@ -15,10 +19,26 @@ import { trigger, state, style, animate, transition } from '@angular/animations'
     ]
 })
 export class AboutComponent implements OnInit {
+    about_content = new AboutContent();
 
-    constructor() { }
+    constructor(
+        public dialog: MatDialog,
+    ) { }
 
     ngOnInit() {
         document.scrollingElement.scrollTop = 0;
+    }
+
+    preview_image(event) {
+        if (window['current_image']) {
+            this.dialog.open(PreviewComponent, {
+                data: {
+                    name: '',
+                    src: window['current_image']
+                }
+            }).afterClosed().subscribe(
+                res => { });
+            window['current_image'] = null;
+        }
     }
 }

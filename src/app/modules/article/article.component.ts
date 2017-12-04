@@ -8,11 +8,10 @@ import { MarkdownDirective } from 'directive/markdown.directive';
 import { ArticleDatabaseService } from 'service/article-database/article-database.service';
 import { CategoryDatabaseService } from 'service/category-database/category-database.service';
 import { ScrollorService } from 'service/scrollor//scrollor.service';
-import { PreviewComponent } from 'component/preview/preview.component';
-import { Article, ArticleData, Options } from 'public/data-struct-definition';
+import { PreviewComponent } from 'preview/preview.component';
+import { Article, ArticleData, Options } from 'data-struct-definition';
 
-
-declare var Prism: any;
+import anime from 'animejs';
 
 @Component({
     selector: 'la-article',
@@ -38,10 +37,14 @@ export class ArticleComponent implements OnInit {
     public page_appear: number;
     private nav_zone_width = 125;
     private right_nav_show = false;
+    public menu_anime_handler: any;
+    public menu_anime_state = 'hidden';
 
     @ViewChild('navEditor') nav_editor;
     @ViewChild('navTop') nav_top;
-    @ViewChild('navHome') nav_home;
+    // @ViewChild('navHome') nav_home;
+    @ViewChild('navGuide') nav_guide;
+    @ViewChild('navGuideIcon') nav_guide_icon;
 
     constructor(
         private _http: HttpClient,
@@ -78,23 +81,54 @@ export class ArticleComponent implements OnInit {
     }
 
     show_nav_button(event) {
-        if (event.type !== 'mousemove' || event.x >= event.view.innerWidth || event.x < 0) {
+        if (event.type !== 'mousemove') {
             return event;
         }
 
-        if (event.x >= event.view.innerWidth - this.nav_zone_width * 0.33) {
-            if (!this.right_nav_show) {
-                this.right_nav_show = true;
-                this.nav_editor._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5)';
-                this.nav_top._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5) translateY(-60px)';
-                this.nav_home._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5) translateY(60px)';
+        if (event.x < event.view.innerWidth - this.nav_zone_width * 1.5) {
+            if (this.menu_anime_state === 'show') {
+                this.toggle_menu();
             }
-        } else if (event.x < event.view.innerWidth - this.nav_zone_width * 1.5) {
-            if (this.right_nav_show) {
-                this.right_nav_show = false;
-                this.nav_editor._elementRef.nativeElement.style.transform = 'translateX(80%)';
-                this.nav_top._elementRef.nativeElement.style.transform = 'translateX(80%)';
-                this.nav_home._elementRef.nativeElement.style.transform = 'translateX(80%)';
+        }
+    }
+
+    toggle_menu(event?) {
+        if (this.menu_anime_state === 'hidden') {
+            if (!this.menu_anime_handler) {
+                this.menu_anime_handler = anime.timeline().add({
+                    targets: this.nav_editor._elementRef.nativeElement,
+                    translateY: -70,
+                    duration: 200,
+                    opacity: [0, 1],
+                    offset: 0,
+                    easing: 'linear'
+                }).add({
+                    targets: this.nav_top._elementRef.nativeElement,
+                    translateY: -130,
+                    duration: 200,
+                    opacity: [0, 1],
+                    offset: 0,
+                    easing: 'linear'
+                }).add({
+                    targets: this.nav_guide_icon._elementRef.nativeElement,
+                    rotate: '0.5turn',
+                    duration: 200,
+                    // opacity: [0, 1],
+                    offset: 0,
+                    easing: 'linear'
+                });
+                console.log(this.nav_guide_icon._elementRef);
+                this.menu_anime_handler.play();
+            } else {
+                this.menu_anime_handler.reverse();
+                this.menu_anime_handler.play();
+            }
+            this.menu_anime_state = 'show';
+        } else if (this.menu_anime_state === 'show') {
+            if (event && event.type !== 'mouseenter' || !event) {
+                this.menu_anime_handler.reverse();
+                this.menu_anime_handler.play();
+                this.menu_anime_state = 'hidden';
             }
         }
     }
@@ -138,7 +172,6 @@ export class ArticleComponent implements OnInit {
                 res => { });
             window['current_image'] = null;
         }
-
     }
 
     change(article_id) {

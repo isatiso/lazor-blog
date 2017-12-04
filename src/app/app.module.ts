@@ -28,6 +28,7 @@ import { SnackBarService } from 'service/snack-bar/snack-bar.service';
 import { ScrollorService } from 'service/scrollor//scrollor.service';
 import { AuthGuard } from 'guard/auth.guard';
 import { ArticleOwnerGuard } from 'guard/article-owner.guard';
+import { LeaveGuard } from 'guard/leave.guard';
 
 @NgModule({
     declarations: [
@@ -61,6 +62,7 @@ import { ArticleOwnerGuard } from 'guard/article-owner.guard';
         MatSnackBar,
         ScrollorService,
         AuthGuard,
+        LeaveGuard,
         ArticleOwnerGuard],
     entryComponents: [
         ProfileComponent

@@ -11,7 +11,10 @@ import { SnackBarService } from 'service/snack-bar/snack-bar.service';
 import { ScrollorService } from 'service/scrollor//scrollor.service';
 import { ArticleData, Category, Options } from 'public/data-struct-definition';
 
+import anime from 'animejs';
+
 declare var Prism: any;
+declare var InputEvent: any;
 
 @Component({
     selector: 'la-editor',
@@ -42,18 +45,27 @@ export class EditorComponent implements OnInit, OnDestroy {
 
     public page_appear = 'active';
     public content_rows = 0;
-    public tab_select = 0;
+    public tab_select_value = 0;
     public render_latex = false;
     public progress_value = 0;
     public progress_state = 'inactive';
-    private _article_status = 'published';
+    public left_scroll_top = 0;
+    public right_scroll_top = 0;
     private _nav_zone_width = 125;
+    private _nav_zone_leave_width = 375;
     private _nav_show = false;
+    private _last_category_id: string = null;
+    public menu_anime_handler: any;
+    public menu_anime_state = 'hidden';
 
     @ViewChild('navView') nav_view;
     @ViewChild('navTop') nav_top;
     @ViewChild('navHome') nav_home;
     @ViewChild('navAddImage') nav_add_image;
+    @ViewChild('navDelete') nav_delete;
+    @ViewChild('navGuide') nav_guide;
+    @ViewChild('navGuideIcon') nav_guide_icon;
+
     @ViewChild('editorContainer') editor_container;
     @ViewChild('imageForm') image_form;
     @ViewChild('imageUpload') image_upload;
@@ -78,7 +90,7 @@ export class EditorComponent implements OnInit, OnDestroy {
 
     set content(value: string) {
         this.current_article.content = value;
-        this._article_status = 'modified';
+        this._article_db.article_status = 'modified';
         this.remove_extra_lines();
     }
 
@@ -88,7 +100,22 @@ export class EditorComponent implements OnInit, OnDestroy {
 
     set title(value: string) {
         this.current_article.title = value;
-        this._article_status = 'modified';
+        this._article_db.article_status = 'modified';
+    }
+
+    get tab_select(): number {
+        return this.tab_select_value;
+    }
+
+    set tab_select(value: number) {
+        if (value !== this.tab_select_value) {
+            if (value === 1) {
+                this.left_scroll_top = document.scrollingElement.scrollTop;
+            } else if (value === 0) {
+                this.right_scroll_top = document.scrollingElement.scrollTop;
+            }
+            this.tab_select_value = value;
+        }
     }
 
     get categories(): Category[] {
@@ -119,8 +146,20 @@ export class EditorComponent implements OnInit, OnDestroy {
         }
     }
 
+    private _before_unload = event => {
+        const confirmMessage = '\\o/';
+        if (this._article_db.article_status === 'modified') {
+            event.returnValue = false;
+            return false;
+        } else {
+            return;
+        }
+    }
+
     ngOnInit() {
         document.scrollingElement.scrollTop = 0;
+        window.addEventListener('beforeunload', this._before_unload);
+
         const total_width = document.scrollingElement.clientWidth;
         const editor_width = this.editor_container.nativeElement.clientWidth;
         const article_id = this._activate_route.params['value']['id'];
@@ -129,24 +168,27 @@ export class EditorComponent implements OnInit, OnDestroy {
         if (!this._category_db.init_status) {
             this._category_db.pull(new Options({ flush: true }));
         }
-        this._article_status = 'saved';
+        this._article_db.article_status = 'saved';
         this.page_appear = 'active';
 
         if (article_id !== 'new-article') {
             this._article_db.fetch(article_id).subscribe(
                 data => {
+                    this._category_db.update_home(data.category_id);
                 }
             );
         } else {
             // this._article_db.on_edit_data.next(new ArticleData({}));
         }
 
+        this._last_category_id = this.current_category.category_id;
         this.remove_extra_lines();
         this.title_ref.nativeElement.focus();
     }
 
     ngOnDestroy() {
         this.page_appear = 'inactive';
+        window.removeEventListener('beforeunload', this._before_unload);
     }
 
     remove_extra_lines() {
@@ -168,34 +210,110 @@ export class EditorComponent implements OnInit, OnDestroy {
         this._router.navigate(['/home']);
     }
 
+    toggle_menu(event?) {
+        if (this.menu_anime_state === 'hidden') {
+            if (!this.menu_anime_handler) {
+                this.menu_anime_handler = anime.timeline().add({
+                    targets: this.nav_delete._elementRef.nativeElement,
+                    translateY: -70,
+                    duration: 200,
+                    opacity: [0, 1],
+                    offset: 0,
+                    easing: 'linear'
+                }).add({
+                    targets: this.nav_add_image._elementRef.nativeElement,
+                    translateY: -130,
+                    duration: 200,
+                    opacity: [0, 1],
+                    offset: 0,
+                    easing: 'linear'
+                }).add({
+                    targets: this.nav_home._elementRef.nativeElement,
+                    translateY: -190,
+                    duration: 200,
+                    opacity: [0, 1],
+                    offset: 0,
+                    easing: 'linear'
+                }).add({
+                    targets: this.nav_view._elementRef.nativeElement,
+                    translateY: -250,
+                    duration: 200,
+                    opacity: [0, 1],
+                    offset: 0,
+                    easing: 'linear'
+                }).add({
+                    targets: this.nav_top._elementRef.nativeElement,
+                    translateY: -310,
+                    duration: 200,
+                    opacity: [0, 1],
+                    offset: 0,
+                    easing: 'linear'
+                }).add({
+                    targets: this.nav_guide_icon._elementRef.nativeElement,
+                    rotate: '0.5turn',
+                    duration: 200,
+                    offset: 0,
+                    easing: 'linear'
+                });
+                console.log(this.nav_guide_icon._elementRef);
+                this.menu_anime_handler.play();
+            } else {
+                this.menu_anime_handler.reverse();
+                this.menu_anime_handler.play();
+            }
+            this.menu_anime_state = 'show';
+        } else if (this.menu_anime_state === 'show') {
+            if (event && event.type !== 'mouseenter' || !event) {
+                this.menu_anime_handler.reverse();
+                this.menu_anime_handler.play();
+                this.menu_anime_state = 'hidden';
+            }
+        }
+    }
+
     select_change(event) {
         this.tab_select = event;
+        const current_scroll_top = document.scrollingElement.scrollTop;
         if (event === 1) {
             this.render_latex = true;
-            Prism.highlightAll(false);
+            setTimeout(() => {
+                this._scrollor.goto(current_scroll_top, this.right_scroll_top, 30);
+            }, 0);
         } else {
             this.render_latex = false;
+            setTimeout(() => {
+                this._scrollor.goto(current_scroll_top, this.left_scroll_top, 30);
+            }, 0);
         }
     }
 
     show_nav_button(event) {
-        if (event.view.innerWidth - this._nav_zone_width <= event.x && event.x <= event.view.innerWidth) {
-            if (!this._nav_show) {
-                this._nav_show = true;
-                this.nav_top._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5) translateY(-120px)';
-                this.nav_view._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5) translateY(-60px)';
-                this.nav_add_image._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5)';
-                this.nav_home._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5) translateY(60px)';
-            }
-        } else if (event.view.innerWidth - this._nav_zone_width * 3 > event.x) {
-            if (this._nav_show) {
-                this._nav_show = false;
-                this.nav_view._elementRef.nativeElement.style.transform = 'translateX(80%)';
-                this.nav_top._elementRef.nativeElement.style.transform = 'translateX(80%)';
-                this.nav_home._elementRef.nativeElement.style.transform = 'translateX(80%)';
-                this.nav_add_image._elementRef.nativeElement.style.transform = 'translateX(80%)';
+        if (event.type !== 'mousemove') {
+            return event;
+        }
+
+        if (event.x < event.view.innerWidth - this._nav_zone_width * 1.5) {
+            if (this.menu_anime_state === 'show') {
+                this.toggle_menu();
             }
         }
+        // if (event.x >= event.view.innerWidth - this._nav_zone_width) {
+        //     if (!this._nav_show) {
+        //         this._nav_show = true;
+        //         this.nav_top._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5) translateY(-120px)';
+        //         this.nav_view._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5) translateY(-60px)';
+        //         this.nav_add_image._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5)';
+        //         this.nav_home._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5) translateY(60px)';
+        //     }
+        // } else if (event.x < event.view.innerWidth - this._nav_zone_leave_width) {
+        //     if (this._nav_show) {
+        //         this._nav_show = false;
+        //         this.nav_view._elementRef.nativeElement.style.transform = 'translateX(80%)';
+        //         this.nav_top._elementRef.nativeElement.style.transform = 'translateX(80%)';
+        //         this.nav_home._elementRef.nativeElement.style.transform = 'translateX(80%)';
+        //         this.nav_add_image._elementRef.nativeElement.style.transform = 'translateX(80%)';
+        //     }
+        // }
     }
 
     save_article() {
@@ -206,11 +324,14 @@ export class EditorComponent implements OnInit, OnDestroy {
                 category_id: this.current_category.category_id,
             }).subscribe(
                 res => {
-                    this._article_db.fetch(res['data']['article_id']);
-                    this._article_db.on_edit_data.next(new ArticleData({}));
-                    this.snack_bar.show('Save Article Successfully.', 'OK', null);
-                    this._category_db.update_home(this.current_category.category_id, new Options({ flush: true }));
-                    this._router.navigate(['/editor/' + res['data']['article_id']]);
+                    if (res['result']) {
+                        this._article_db.fetch(res['data']['article_id']);
+                        this._article_db.on_edit_data.next(new ArticleData({}));
+                        this.snack_bar.show('Save Article Successfully.', 'OK', null);
+                        this._category_db.clear_category_cache(this._last_category_id);
+                        this._category_db.update_home(this.current_category.category_id, new Options({ flush: true }));
+                        this._router.navigate(['/editor/' + res['data']['article_id']]);
+                    }
                 });
         } else {
             this._http.post('/middle/article', {
@@ -220,8 +341,15 @@ export class EditorComponent implements OnInit, OnDestroy {
                 category_id: this.current_category.category_id,
             }).subscribe(
                 res => {
-                    this._article_db.current_article = new ArticleData(res['data']);
-                    this.snack_bar.show('Save Article Successfully.', 'OK', null);
+                    if (res['result']) {
+                        this._article_db.current_article = new ArticleData(res['data']);
+                        this.snack_bar.show('Save Article Successfully.', 'OK', null);
+                        if (this._last_category_id !== this.current_category.category_id) {
+                            this._category_db.clear_category_cache(this._last_category_id);
+                            this._last_category_id = this.current_category.category_id;
+                            this._category_db.update_home(this.current_category.category_id, new Options({ flush: true }));
+                        }
+                    }
                 });
         }
 
@@ -274,7 +402,7 @@ export class EditorComponent implements OnInit, OnDestroy {
 
     upload_file(event) {
         const file = new FormData(this.image_form.nativeElement);
-        this._article_status = 'modified';
+        this._article_db.article_status = 'modified';
         this.image_upload.nativeElement.value = '';
         const req = new HttpRequest('PUT', '/middle/file', file, {
             reportProgress: true,
@@ -291,7 +419,7 @@ export class EditorComponent implements OnInit, OnDestroy {
                     const file_path = 'https://lazor.cn' + next.body['data']['file_path'];
                     const left = this.content.slice(0, content_index);
                     const right = this.content.slice(content_index);
-                    const content = `![${next.body['data']['file_name']}](${file_path})\n`;
+                    const content = `![${next.body['data']['file_name']}](${file_path} "${next.body['data']['file_name']}")\n`;
 
                     this.content = left + content + right;
                     setTimeout(() => {
@@ -309,13 +437,13 @@ export class EditorComponent implements OnInit, OnDestroy {
     }
 
     save_button_click() {
-        if (this._article_status === 'modified') {
+        if (this._article_db.article_status === 'modified') {
             this.save_article();
-            this._article_status = 'saved';
-        } else if (this._article_status === 'saved') {
+            this._article_db.article_status = 'saved';
+        } else if (this._article_db.article_status === 'saved') {
             this.publish_article();
-            this._article_status = 'published';
-        } else if (this._article_status === 'published') {
+            this._article_db.article_status = 'published';
+        } else if (this._article_db.article_status === 'published') {
             const params: NavigationExtras = {
                 queryParams: { 'from': 'editor' },
             };
@@ -324,17 +452,17 @@ export class EditorComponent implements OnInit, OnDestroy {
     }
 
     save_button_icon() {
-        if (this._article_status === 'modified') {
+        if (this._article_db.article_status === 'modified') {
             return 'save';
-        } else if (this._article_status === 'saved') {
+        } else if (this._article_db.article_status === 'saved') {
             return 'publish';
-        } else if (this._article_status === 'published') {
+        } else if (this._article_db.article_status === 'published') {
             return 'description';
         }
     }
 
     save_button_outlet() {
-        switch (this._article_status) {
+        switch (this._article_db.article_status) {
             case 'modified':
                 return '保存文章 (ctrl + S)';
             case 'saved':
@@ -374,11 +502,59 @@ export class EditorComponent implements OnInit, OnDestroy {
     }
 
     article_change(event) {
-        this._article_status = 'modified';
+        this._article_db.article_status = 'modified';
     }
 
     unsaved() {
-        return this._article_status === 'modified' ? '●' : '';
+        return this._article_db.article_status === 'modified' ? '●' : '';
+    }
+
+    input_translate(event) {
+
+        if (!(event.ctrlKey || event.key === 'Tab')) {
+            return event;
+        }
+        if (event.key === 'Tab') {
+            const content_index = this.content_ref.nativeElement.selectionStart;
+            const left = this.content.slice(0, content_index);
+            const right = this.content.slice(content_index);
+            this.content_ref.nativeElement.value = left + '\t' + right;
+            setTimeout(() => {
+                this.content_ref.nativeElement.setSelectionRange(content_index + 1, content_index + 1);
+            }, 0);
+        } else if (event.ctrlKey && event.key === 'b') {
+            const s = this.content_ref.nativeElement.selectionStart;
+            const e = this.content_ref.nativeElement.selectionEnd;
+            if (s === e) {
+                return;
+            }
+            const left = this.content.slice(0, s);
+            const content = this.content.slice(s, e);
+            const right = this.content.slice(e);
+            this.content = `${left}**${content}**${right}`;
+            setTimeout(() => {
+                this.content_ref.nativeElement.setSelectionRange(e + 4, e + 4);
+            }, 0);
+        } else if (event.ctrlKey && event.key === 'i') {
+            const s = this.content_ref.nativeElement.selectionStart;
+            const e = this.content_ref.nativeElement.selectionEnd;
+            if (s === e) {
+                return;
+            }
+            const left = this.content.slice(0, s);
+            const content = this.content.slice(s, e);
+            const right = this.content.slice(e);
+            this.content = `${left}*${content}*${right}`;
+            setTimeout(() => {
+                this.content_ref.nativeElement.setSelectionRange(e + 2, e + 2);
+            }, 0);
+        } else {
+            return event;
+        }
+
+
+
+        event.preventDefault();
     }
 
     boss_key(event) {
@@ -408,6 +584,9 @@ export class EditorComponent implements OnInit, OnDestroy {
             this.save_button_click();
         } else if (event.key === 'p') {
             this.select_file_click(null);
+        } else {
+
+            return event;
         }
         event.preventDefault();
     }

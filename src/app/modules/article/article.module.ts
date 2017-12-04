@@ -11,12 +11,13 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { ArticleComponent } from './article.component';
 import { ArticleRoutingModule } from './article-routing.module';
-import { PreviewComponent } from 'component/preview/preview.component';
-import { MarkdownModule } from 'directive/markdown.module';
+import { PreviewModule } from 'public/preview/preview.module';
+import { MarkdownModule } from 'public/markdown/markdown.module';
 
 @NgModule({
     imports: [
         CommonModule,
+        PreviewModule,
         MarkdownModule,
         MatCardModule,
         MatButtonModule,
@@ -26,9 +27,6 @@ import { MarkdownModule } from 'directive/markdown.module';
         HttpClientModule,
         ArticleRoutingModule
     ],
-    entryComponents: [
-        PreviewComponent
-    ],
-    declarations: [ArticleComponent, PreviewComponent]
+    declarations: [ArticleComponent]
 })
 export class ArticleModule { }

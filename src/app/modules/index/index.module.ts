@@ -1,11 +1,17 @@
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { MatCardModule, MatTableModule, MatInputModule, MatButtonModule } from '@angular/material';
+import {
+    MatCardModule,
+    MatTableModule,
+    MatInputModule,
+    MatChipsModule,
+    MatButtonModule
+} from '@angular/material';
 import { CdkTableModule } from '@angular/cdk/table';
 
 import { IndexRoutingModule } from './index-routing.module';
-import { IndexComponent } from './index.component';
+import { IndexComponent, IndexArticleComponent } from './index.component';
 
 @NgModule({
     imports: [
@@ -14,10 +20,14 @@ import { IndexComponent } from './index.component';
         MatCardModule,
         MatInputModule,
         MatTableModule,
+        MatChipsModule,
         MatButtonModule,
         CdkTableModule,
         IndexRoutingModule
     ],
-    declarations: [IndexComponent]
+    declarations: [
+        IndexComponent,
+        IndexArticleComponent
+    ]
 })
 export class IndexModule { }

@@ -7,8 +7,7 @@
         "root": "src",
         "outDir": "dist",
         "assets": [
-            "assets",
-            "favicon.ico"
+            "assets"
         ],
         "index": "index.html",
         "main": "main.ts",
@@ -21,7 +20,6 @@
             "styles.scss"
         ],
         "scripts": [
-            "assets/js/marked.js"
         ],
         "environmentSource": "environments/environment.ts",
         "environments": {

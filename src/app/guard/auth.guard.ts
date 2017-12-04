@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { Router, NavigationExtras } from '@angular/router';
 
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -22,12 +22,14 @@ export class AuthGuard implements CanActivate {
     canActivate(
         next: ActivatedRouteSnapshot,
         state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
-        const url = state.url;
 
         return this._http.get('/middle/guard/auth').map(
             data => {
                 if (data['result'] !== 1) {
-                    this._router.navigate(['/auth']);
+                    const params: NavigationExtras = {
+                        queryParams: { 'backurl': state.url },
+                    };
+                    this._router.navigate(['/auth'], params);
                     window.localStorage.setItem('user_name', null);
                     this._account.data = null;
                     return false;

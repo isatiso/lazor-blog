@@ -5,14 +5,16 @@ import 'rxjs/add/observable/throw';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
 
+import { Marked } from './marked';
+
 // A javascript lib has import, so here is just a delaration
-declare var marked: any;
 declare var MathJax: any;
 
 @Injectable()
 export class MarkdownService {
 
-    private _renderer: any = new marked.Renderer();
+    // private _renderer: any = new marked.Renderer();
+    private _marked: any = new Marked();
 
     constructor() {
         // this.extendRenderer();
@@ -20,9 +22,9 @@ export class MarkdownService {
         this.setMathJaxOptions({});
     }
 
-    public get renderer() {
-        return this._renderer;
-    }
+    // public get renderer() {
+        // return this._renderer;
+    // }
 
     // handle data
     public setMarkedOptions(options: any) {
@@ -35,8 +37,8 @@ export class MarkdownService {
             smartLists: true,
             smartypants: false
         }, options);
-        options.renderer = this._renderer;
-        marked.setOptions(options);
+        // options.renderer = this._renderer;
+        this._marked.setOptions(options);
     }
 
     public setMathJaxOptions(options: any) {
@@ -65,31 +67,12 @@ export class MarkdownService {
 
     // comple markdown to html
     public compile(data: string) {
-        return marked(data);
+        return this._marked.render(data);
     }
 
     public latexRender(env: any) {
         MathJax.Hub.Queue(
             ['Typeset', MathJax.Hub, env]
         );
-    }
-
-    private extendRenderer() {
-        this._renderer.listitem = function (text: string) {
-            if (/^\s*\[[x ]\]\s*/.test(text)) {
-                text = text
-                    .replace(
-                    /^\s*\[ \]\s*/,
-                    `<input type="checkbox" style=" vertical-align: middle; margin: 0 0.2em 0.25em -1.6em; font-size: 16px; "
-                     disabled> `)
-                    .replace(
-                    /^\s*\[x\]\s*/,
-                    `<input type="checkbox" style=" vertical-align: middle; margin: 0 0.2em 0.25em -1.6em; font-size: 16px; "
-                     checked disabled> `);
-                return '<li style="list-style: none">' + text + '</li>';
-            } else {
-                return '<li>' + text + '</li>';
-            }
-        };
     }
 }

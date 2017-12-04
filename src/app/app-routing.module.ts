@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { AuthGuard } from 'guard/auth.guard';
 import { ArticleOwnerGuard } from 'guard/article-owner.guard';
+import { LeaveGuard } from 'guard/leave.guard';
 
 const routes: Routes = [
     {
@@ -21,7 +22,8 @@ const routes: Routes = [
         path: 'editor/:id',
         loadChildren: './modules/editor/editor.module#EditorModule',
         canActivate: [AuthGuard, ArticleOwnerGuard],
-        data: { title: 'editor', scrollLimit: 0 }
+        canDeactivate: [LeaveGuard],
+        data: { title: 'editor', scrollLimit: 0, noFooter: true }
     },
     {
         path: 'index',
@@ -36,7 +38,7 @@ const routes: Routes = [
     {
         path: 'article',
         loadChildren: './modules/article/article.module#ArticleModule',
-        data: { title: 'article', scrollLimit: 0 }
+        data: { title: 'article', scrollLimit: 0, noFooter: true }
     },
     {
         path: 'error',

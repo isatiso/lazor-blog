@@ -9,3 +9,43 @@ $theme: mat-light-theme($primary, $accent, $warn);
     font-family: Zcool_fun;
     src: url('/assets/font/Zcool_fun.ttf');
 }
+
+$font-banner: 'Delius Swash Caps',
+Zcool_fun,
+Arial,
+Helvetica,
+sans-serif;
+
+$font-title: 'Imprima',
+Zcool_fun,
+Arial,
+Helvetica,
+sans-serif;
+
+$font-content: Arial,
+Helvetica,
+'Microsoft YaHei',
+'Hiragino Sans GB',
+'STHeiti Light',
+sans-serif;
+
+$font-list-text: 'Imprima',
+Arial,
+Helvetica,
+'FangSong',
+'STFangSong',
+
+sans-serif;
+
+$font-quote-text: 'Imprima',
+Arial,
+Helvetica,
+'SimSun',
+'STSong',
+sans-serif;
+
+$font-code: Monaco,
+Inconsolata,
+Consolas,
+Andale Mono,
+monospace;
