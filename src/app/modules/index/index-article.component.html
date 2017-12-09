@@ -7,11 +7,9 @@
     <ul *ngIf="article_list.length">
         <li *ngFor="let article of article_list" class="article-item">
             <div class="helper"></div>
-            <mat-chip-list [@loadArticle]="1">
-                <mat-chip routerLink="/article/{{article.article_id}}" selected="true" color="primary">
-                    {{ article.title }}
-                </mat-chip>
-            </mat-chip-list>
+            <span [@loadArticle]="1" routerLink="/article/{{article.article_id}}" class="article-item-content">
+                {{ article.title }}
+            </span>
         </li>
     </ul>
     <div class="nothing" *ngIf="!article_list.length">

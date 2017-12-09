@@ -214,3 +214,142 @@
     background-color: #ffffff;
     opacity: 0;
 }
+
+@media (max-width: 768px) {
+    .home-container {
+        padding: 0;
+        margin-top: 48px;
+        overflow-x: hidden;
+        width: 100%;
+    }
+    .category-card-container {
+        transform: translateX(-100%);
+        position: fixed;
+        z-index: 48;
+        top: 48px;
+        left: 0;
+        width: 100%;
+        height: calc(100% - 64px);
+        .category-card {
+            width: 70%;
+            height: 100%;
+            overflow-y: scroll;
+        }
+    }
+    .small-view-right {
+        z-index: 0;
+        min-height: 100%;
+    }
+    .content-container {
+        width: 100%;
+        display: block;
+        position: relative;
+        .category-list {
+            padding-top: 0;
+            width: 90%;
+            margin: 0 auto;
+            ul {
+                padding-left: 0px;
+                li.category-item {
+                    height: 52px;
+                    margin-top: 4px;
+                    .mat-card {
+                        font-size: 20px;
+                        padding: 15px;
+                        padding-left: 20px;
+                    }
+                    .options-button {
+                        width: 100%;
+                        height: 52px;
+                        border-radius: 5px;
+                        top: 0px;
+                        .spacer {
+                            flex: 3;
+                            height: 52px;
+                        }
+                        .button-container {
+                            flex: 2;
+                            padding-left: 10px;
+                            padding-right: 10px;
+                            height: 52px;
+                            button {
+                                height: 52px;
+                                width: 36px;
+                            }
+                        }
+                    }
+                }
+            }
+            .add-category-container {
+                padding: 20px;
+                .add-category {
+                    font-family: $font-title;
+                    font-size: 20px;
+                    width: 100%;
+                }
+            }
+        }
+        .spacer {
+            width: 80px;
+        }
+        .article-list {
+            min-height: 100%;
+            ul {
+                padding: 0;
+                margin: 0;
+                padding-left: 0px;
+                li {
+                    .article-item-content {
+                        transform: translateX(100px);
+                        opacity: 0;
+                        display: inline-block;
+                        vertical-align: middle;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        max-width: 85%;
+                        color: map-get($primary, 50);
+                        background-color: map-get($primary, 500);
+                        line-height: 28px;
+                        height: 28px;
+                        padding: 5px 15px;
+                        border-radius: 28px;
+                        margin-left: 15px;
+                        outline: none;
+                        transition: background 200ms cubic-bezier(.25, .8, .25, 1),
+                        box-shadow 140ms cubic-bezier(.4, 0, .2, 1);
+                        box-shadow: 0 3px 1px -2px rgba(0, 0, 0, .2),
+                        0 2px 2px 0 rgba(0, 0, 0, .14),
+                        0 1px 5px 0 rgba(0, 0, 0, .12);
+                        &:hover {
+                            box-shadow: 0 5px 5px -3px rgba(0, 0, 0, .2), 0 8px 10px 1px rgba(0, 0, 0, .14), 0 3px 14px 2px rgba(0, 0, 0, .12);
+                        }
+                    }
+                    .helper {
+                        display: inline-block;
+                        height: 100%;
+                        vertical-align: middle;
+                    }
+                    .mat-chip-list {
+                        transform: translateX(-100px);
+                        opacity: 0;
+                        display: inline-block;
+                        vertical-align: middle;
+                    }
+                }
+            }
+        }
+        .article-item {
+            width: 100%;
+            height: 49px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+            .list-title {
+                color: rgba(0, 0, 0, 0.54);
+                line-height: 49px;
+                padding-left: 20px;
+                font-size: 12px;
+                font-weight: 500;
+            }
+        }
+    }
+}

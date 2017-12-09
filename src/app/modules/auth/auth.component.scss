@@ -9,18 +9,20 @@
 }
 
 .long-input {
-    width: 340px;
-    min-width: 340px;
+    width: 100%;
 }
 
 .tab-content-container {
-    display: flex;
+    display: block;
     .big-box {
-        flex: 4;
+        display: inline-block;
+        width: 90%;
+        max-width: 340px;
         margin: 20px;
     }
     .info-box {
-        flex: 6;
+        display: inline-block;
+        width: 90%;
         font-family: $font-title;
         margin: 20px;
         .title {
@@ -42,4 +44,11 @@
 
 .auth-container {
     opacity: 0;
+}
+
+@media (max-width: 768px) {
+    .auth-container {
+        padding: 0;
+        margin-top: 48px;
+    }
 }

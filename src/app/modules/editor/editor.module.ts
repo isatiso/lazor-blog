@@ -16,6 +16,7 @@ import {
 
 import { EditorRoutingModule } from './editor-routing.module';
 import { EditorComponent, InputComponent, WarningComponent } from './editor.component';
+import { NavButtonModule } from 'public/nav-button/nav-button.module';
 import { MarkdownModule } from 'public/markdown/markdown.module';
 
 @NgModule({
@@ -32,6 +33,7 @@ import { MarkdownModule } from 'public/markdown/markdown.module';
         MatDialogModule,
         MatTooltipModule,
         MatProgressBarModule,
+        NavButtonModule,
         EditorRoutingModule
     ],
     entryComponents: [

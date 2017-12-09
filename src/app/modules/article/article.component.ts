@@ -5,11 +5,12 @@ import { HttpClient } from '@angular/common/http';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 import { MarkdownDirective } from 'directive/markdown.directive';
-import { ArticleDatabaseService } from 'service/article-database/article-database.service';
-import { CategoryDatabaseService } from 'service/category-database/category-database.service';
-import { ScrollorService } from 'service/scrollor//scrollor.service';
+import { ArticleDatabaseService } from 'service/article-database.service';
+import { CategoryDatabaseService } from 'service/category-database.service';
+import { ScrollorService } from 'service/scrollor.service';
+import { NavButtonService } from 'service/nav-button.service';
 import { PreviewComponent } from 'preview/preview.component';
-import { Article, ArticleData, Options } from 'data-struct-definition';
+import { Article, ArticleData, Options, NavButton } from 'data-struct-definition';
 
 import anime from 'animejs';
 
@@ -42,7 +43,6 @@ export class ArticleComponent implements OnInit {
 
     @ViewChild('navEditor') nav_editor;
     @ViewChild('navTop') nav_top;
-    // @ViewChild('navHome') nav_home;
     @ViewChild('navGuide') nav_guide;
     @ViewChild('navGuideIcon') nav_guide_icon;
 
@@ -53,6 +53,7 @@ export class ArticleComponent implements OnInit {
         private _article_db: ArticleDatabaseService,
         private _category_db: CategoryDatabaseService,
         private _scrollor: ScrollorService,
+        private _nav_button: NavButtonService,
         public dialog: MatDialog,
     ) { }
 
@@ -78,6 +79,17 @@ export class ArticleComponent implements OnInit {
                 this.render_latex = article_id;
             }
         );
+        this._nav_button.button_list = [{
+            name: 'navEditor',
+            icon: () => 'mode_edit',
+            callback: event => this.go_editor(event),
+            tool_tip: () => '编辑文章 (ctrl + E)',
+        }, {
+            name: 'navTop',
+            icon: () => 'arrow_upward',
+            callback: event => this._scrollor.goto_top(event),
+            tool_tip: () => '回到顶部 (ctrl + ↑)',
+        }];
     }
 
     show_nav_button(event) {

@@ -1,4 +1,4 @@
-<div style="width: 640px;text-align: center" (keyup)="submit($event)">
+<div style="text-align: center" (keyup)="submit($event)">
     <mat-dialog-content style="width: 100%;">
         <mat-input-container style="width: 100%;">
             <mat-placeholder>
@@ -9,7 +9,7 @@
         </mat-input-container>
     </mat-dialog-content>
     <mat-dialog-actions style="width: 100%;text-align: center; display: flex;">
-        <button mat-raised-button [mat-dialog-close]="0" style="flex: 1">Cancel</button>
-        <button mat-raised-button [mat-dialog-close]="data" style="flex: 1" color="primary">Submit</button>
+        <button mat-raised-button [mat-dialog-close]="0" style="flex: 1; max-width: 15rem; ">Cancel</button>
+        <button mat-raised-button [mat-dialog-close]="data" style="flex: 1; max-width: 15rem;" color="primary">Submit</button>
     </mat-dialog-actions>
 </div>

@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { SnackBarService } from 'service/snack-bar/snack-bar.service';
+import { SnackBarService } from 'service/snack-bar.service';
 import { Account } from 'public/data-struct-definition';
 
 @Injectable()

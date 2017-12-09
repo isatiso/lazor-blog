@@ -1,4 +1,5 @@
 @import '../../../assets/scss/material_theming.scss';
+
 .container {
     margin-top: 0;
 }
@@ -14,32 +15,15 @@
     margin-top: 64px;
     background-color: map-get($primary, 500);
     background-image: url(/assets/image/abs.png);
-    background-attachment: fixed;
     background-clip: content-box;
-    background-position-y: 660px;
+    background-position-y: 600px;
     background-size: 1920px;
     background-repeat: repeat;
     text-align: center;
     font-family: Raleway, Arial, Helvetica, sans-serif;
-    box-shadow: 0 0 8px rgba(0, 0, 0, 0.12), 0 8px 8px rgba(0, 0, 0, 0.2);
     opacity: 0.7;
     transform: translateY(-276px);
-    h1 {
-        z-index: 100;
-        margin: 0;
-        padding-top: 75px;
-        color: map-get($primary, 50);
-        font-size: 5em;
-        font-weight: normal;
-    }
 }
-
-// .article-list {
-//     width: 100%;
-//     .mat-button {
-//         min-width: 20px;
-//     }
-// }
 
 .article-list {
     flex: 14;
@@ -57,19 +41,42 @@
                 height: 100%;
                 vertical-align: middle;
             }
-            .mat-chip-list {
-                transform: translateX(100px);
-                opacity: 0;
-                display: inline-block;
-                vertical-align: middle;
+            &.article-item {
+                width: 100%;
+                height: 49px;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+                .article-item-content {
+                    transform: translateX(100px);
+                    opacity: 0;
+                    display: inline-block;
+                    vertical-align: middle;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    max-width: 85%;
+                    color: map-get($primary, 50);
+                    background-color: map-get($primary, 500);
+                    line-height: 28px;
+                    height: 28px;
+                    padding: 5px 15px;
+                    border-radius: 28px;
+                    margin-left: 15px;
+                    outline: none;
+                    transition: background 200ms cubic-bezier(.25, .8, .25, 1),
+                    box-shadow 140ms cubic-bezier(.4, 0, .2, 1);
+                    box-shadow: 0 3px 1px -2px rgba(0, 0, 0, .2),
+                    0 2px 2px 0 rgba(0, 0, 0, .14),
+                    0 1px 5px 0 rgba(0, 0, 0, .12);
+                    &:hover {
+                        box-shadow: 0 5px 5px -3px rgba(0, 0, 0, .2), 0 8px 10px 1px rgba(0, 0, 0, .14), 0 3px 14px 2px rgba(0, 0, 0, .12);
+                    }
+                }
             }
         }
     }
 }
+
 .article-item {
-    width: 100%;
-    height: 49px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
     .list-title {
         color: rgba(0, 0, 0, 0.54);
         line-height: 49px;
@@ -103,10 +110,13 @@
         display: block;
         position: relative;
         .category {
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
             font-family: $font-title;
             font-size: 28px;
             width: 203px;
-            line-height:28px;
+            line-height: 28px;
             height: 28px;
             margin: 20px 25px;
             padding: 20px;
@@ -125,7 +135,68 @@
             background-color: map-get($accent, 300);
             box-shadow: inset -1px -1px 10px rgba(0, 0, 0, 0.30);
         }
+    }
+}
 
+.banner {
+    font-family: $font-banner;
+    z-index: 100;
+    margin: 0;
+    padding-top: 75px;
+    color: map-get($primary, 50);
+    font-size: 100px;
+    font-weight: normal;
+}
+
+@media (max-width: 768px) {
+
+    .index-container {
+        padding: 0;
     }
 
+    .site-banner {
+        height: 152px;
+        margin-top: 48px;
+        background-position-y: 494px;
+        background-position-x: 950px;
+    }
+
+    .category-list {
+        .category-container {
+            .category {
+                font-size: 28px;
+                width: 203px;
+                line-height: 28px;
+                height: 28px;
+                margin: 20px 25px;
+                padding: 20px;
+                z-index: 2;
+                transform-origin: left;
+            }
+            .category-hole {
+                position: absolute;
+                background-color: black;
+                width: 239px;
+                height: 65px;
+                top: 21px;
+                left: 27px;
+                z-index: 1;
+                border-radius: 5px;
+                background-color: map-get($accent, 300);
+                box-shadow: inset -1px -1px 10px rgba(0, 0, 0, 0.30);
+            }
+        }
+    }
+
+    .banner {
+        padding-top: 42px;
+        font-size: 56px;
+    }
+}
+
+
+@media (max-width: 568px) {
+    .banner {
+        font-size: 36px;
+    }
 }

@@ -12,12 +12,12 @@ const routes: Routes = [
             {
                 path: '',
                 component: IndexArticleComponent,
-                data: { title: 'index', scrollLimit: 276 }
+                data: { title: 'index', scrollLimit: 276,  footerType: 'normal' }
             },
             {
                 path: ':category_id',
                 component: IndexArticleComponent,
-                data: { title: 'index', scrollLimit: 276 }
+                data: { title: 'index', scrollLimit: 276,  footerType: 'normal' }
             },
         ],
     },

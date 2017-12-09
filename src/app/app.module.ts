@@ -19,16 +19,18 @@ import { AppRoutingModule } from 'app-routing.module';
 import { AppComponent, ProfileComponent } from 'app.component';
 import { NavBgDirective } from 'directive/nav-bg.directive';
 import { MarkdownDirective } from 'directive/markdown.directive';
-import { NavProfileService } from 'service/nav-profile/nav-profile.service';
-import { MarkdownService } from 'service/markdown/markdown.service';
-import { AccountService } from 'service/account/account.service';
-import { CategoryDatabaseService } from 'service/category-database/category-database.service';
-import { ArticleDatabaseService } from 'service/article-database/article-database.service';
-import { SnackBarService } from 'service/snack-bar/snack-bar.service';
-import { ScrollorService } from 'service/scrollor//scrollor.service';
+import { NavProfileService } from 'service/nav-profile.service';
+import { MarkdownService } from 'service/markdown.service';
+import { AccountService } from 'service/account.service';
+import { CategoryDatabaseService } from 'service/category-database.service';
+import { ArticleDatabaseService } from 'service/article-database.service';
+import { SnackBarService } from 'service/snack-bar.service';
+import { ScrollorService } from 'service/scrollor.service';
+import { NavButtonService } from 'service/nav-button.service';
 import { AuthGuard } from 'guard/auth.guard';
 import { ArticleOwnerGuard } from 'guard/article-owner.guard';
 import { LeaveGuard } from 'guard/leave.guard';
+import { NavButtonModule } from 'public/nav-button/nav-button.module';
 
 @NgModule({
     declarations: [
@@ -49,6 +51,7 @@ import { LeaveGuard } from 'guard/leave.guard';
         MatMenuModule,
         MatSnackBarModule,
         BrowserAnimationsModule,
+        NavButtonModule,
         AppRoutingModule
     ],
     providers: [
@@ -61,6 +64,7 @@ import { LeaveGuard } from 'guard/leave.guard';
         HttpClient,
         MatSnackBar,
         ScrollorService,
+        NavButtonService,
         AuthGuard,
         LeaveGuard,
         ArticleOwnerGuard],

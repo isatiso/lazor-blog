@@ -1,0 +1,10 @@
+<div #container class="button-container" (mouseleave)="toggle_menu($event, 'hidden')">
+    <button #navGuide mat-fab color="primary" class="guide" (click)="toggle_menu($event)" (mouseenter)="toggle_menu($event, 'show')">
+        <mat-icon #navGuideIcon>menu</mat-icon>
+    </button>
+    <div class="options-container" *ngFor="let button of button_list">
+        <button #navOption mat-mini-fab (click)="toggle_menu($event) && button.callback($event)" [color]="button.color && button.color() || 'accent'" class="option" [matTooltip]="button.tool_tip && button.tool_tip()" matTooltipPosition="left">
+            <mat-icon>{{ button.icon() }}</mat-icon>
+        </button>
+    </div>
+</div>

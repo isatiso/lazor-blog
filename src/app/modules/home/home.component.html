@@ -1,5 +1,5 @@
 <div class="container home-container" [@pageAppear]="page_appear">
-    <mat-card>
+    <mat-card *ngIf="outer_width > 768">
         <div class="header-area">
             <p class="title home-title">
                 Hi, {{ user_name }}
@@ -11,7 +11,7 @@
             </p>
         </div>
         <div class="divider"></div>
-        <div class="content-container">
+        <div class="content-container" #categoryListPad>
             <div class="category-list">
                 <ul *ngIf="categories.length; else emptyInfo" [sortablejs]="categories" [sortablejsOptions]="category_sort_options">
                     <li *ngFor="let category of categories;" class="category-item" (click)="set_step(category)">
@@ -23,22 +23,22 @@
                             <div class="button-container">
                                 <div class="helper"></div>
                                 <button mat-icon-button class="modify-button" color="primary" (click)="modify_category($event, category)">
-                                        <mat-icon>mode_edit</mat-icon>
-                                    </button>
+                                    <mat-icon>create</mat-icon>
+                                </button>
                                 <button *ngIf="category.category_type" mat-icon-button class="delete-button" color="warn" (click)="delete_confirm($event, category.category_id)">
-                                        <mat-icon>delete</mat-icon>
-                                    </button>
-
+                                    <mat-icon>delete</mat-icon>
+                                </button>
                             </div>
                         </div>
                     </li>
                 </ul>
                 <ng-template #emptyInfo>
-                    <p style="width: 100%; text-align: center;">添加分类<br/><br/><button mat-raised-button color="primary" (click)="add_category()">Add Category</button></p>
+                    <p style="width: 100%; text-align: center;">添加分类
+                        <br/>
+                        <br/>
+                        <button mat-raised-button color="primary" (click)="add_category()">Add Category</button>
+                    </p>
                 </ng-template>
-                <div class="add-category-container">
-                    <button mat-raised-button class="add-category" color="primary" (click)="input_category()">添加分类</button>
-                </div>
             </div>
 
             <div class="spacer"></div>
@@ -57,6 +57,66 @@
                                 {{ article.title }}
                             </mat-chip>
                         </mat-chip-list>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </mat-card>
+    <div class="category-card-container" (click)="toggle_show_cate($event)" #smallViewLeft [@showCate]="show_cate_state" *ngIf="outer_width <= 768">
+        <mat-card class="category-card" >
+            <div class="content-container" #categoryListPad>
+                <div class="category-list">
+                    <ul *ngIf="categories.length; else emptyInfo" [sortablejs]="categories" [sortablejsOptions]="category_sort_options">
+                        <li *ngFor="let category of categories;" class="category-item" (click)="set_step(category)">
+                            <mat-card [@showOptions]="show_options(category)" [@sortState]="can_sort">
+                                {{ category.category_name }}
+                            </mat-card>
+                            <div class="options-button">
+                                <div class="spacer"></div>
+                                <div class="button-container">
+                                    <div class="helper"></div>
+                                    <button mat-icon-button class="modify-button" color="primary" (click)="modify_category($event, category)">
+                                        <mat-icon>create</mat-icon>
+                                    </button>
+                                    <button *ngIf="category.category_type" mat-icon-button class="delete-button" color="warn" (click)="delete_confirm($event, category.category_id)">
+                                        <mat-icon>delete</mat-icon>
+                                    </button>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    <ng-template #emptyInfo>
+                        <p style="width: 100%; text-align: center;">添加分类
+                            <br/>
+                            <br/>
+                            <button mat-raised-button color="primary" (click)="add_category()">Add Category</button>
+                        </p>
+                    </ng-template>
+                </div>
+            </div>
+        </mat-card>
+    </div>
+
+    <mat-card class="small-view-right" #smallViewRight *ngIf="outer_width <= 768">
+        <div class="header-area">
+            <p class="title home-title">
+                Hi, {{ user_name }}
+            </p>
+        </div>
+        <div class="divider"></div>
+        <div class="content-container">
+            <div class="article-list">
+                <div class="article-item">
+                    <div class="list-title">
+                        Article
+                    </div>
+                </div>
+                <ul [sortablejs]="article_list" [sortablejsOptions]="article_sort_options" class="sortable">
+                    <li *ngFor="let article of article_list" class="article-item" [@sortState]="can_sort">
+                        <div class="helper"></div>
+                        <span [@loadArticle]="load_article" class="article-item-content" routerLink="/article/{{article.article_id}}" color="primary">
+                            {{ article.title }}
+                        </span>
                     </li>
                 </ul>
             </div>

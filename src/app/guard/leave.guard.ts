@@ -8,9 +8,9 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 
-import { SnackBarService } from 'service/snack-bar/snack-bar.service';
-import { AccountService } from 'service/account/account.service';
-import { ArticleDatabaseService } from 'service/article-database/article-database.service';
+import { SnackBarService } from 'service/snack-bar.service';
+import { AccountService } from 'service/account.service';
+import { ArticleDatabaseService } from 'service/article-database.service';
 
 @Injectable()
 

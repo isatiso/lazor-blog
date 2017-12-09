@@ -1,5 +1,5 @@
 var showNotification = true;
-var VERSION = '1.0.38';
+var VERSION = '1.0.11';
 var NEED_CACHE = false;
 
 self.addEventListener('install', function (event) {
@@ -38,7 +38,8 @@ self.addEventListener('fetch', event => {
         return;
     }
 
-    let bundle_regex = /(\/(.*)\.(js|ttf|woff2|png|ico|jpg|gif))/
+    let bundle_regex = /(\/(.*)\.(js|ttf|woff2|png|ico|jpg|gif))/;
+    let forever_regex = /(\/(.*)\.(ttf|woff2))/;
     var this_url = new URL(event.request.url);
     if (this_url.protocol !== 'https:') {
         return;
@@ -46,18 +47,22 @@ self.addEventListener('fetch', event => {
     var br;
     if (NEED_CACHE && (br = bundle_regex.exec(this_url.pathname))) {
         // console.log(br[2] + '.' + br[3]);
-
+        let cache_name;
         event.respondWith(async function () {
-            const cache = await caches.open(VERSION);
+            if ((br = forever_regex.exec(this_url.pathname))) {
+                cache_name = 'forever';
+            } else {
+                cache_name = VERSION;
+            }
+            const cache = await caches.open(cache_name);
             const cachedResponse = await cache.match(event.request);
             if (cachedResponse) {
-                // event.waitUntil(cache.add(event.request));
                 return cachedResponse;
             }
 
             return fetch(event.request).then(
                 function (r) {
-                    caches.open(VERSION).then(function (cache) {
+                    caches.open(cache_name).then(function (cache) {
                         cache.put(event.request, r);
                     });
                     return r.clone();

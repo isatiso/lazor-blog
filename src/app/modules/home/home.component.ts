@@ -3,14 +3,19 @@ import { MatSnackBar, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { trigger, state, style, animate, transition } from '@angular/animations';
+import { FocusTrap, FocusTrapFactory } from '@angular/cdk/a11y';
 
 import { SortablejsOptions } from 'angular-sortablejs';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { NavProfileService } from 'service/nav-profile/nav-profile.service';
-import { CategoryDatabaseService, CategorySource } from 'service/category-database/category-database.service';
-import { AccountService } from 'service/account/account.service';
-import { ArticleData, Category, Options } from 'public/data-struct-definition';
+import { NavProfileService } from 'service/nav-profile.service';
+import { CategoryDatabaseService, CategorySource } from 'service/category-database.service';
+import { AccountService } from 'service/account.service';
+import { ScrollorService } from 'service/scrollor.service';
+import { NavButtonService } from 'service/nav-button.service';
+import { ArticleData, Category, Options, NavButton } from 'public/data-struct-definition';
+
+import anime from 'animejs';
 
 @Component({
     selector: 'la-home',
@@ -37,6 +42,16 @@ import { ArticleData, Category, Options } from 'public/data-struct-definition';
                 backgroundColor: '#fff'
             })),
             transition('1 <=> 0', animate('200ms ease-in'))
+        ]),
+        trigger('showCate', [
+            state('1', style({
+                transform: 'translateX(0)',
+            })),
+            state('0', style({
+                transform: 'translateX(-100%)',
+            })),
+            transition('void => 0', animate('200ms linear')),
+            transition('0 <=> 1', animate('200ms linear'))
         ]),
         trigger('loadArticle', [
             state('1', style({
@@ -74,6 +89,14 @@ export class HomeComponent implements OnInit, OnDestroy {
     dataSource: CategorySource | null;
     can_sort: boolean;
     load_article: boolean;
+    current_card = 'left';
+
+    public menu_anime_handler: any;
+    public menu_anime_state = 'hidden';
+    private _touch_state = null;
+    public show_cate_state = 0;
+    private _focusTrap: FocusTrap;
+
     article_sort_options_data: SortablejsOptions = {
         animation: 100,
         disabled: false,
@@ -107,13 +130,28 @@ export class HomeComponent implements OnInit, OnDestroy {
     article_sort_options: SortablejsOptions;
     category_sort_options: SortablejsOptions;
 
+    @ViewChild('smallViewLeft') small_view_left;
+    @ViewChild('smallViewRight') small_view_right;
+    @ViewChild('categoryListPad') category_list_pad;
+    @ViewChild('navCate') nav_cate;
+    @ViewChild('navTop') nav_top;
+    @ViewChild('navGuide') nav_guide;
+    @ViewChild('navGuideIcon') nav_guide_icon;
+
     constructor(
         private _http_client: HttpClient,
         private _router: Router,
         private _account: AccountService,
         private _category_db: CategoryDatabaseService,
+        private _scrollor: ScrollorService,
+        private _focusTrapFactory: FocusTrapFactory,
+        private _nav_button: NavButtonService,
         public dialog: MatDialog,
     ) { }
+
+    get outer_width(): number {
+        return window.outerWidth;
+    }
 
     get categories() {
         return this._category_db.category_list;
@@ -140,6 +178,27 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.can_sort = false;
         this.load_article = true;
         this.query_category();
+        this._nav_button.button_list = [{
+            name: 'navToggle',
+            icon: () => 'view_list',
+            callback: event => this.toggle_show_cate(),
+            tool_tip: () => '编辑文章 (ctrl + E)',
+        }, {
+            name: 'navCreate',
+            icon: () => 'create',
+            callback: event => this.go_create_article(),
+            tool_tip: () => '写新文章'
+        }, {
+            name: 'navCreateCategory',
+            icon: () => 'create_new_folder',
+            callback: event => this.input_category(),
+            tool_tip: () => '添加分类'
+        }, {
+            name: 'navTop',
+            icon: () => 'arrow_upward',
+            callback: event => this._scrollor.goto_top(),
+            tool_tip: () => '回到顶部 (ctrl + ↑)'
+        }];
     }
 
     ngOnDestroy() {
@@ -264,6 +323,23 @@ export class HomeComponent implements OnInit, OnDestroy {
             res => {
                 this.query_category();
             });
+    }
+
+    toggle_show_cate(event?) {
+        if (event && !event.target.className.split(' ').find((res) => res === 'category-card-container')) {
+            return event;
+        }
+
+        if (this.show_cate_state === 1) {
+            this.show_cate_state = 0;
+            this._focusTrap && this._focusTrap.destroy();
+        } else {
+            this.show_cate_state = 1;
+        }
+    }
+
+    go_create_article(event?) {
+        this._router.navigate(['/editor/new-article']);
     }
 }
 

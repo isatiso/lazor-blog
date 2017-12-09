@@ -1,0 +1,22 @@
+.button-container {
+    z-index: 50;
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    .guide {
+        z-index: 50;
+        position: fixed;
+        bottom: 25px;
+        right: 25px;
+    }
+
+    .option {
+        z-index: 49;
+        position: fixed;
+        bottom: 33px;
+        right: 33px;
+        .mat-icon {
+            color: white;
+        }
+    }
+}

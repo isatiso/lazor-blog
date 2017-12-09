@@ -46,7 +46,7 @@ import { HomeRoutingModule } from './home-routing.module';
     ],
     entryComponents: [
         AddCategoryComponent,
-        WarningComponent
+        WarningComponent,
     ],
     declarations: [
         HomeComponent,

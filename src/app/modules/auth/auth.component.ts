@@ -4,8 +4,9 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 
-import { AccountService } from 'service/account/account.service';
-import { SnackBarService } from 'service/snack-bar/snack-bar.service';
+import { AccountService } from 'service/account.service';
+import { SnackBarService } from 'service/snack-bar.service';
+import { NavButtonService } from 'service/nav-button.service';
 import { Account } from 'public/data-struct-definition';
 
 @Component({
@@ -60,6 +61,7 @@ export class AuthComponent implements OnInit, OnDestroy {
         private _active_route: ActivatedRoute,
         private _snack_bar: SnackBarService,
         private _account: AccountService,
+        private _nav_button: NavButtonService,
     ) { }
 
     ngOnInit() {
@@ -74,6 +76,7 @@ export class AuthComponent implements OnInit, OnDestroy {
                 }
             },
         );
+        this._nav_button.button_list = [];
     }
 
     ngOnDestroy() {

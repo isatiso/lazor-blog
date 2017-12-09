@@ -5,7 +5,7 @@ import { DataSource } from '@angular/cdk/table';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 
-import { AccountService } from 'service/account/account.service';
+import { AccountService } from 'service/account.service';
 import { ArticleData, Category, Options } from 'public/data-struct-definition';
 
 

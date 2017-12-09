@@ -4,7 +4,7 @@ import { Router, NavigationExtras } from '@angular/router';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { AsyncSubject } from 'rxjs/AsyncSubject';
 
-import { CategoryDatabaseService } from 'service/category-database/category-database.service';
+import { CategoryDatabaseService } from 'service/category-database.service';
 import { Article, ArticleData, Options } from 'public/data-struct-definition';
 
 @Injectable()

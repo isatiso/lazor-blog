@@ -5,10 +5,13 @@ import { HttpClient } from '@angular/common/http';
 import { MatSnackBar, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 import { NavBgDirective } from 'directive/nav-bg.directive';
-import { NavProfileService } from 'service/nav-profile/nav-profile.service';
-import { ArticleDatabaseService } from 'service/article-database/article-database.service';
-import { CategoryDatabaseService } from 'service/category-database/category-database.service';
-import { AccountService } from 'service/account/account.service';
+import { NavProfileService } from 'service/nav-profile.service';
+import { ArticleDatabaseService } from 'service/article-database.service';
+import { CategoryDatabaseService } from 'service/category-database.service';
+import { AccountService } from 'service/account.service';
+import { NavButtonService } from 'service/nav-button.service';
+
+import { NavButton } from 'public/data-struct-definition';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/filter';
@@ -45,7 +48,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     height_limit = 0;
     client_width = 0;
     navbarWidth = 0;
-    no_footer = false;
+    footer_type = 'normal';
 
     constructor(
         private el: ElementRef,
@@ -56,10 +59,13 @@ export class AppComponent implements OnInit, AfterViewInit {
         public dialog: MatDialog,
         private _article_db: ArticleDatabaseService,
         private _category_db: CategoryDatabaseService,
+        private _nav_button: NavButtonService,
         public nav_profile: NavProfileService,
     ) { }
 
     @ViewChild('siteLogo') site_logo;
+    @ViewChild('appContainer') app_container;
+    @ViewChild('footer') footer;
 
     get current_user(): string {
         if (this._account.data) {
@@ -67,6 +73,14 @@ export class AppComponent implements OnInit, AfterViewInit {
         } else {
             return '';
         }
+    }
+
+    get outer_width(): number {
+        return window.outerWidth;
+    }
+
+    get nav_button_list(): any {
+        return this._nav_button.button_list_subject;
     }
 
     ngOnInit() {
@@ -101,11 +115,16 @@ export class AppComponent implements OnInit, AfterViewInit {
             .mergeMap(route => route.data)
             .subscribe((data) => {
                 if (data['scrollLimit']) {
-                    this.height_limit = data['scrollLimit'];
+                    if (window.outerWidth > 769) {
+                        this.height_limit = 276;
+                    } else {
+                        this.height_limit = 152;
+                    }
+
                 } else {
                     this.height_limit = 0;
                 }
-                this.no_footer = data['noFooter'];
+                this.footer_type = data['footerType'];
             });
 
         const wrapperEl = document.querySelector('#loading-wrapper');
@@ -125,6 +144,10 @@ export class AppComponent implements OnInit, AfterViewInit {
         setTimeout(() => {
             wrapperEl.innerHTML = '';
         }, 1000);
+        // console.log(this.footer);
+        setTimeout(() => {
+            this.app_container.nativeElement.style.minHeight = window.innerHeight - this.footer.nativeElement.clientHeight + 'px';
+        }, 0);
     }
 
     ngAfterViewInit() {
@@ -139,6 +162,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             ],
             loop: true
         });
+
     }
 
     is_logged() {
@@ -151,7 +175,11 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
 
     edit_profile() {
+        const rate = window.outerWidth > 1024 ? .5 : .9;
+        const editor_width = (window.outerWidth * rate) + 'px';
+
         this.dialog.open(ProfileComponent, {
+            width: editor_width,
             data: {
                 name: this._account.data.user_name,
                 placeholder: 'Enter a New Name'

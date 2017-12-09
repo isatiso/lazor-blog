@@ -8,8 +8,8 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 
-import { AccountService } from 'service/account/account.service';
-import { SnackBarService } from 'service/snack-bar/snack-bar.service';
+import { AccountService } from 'service/account.service';
+import { SnackBarService } from 'service/snack-bar.service';
 
 @Injectable()
 export class ArticleOwnerGuard implements CanActivate {

@@ -3,8 +3,9 @@ import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute, NavigationExtras } from '@angular/router';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 
-import { CategoryDatabaseService, CategorySource } from 'service/category-database/category-database.service';
+import { CategoryDatabaseService, CategorySource } from 'service/category-database.service';
 import { ArticleData, Category } from 'public/data-struct-definition';
+import { NavButtonService } from 'service/nav-button.service';
 
 import anime from 'animejs';
 
@@ -70,7 +71,8 @@ export class IndexComponent implements OnInit, OnDestroy {
         private _http: HttpClient,
         private _router: Router,
         private _active_route: ActivatedRoute,
-        private _category_db: CategoryDatabaseService
+        private _category_db: CategoryDatabaseService,
+        private _nav_button: NavButtonService,
     ) { }
 
     get category_list(): Category[] {
@@ -93,6 +95,7 @@ export class IndexComponent implements OnInit, OnDestroy {
         } else {
             this._category_db.get_index_category_list(null);
         }
+        this._nav_button.button_list = [];
     }
 
     ngOnDestroy() {
@@ -100,18 +103,19 @@ export class IndexComponent implements OnInit, OnDestroy {
     }
 
     trig_article_list(category_id) {
+        // console.log(category_id);
         this._router.navigate([`/index/${category_id}`]);
         this._category_db.shuffle(category_id);
     }
 
-    onscroll(event) {
-        const scroll_top = event.target.scrollingElement.scrollTop;
-        if (scroll_top <= this._scroll_height_limit) {
-            this.banner.nativeElement.firstElementChild.style.opacity = 1 - (scroll_top / this._scroll_height_limit);
-        } else {
-            this.banner.nativeElement.firstElementChild.style.opacity = 0;
-        }
-    }
+    // onscroll(event) {
+    //     const scroll_top = event.target.scrollingElement.scrollTop;
+    //     if (scroll_top <= this._scroll_height_limit) {
+    //         this.banner.nativeElement.firstElementChild.style.opacity = 1 - (scroll_top / (window.outerWidth > 769 ? 100 : 45));
+    //     } else {
+    //         this.banner.nativeElement.firstElementChild.style.opacity = 0;
+    //     }
+    // }
 }
 
 @Component({

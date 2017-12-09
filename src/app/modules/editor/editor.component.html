@@ -1,12 +1,8 @@
-<div (window:keydown)="boss_key($event)" class="container editor-container" #editorContainer [@pageAppear]="page_appear"
-    (window:mousemove)="show_nav_button($event)">
+<div (window:keydown)="boss_key($event)" class="container editor-container" #editorContainer [@pageAppear]="page_appear">
     <mat-card>
         <div class="editor-title-container">
             <input [(ngModel)]="title" class="editor-title" placeholder="Untitled" maxlength="50" #titleRef/>
         </div>
-        <!-- <div class="dash-board">
-            <button mat-raised-button color="warn" (click)="delete_confirm($event)">删除文章</button>
-        </div> -->
         <div class="category-editor">
             <mat-form-field>
                 <mat-select [(ngModel)]="current_category.category_id" (change)="article_change($event)">
@@ -16,7 +12,7 @@
                 </mat-select>
             </mat-form-field>
         </div>
-        <div class="divider"></div>
+        <div class="divider" *ngIf="outer_width > 768"></div>
         <div class="page-progress" #progressBarContainer [@progressAppear]="progress_state">
             <mat-progress-bar #progressBar color="accent" mode="determinate" [value]="progress_value"> </mat-progress-bar>
         </div>
@@ -35,31 +31,7 @@
                 </div>
             </mat-tab>
         </mat-tab-group>
-
-        <button #navGuide mat-fab color="primary" class="markdown-showup" (mouseenter)="toggle_menu($event)" id="nav-guide">
-            <mat-icon #navGuideIcon class="big-icon">menu</mat-icon>
-        </button>
-
-        <button #navHome mat-mini-fab color="primary" (click)="save_button_click($event)" class="markdown-option" *ngIf="true" [matTooltip]="save_button_outlet()"
-            matTooltipPosition="left">
-            <mat-icon class="big-icon">{{ save_button_icon() }}</mat-icon>
-        </button>
-        <button #navDelete mat-mini-fab color="warn" (click)="delete_confirm($event)" class="markdown-option" *ngIf="true" matTooltip="删除文章"
-            matTooltipPosition="left">
-            <mat-icon class="big-icon">delete</mat-icon>
-        </button>
-        <button #navAddImage mat-mini-fab (click)="select_file_click($event)" class="markdown-option" *ngIf="true" matTooltip="插入图片 (ctrl + P)"
-            matTooltipPosition="left">
-            <mat-icon class="big-icon">insert_photo</mat-icon>
-        </button>
-        <button #navView mat-mini-fab (click)="preview_button_click($event)" class="markdown-option" *ngIf="true" [matTooltip]="preview_button_outlet()"
-            matTooltipPosition="left">
-            <mat-icon class="big-icon">{{ preview_button_icon() }}</mat-icon>
-        </button>
-        <button #navTop mat-mini-fab (click)="go_top($event)" class="markdown-option" *ngIf="true" matTooltip="回到顶部 (ctrl + ↑)" matTooltipPosition="left">
-            <mat-icon class="big-icon">arrow_upward</mat-icon>
-        </button>
-
+        <!-- <la-nav-button [buttonList]="button_list"></la-nav-button> -->
     </mat-card>
     <form class="add-image-form" action="/middle/file" method="post" enctype="multipart/form-data" #imageForm>
         <label for="image_uploads">Choose file to upload</label>

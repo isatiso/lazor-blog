@@ -1,18 +1,20 @@
 @import './assets/scss/material_theming.scss';
 @import './assets/scss/highlight.scss';
 @import './assets/scss/markdown.scss';
+
 html {
     width: 100%;
     height: 100%;
     display: block;
     padding: 0;
     margin: 0;
+    font-size: 62.5%;
     body {
+        font-size: 1.4rem;
         -webkit-font-smoothing: antialiased;
         -moz-font-smoothing: antialiased;
         width: 100%;
-        height: calc(100% - 64px);
-        // height: 100%;
+        height: calc(100% - 64px); // height: 100%;
         display: block;
         padding: 0;
         margin: 0;
@@ -37,16 +39,6 @@ html {
     box-sizing: border-box;
     width: 100%;
     max-width: 1280px;
-}
-
-.banner {
-    font-family: $font-banner;
-    z-index: 100;
-    margin: 0;
-    padding-top: 75px;
-    color: map-get($primary, 50);
-    font-size: 5em;
-    font-weight: normal;
 }
 
 .title {
@@ -96,17 +88,6 @@ html {
     font-size: 10px;
 }
 
-footer {
-    background-color: map-get($primary, 500);
-    background-image: url(/assets/image/abs.png);
-    background-attachment: fixed;
-    background-clip: content-box;
-    background-position-y: 660px;
-    background-size: 1920px;
-    background-repeat: repeat;
-    text-align: center;
-}
-
 mat-dialog-container.mat-dialog-container {
     max-width: none;
 }
@@ -115,12 +96,9 @@ mat-dialog-container.mat-dialog-container {
     opacity: 1;
 }
 
-// .icon {
-//     width: 16px;
-//     height: 16px;
-//     display: inline-block;
-//     background-repeat: no-repeat;
-//     background-image: url(assets/image/favicon.svg);
-//     background-position: 0 0;
-// }
-
+@media (max-width: 768px) {
+    .title {
+        font-size: 32px;
+        padding-bottom: 10px;
+    }
+}

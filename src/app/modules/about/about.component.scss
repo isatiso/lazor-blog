@@ -15,5 +15,17 @@
 .title {
     font-family: $font-banner;
     font-size: 56px;
-    padding-bottom: 20px;
+    padding-bottom: 0;
+}
+
+
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0;
+        margin-top: 48px;
+    }
+    .title {
+        font-size: 32px;
+    }
 }

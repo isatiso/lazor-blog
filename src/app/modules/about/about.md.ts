@@ -14,6 +14,6 @@ export class AboutContent {
 - **我的邮箱**？
 sieglive@163.com
 
-![aeflkajef](/assets/image/funny_face.jpg)
+![高端大气，奢华又有内涵，充满了自然的清新气息，就好像身处于原始森林里一样，感觉负离子围绕着转动，全身都变轻了许多。](/assets/image/funny_face.gif "自从写了这么高端大气，奢华又有内涵，充满了自然的清新气息的博客之后，就好像身处于原始森林里一样，感觉负离子围绕着转动，全身都变轻了许多。")
 `;
 }

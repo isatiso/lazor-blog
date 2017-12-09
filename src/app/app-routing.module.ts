@@ -11,48 +11,50 @@ const routes: Routes = [
         loadChildren: './modules/home/home.module#HomeModule',
         pathMatch: 'full',
         canActivate: [AuthGuard],
-        data: { title: 'home', scrollLimit: 0 }
+        data: { title: 'home', scrollLimit: 0, footerType: 'normal' }
     },
     {
         path: 'auth',
         loadChildren: './modules/auth/auth.module#AuthModule',
-        data: { title: 'auth', scrollLimit: 0 }
+        data: { title: 'auth', scrollLimit: 0, footerType: 'normal' }
     },
     {
         path: 'editor/:id',
         loadChildren: './modules/editor/editor.module#EditorModule',
         canActivate: [AuthGuard, ArticleOwnerGuard],
         canDeactivate: [LeaveGuard],
-        data: { title: 'editor', scrollLimit: 0, noFooter: true }
+        data: { title: 'editor', scrollLimit: 0, footerType: 'simple' }
     },
     {
         path: 'index',
         loadChildren: './modules/index/index.module#IndexModule',
-        data: { title: 'index', scrollLimit: 276 }
+        data: { title: 'index', scrollLimit: 276, footerType: 'normal' }
     },
     {
         path: 'about',
         loadChildren: './modules/about/about.module#AboutModule',
-        data: { title: 'about', scrollLimit: 0 }
+        data: { title: 'about', scrollLimit: 0, footerType: 'normal' }
     },
     {
         path: 'article',
         loadChildren: './modules/article/article.module#ArticleModule',
-        data: { title: 'article', scrollLimit: 0, noFooter: true }
+        data: { title: 'article', scrollLimit: 0, footerType: 'simple' }
     },
     {
         path: 'error',
-        loadChildren: './modules/error/error.module#ErrorModule'
+        loadChildren: './modules/error/error.module#ErrorModule',
+        data: { title: 'error', scrollLimit: 0, footerType: 'normal' }
     },
     {
         path: '',
         redirectTo: 'home',
         pathMatch: 'full',
-        data: { title: 'home', scrollLimit: 276 }
+        data: { title: 'home', scrollLimit: 276, footerType: 'normal' }
     },
     {
         path: '**',
-        redirectTo: '/error'
+        redirectTo: '/error',
+        data: { title: 'error', scrollLimit: 0, footerType: 'normal' }
     }
 ];
 

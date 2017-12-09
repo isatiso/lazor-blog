@@ -10,35 +10,15 @@ $config: mat-typography-config();
     font-size: 48px;
     border: none;
     font-family: $font-title;
-    &:focus {
-        outline: none;
-    }
+    outline: none;
 }
 
-.markdown-showup {
-    z-index: 10;
-    position: fixed;
-    bottom: 25px;
-    right: 25px;
-}
-
-.markdown-option {
-    z-index: 9;
-    position: fixed;
-    bottom: 33px;
-    right: 33px;
-    .mat-icon {
-        color: white;
-    }
-}
 
 .input-test textarea {
     font-family: $font-code;
     font-size: 20px;
     line-height: 28px;
 }
-
-@keyframes nav-button {}
 
 .dash-board {
     position: absolute;
@@ -77,4 +57,27 @@ $config: mat-typography-config();
 
 .add-image-form {
     display: none;
+}
+
+@media (max-width: 768px) {
+    .editor-container {
+        padding: 0;
+        margin-top: 48px;
+    }
+
+    .editor-title {
+        width: 100%;
+        font-size: 2.4rem;
+    }
+
+    .category-editor {
+        position: initial;
+        text-align: right;
+        z-index: 9;
+    }
+
+    .input-test textarea {
+        font-size: 1.2rem;
+        line-height: 1.6rem;
+    }
 }

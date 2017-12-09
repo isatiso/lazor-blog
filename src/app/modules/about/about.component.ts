@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material';
 
 import { AboutContent } from './about.md';
 import { PreviewComponent } from 'public/preview/preview.component';
+import { NavButtonService } from 'service/nav-button.service';
 
 @Component({
     selector: 'la-about',
@@ -22,11 +23,13 @@ export class AboutComponent implements OnInit {
     about_content = new AboutContent();
 
     constructor(
+        private _nav_button: NavButtonService,
         public dialog: MatDialog,
     ) { }
 
     ngOnInit() {
         document.scrollingElement.scrollTop = 0;
+        this._nav_button.button_list = [];
     }
 
     preview_image(event) {

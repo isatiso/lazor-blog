@@ -5,10 +5,11 @@ import { trigger, state, style, animate, transition } from '@angular/animations'
 import { MatSnackBar, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 import { MarkdownDirective } from 'directive/markdown.directive';
-import { ArticleDatabaseService } from 'service/article-database/article-database.service';
-import { CategoryDatabaseService } from 'service/category-database/category-database.service';
-import { SnackBarService } from 'service/snack-bar/snack-bar.service';
-import { ScrollorService } from 'service/scrollor//scrollor.service';
+import { ArticleDatabaseService } from 'service/article-database.service';
+import { CategoryDatabaseService } from 'service/category-database.service';
+import { SnackBarService } from 'service/snack-bar.service';
+import { NavButtonService } from 'service/nav-button.service';
+import { ScrollorService } from 'service/scrollor.service';
 import { ArticleData, Category, Options } from 'public/data-struct-definition';
 
 import anime from 'animejs';
@@ -55,8 +56,6 @@ export class EditorComponent implements OnInit, OnDestroy {
     private _nav_zone_leave_width = 375;
     private _nav_show = false;
     private _last_category_id: string = null;
-    public menu_anime_handler: any;
-    public menu_anime_state = 'hidden';
 
     @ViewChild('navView') nav_view;
     @ViewChild('navTop') nav_top;
@@ -80,9 +79,16 @@ export class EditorComponent implements OnInit, OnDestroy {
         private _activate_route: ActivatedRoute,
         private _article_db: ArticleDatabaseService,
         private _category_db: CategoryDatabaseService,
+        private _nav_button: NavButtonService,
         public snack_bar: SnackBarService,
         public dialog: MatDialog
-    ) { }
+    ) {
+
+    }
+
+    get outer_width(): number {
+        return window.outerWidth;
+    }
 
     get content(): string {
         return this.current_article.content;
@@ -184,6 +190,34 @@ export class EditorComponent implements OnInit, OnDestroy {
         this._last_category_id = this.current_category.category_id;
         this.remove_extra_lines();
         this.title_ref.nativeElement.focus();
+        this._nav_button.button_list = [{
+            name: 'navHome',
+            icon: () => this.save_button_icon(),
+            callback: event => this.save_button_click(),
+            color: () => 'primary',
+            tool_tip: () => this.save_button_outlet(),
+        }, {
+            name: 'navDelete',
+            icon: () => 'delete',
+            callback: event => this.delete_confirm(event),
+            color: () => 'warn',
+            tool_tip: () => '删除文章',
+        }, {
+            name: 'navAddImage',
+            icon: () => 'insert_photo',
+            callback: event => this.select_file_click(event),
+            tool_tip: () => '添加图片 (ctrl + P)',
+        }, {
+            name: 'navView',
+            icon: () => this.preview_button_icon(),
+            callback: event => this.preview_button_click(event),
+            tool_tip: () => this.preview_button_outlet(),
+        }, {
+            name: 'navTop',
+            icon: () => 'arrow_upward',
+            callback: event => this.go_top(),
+            tool_tip: () => '回到顶部 (ctrl + ↑)',
+        }];
     }
 
     ngOnDestroy() {
@@ -210,67 +244,6 @@ export class EditorComponent implements OnInit, OnDestroy {
         this._router.navigate(['/home']);
     }
 
-    toggle_menu(event?) {
-        if (this.menu_anime_state === 'hidden') {
-            if (!this.menu_anime_handler) {
-                this.menu_anime_handler = anime.timeline().add({
-                    targets: this.nav_delete._elementRef.nativeElement,
-                    translateY: -70,
-                    duration: 200,
-                    opacity: [0, 1],
-                    offset: 0,
-                    easing: 'linear'
-                }).add({
-                    targets: this.nav_add_image._elementRef.nativeElement,
-                    translateY: -130,
-                    duration: 200,
-                    opacity: [0, 1],
-                    offset: 0,
-                    easing: 'linear'
-                }).add({
-                    targets: this.nav_home._elementRef.nativeElement,
-                    translateY: -190,
-                    duration: 200,
-                    opacity: [0, 1],
-                    offset: 0,
-                    easing: 'linear'
-                }).add({
-                    targets: this.nav_view._elementRef.nativeElement,
-                    translateY: -250,
-                    duration: 200,
-                    opacity: [0, 1],
-                    offset: 0,
-                    easing: 'linear'
-                }).add({
-                    targets: this.nav_top._elementRef.nativeElement,
-                    translateY: -310,
-                    duration: 200,
-                    opacity: [0, 1],
-                    offset: 0,
-                    easing: 'linear'
-                }).add({
-                    targets: this.nav_guide_icon._elementRef.nativeElement,
-                    rotate: '0.5turn',
-                    duration: 200,
-                    offset: 0,
-                    easing: 'linear'
-                });
-                console.log(this.nav_guide_icon._elementRef);
-                this.menu_anime_handler.play();
-            } else {
-                this.menu_anime_handler.reverse();
-                this.menu_anime_handler.play();
-            }
-            this.menu_anime_state = 'show';
-        } else if (this.menu_anime_state === 'show') {
-            if (event && event.type !== 'mouseenter' || !event) {
-                this.menu_anime_handler.reverse();
-                this.menu_anime_handler.play();
-                this.menu_anime_state = 'hidden';
-            }
-        }
-    }
-
     select_change(event) {
         this.tab_select = event;
         const current_scroll_top = document.scrollingElement.scrollTop;
@@ -285,35 +258,6 @@ export class EditorComponent implements OnInit, OnDestroy {
                 this._scrollor.goto(current_scroll_top, this.left_scroll_top, 30);
             }, 0);
         }
-    }
-
-    show_nav_button(event) {
-        if (event.type !== 'mousemove') {
-            return event;
-        }
-
-        if (event.x < event.view.innerWidth - this._nav_zone_width * 1.5) {
-            if (this.menu_anime_state === 'show') {
-                this.toggle_menu();
-            }
-        }
-        // if (event.x >= event.view.innerWidth - this._nav_zone_width) {
-        //     if (!this._nav_show) {
-        //         this._nav_show = true;
-        //         this.nav_top._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5) translateY(-120px)';
-        //         this.nav_view._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5) translateY(-60px)';
-        //         this.nav_add_image._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5)';
-        //         this.nav_home._elementRef.nativeElement.style.transform = 'translateX(-30%) scale(1.5) translateY(60px)';
-        //     }
-        // } else if (event.x < event.view.innerWidth - this._nav_zone_leave_width) {
-        //     if (this._nav_show) {
-        //         this._nav_show = false;
-        //         this.nav_view._elementRef.nativeElement.style.transform = 'translateX(80%)';
-        //         this.nav_top._elementRef.nativeElement.style.transform = 'translateX(80%)';
-        //         this.nav_home._elementRef.nativeElement.style.transform = 'translateX(80%)';
-        //         this.nav_add_image._elementRef.nativeElement.style.transform = 'translateX(80%)';
-        //     }
-        // }
     }
 
     save_article() {

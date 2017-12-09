@@ -69,3 +69,11 @@ export class Options {
         this.article_id = options['article_id'] || '';
     }
 }
+
+export interface NavButton {
+    name: string;
+    icon: () => string;
+    callback: (event?) => any;
+    color?: () => string;
+    tool_tip?: () => string;
+}

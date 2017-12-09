@@ -4,6 +4,39 @@
 // have to load a single css file for Angular Material in your app.
 // Be sure that you only ever include this mixin once!
 @include mat-core();
+
+@mixin paragraph-text {
+    font-family: $font-content;
+    font-size: 1.8rem;
+    line-height: 2.8rem;
+    font-weight: 300;
+    box-sizing: border-box;
+}
+
+@mixin paragraph-text-mobile {
+    font-family: $font-content;
+    font-size: 1.4rem;
+    line-height: 2.4rem;
+    font-weight: 300;
+    box-sizing: border-box;
+}
+
+@mixin head-common {
+    color: map-get($accent, 900);
+    margin: 1.5rem 0;
+    font-weight: normal;
+    font-family: $font-title;
+    padding: 0;
+}
+
+@mixin head-common-mobile {
+    color: map-get($accent, 900);
+    margin: 1rem 0;
+    font-weight: normal;
+    font-family: $font-title;
+    padding: 0;
+}
+
 @font-face {
     font-family: 'ul font';
     src: url('/assets/image/list.svg') format('svg');
@@ -13,7 +46,10 @@
 }
 
 markdown {
+    @include link-style();
+    overflow-x: hidden;
     margin: 0 auto;
+    font-size: 1.8rem;
     .md-strong {
         font-weight: bold;
     }
@@ -21,222 +57,181 @@ markdown {
         font-style: italic;
     }
     .md-image {
+        @include top-block;
         width: 100%;
         text-align: center;
         -ms-transform-origin: 30px 0;
         img {
             max-width: 80%;
             min-width: 20%;
-            transition: background 400ms cubic-bezier(.25, .8, .25, 1), box-shadow 280ms cubic-bezier(.4, 0, .2, 1);
-            box-shadow: 0 3px 1px -2px rgba(0, 0, 0, .2), 0 2px 2px 0 rgba(0, 0, 0, .14), 0 1px 5px 0 rgba(0, 0, 0, .12);
-            &:active {
-                box-shadow: 0 5px 5px -3px rgba(0, 0, 0, .2), 0 8px 10px 1px rgba(0, 0, 0, .14), 0 3px 14px 2px rgba(0, 0, 0, .12);
-            }
+            @include normal-shadow;
         }
     }
     .head-1 {
         width: 100%;
         h1 {
+            @include head-common;
+            @include normal-shadow;
+            margin: 3.6rem 0 3.6rem .5rem;
+            padding: 1rem 2rem 1rem 2rem;
+            font-size: 3.6rem;
+            line-height: 4.2rem;
+            background-color: map-get($primary, 50);
             width: fit-content;
-            margin: 36px 0;
-            margin-left: 5px;
-            padding: 10px 20px 10px 20px;
-            color: map-get($accent, 900);
-            font-weight: 400;
-            font-family: $font-title;
-            font-size: 36px;
-            line-height: 42px;
-            background-color: map-get($primary, 50); // border-radius: 20px;
-            transition: background 400ms cubic-bezier(.25, .8, .25, 1), box-shadow 280ms cubic-bezier(.4, 0, .2, 1);
-            box-shadow: 0 3px 1px -2px rgba(0, 0, 0, .2), 0 2px 2px 0 rgba(0, 0, 0, .14), 0 1px 5px 0 rgba(0, 0, 0, .12);
-            &:active {
-                box-shadow: 0 5px 5px -3px rgba(0, 0, 0, .2), 0 8px 10px 1px rgba(0, 0, 0, .14), 0 3px 14px 2px rgba(0, 0, 0, .12);
-            }
         }
     }
     .head-2 {
         h2 {
-            color: #111111;
-            margin: 30px 0;
-            font-weight: normal;
-            font-family: $font-title;
-            padding: 0;
-            font-size: 36px;
-            line-height: 36px;
+            @include head-common;
+            font-size: 3.4rem;
+            line-height: 3.6rem;
             border-bottom: 1px solid #EFEAEA;
-            padding-bottom: 10px;
+            padding-bottom: 1rem;
         }
     }
     .head-3 {
         h3 {
-            color: #111111;
-            font-weight: 400;
-            margin: 24px 0;
-            font-family: $font-content;
-            font-weight: bolder;
-            padding: 0;
-            font-size: 24px;
-            line-height: 30px;
+            @include head-common;
+            font-size: 3rem;
+            line-height: 3.4rem;
         }
     }
     .head-4 {
         h4 {
-            color: #111111;
-            font-weight: 400;
-            margin-top: 1em;
-            font-family: $font-content;
-            font-weight: bolder;
-            margin-bottom: 16px;
-            padding: 0;
-            font-size: 21px;
-            line-height: 26px;
+            @include head-common;
+            font-size: 2.6rem;
+            line-height: 3rem;
         }
     }
     .head-5 {
         h5 {
-            font-family: $font-content;
-            font-weight: bolder;
-            margin-bottom: 16px;
-            padding: 0;
-            font-size: 18px;
-            line-height: 23px;
+            @include head-common;
+            font-size: 2.2rem;
+            line-height: 2.6rem;
         }
     }
     &>p {
-        font-family: $font-content;
         width: 90%;
-        margin: 10px auto;
-        margin-bottom: 25px;
-        font-size: 20px;
-        line-height: 34px;
-        box-sizing: border-box;
+        @include paragraph-text();
+        @include top-block;
     }
-    a {
-        color: map-get($mat-teal, 500);
-        margin: 0 2px;
-        padding: 0;
-        vertical-align: baseline;
-        text-decoration: none;
-        &:hover {
-            text-decoration: none;
-            color: map-get($mat-orange, 500);
-        }
-    }
-    ol,
-    ul {
-        padding: 10px 48px;
-        margin: 0;
-        list-style: none;
-        box-sizing: border-box;
-        &>li {
-            min-height: 56px;
-            margin: 0;
-            margin-top: 16px;
-            &>p>.text:first-of-type,
-            &>.text:first-of-type {
-                position: relative;
-                padding: 7px 15px;
-                padding-left: 36px;
-                font-size: 18px;
-                line-height: 32px;
-                background: map-get($accent, 100);
-                display: block;
-                color: #444;
-                &:before {
-                    content: "";
-                    position: absolute;
-                    left: -1.3em;
-                    top: 50%;
-                    margin-top: -1.3em;
-                    background: map-get($primary, 300);
-                    color: map-get($primary, 50);
-                    height: 26px;
-                    width: 26px;
-                    line-height: 26px;
-                    border: 10px solid #fff;
-                    text-align: center;
-                    font-weight: bold;
-                    border-radius: 12px; // transition: 200ms cubic-bezier(.25, .8, .25, 1);
-                    // transition: 500ms cubic-bezier(.25, .8, .25, 1);
-                } // &:hover {
-                //     &:before {
-                //         border-radius: 46px;
-                //     }
-                // }
-            }
-            &>p>.text:not(:first-of-type),
-            &>.text:not(:first-of-type) {
-                margin-top: 20px;
-                margin-left: 20px;
-                font-size: 22px;
-                line-height: inherit;
-                display: block;
-                font-family: $font-list-text;
-            }
+    &>.circle-list,
+    &>.rect-list {
+        width: 95%;
+        @include top-block;
+        .rect-list,
+        .circle-list {
+            @include inner-block;
         }
         ol,
         ul {
-            padding-right: 0;
-            margin-top: 0;
-        }
-        .list-level-2 {
-            &>p>.text:first-of-type,
-            &>.text:first-of-type {
-                &:before {
-                    background-color: map-get($mat-cyan, 500);
+            list-style: none;
+            margin: 0 0;
+            &>li {
+                @include inner-block;
+                margin-top: 0;
+                &>p {
+                    margin: 0 0;
+                }
+                &>p>.text:first-of-type,
+                &>.text:first-of-type {
+                    @include paragraph-text();
+                    position: relative;
+                    padding: .7rem 1.5rem .7rem 3.6rem;
+                    background: map-get($accent, 100);
+                    display: block;
+                    font-weight: 300;
+                    &:before {
+                        content: "";
+                        position: absolute;
+                        left: -3.3rem;
+                        top: 50%;
+                        margin-top: -2.1rem;
+                        height: 2.4rem;
+                        width: 2.4rem;
+                        line-height: 2.4rem;
+                        border: .9rem solid #fff;
+                        text-align: center;
+                        font-weight: bold;
+                        background: map-get($primary, 300);
+                        color: map-get($primary, 50);
+                        border-radius: 1.3rem;
+                    }
+                }
+                &>p>.text:not(:first-of-type),
+                &>.text:not(:first-of-type) {
+                    margin-top: 2rem;
+                    margin-left: 2rem;
+                    display: block;
+                    @include paragraph-text();
+                }
+            }
+
+            ol,
+            ul {
+                padding-right: 0;
+                margin-top: 0;
+            }
+            .list-level-2 {
+                &>p>.text:first-of-type,
+                &>.text:first-of-type {
+                    &:before {
+                        background-color: map-get($mat-cyan, 500);
+                    }
+                }
+            }
+            .list-level-3 {
+                &>p>.text:first-of-type,
+                &>.text:first-of-type {
+                    &:before {
+                        background-color: map-get($mat-light-blue, 500);
+                    }
+                }
+            }
+            .list-level-4 {
+                &>p>.text:first-of-type,
+                &>.text:first-of-type {
+                    &:before {
+                        background-color: map-get($mat-indigo, 400);
+                    }
+                }
+            }
+            .list-level-5 {
+                &>p>.text:first-of-type,
+                &>.text:first-of-type {
+                    &:before {
+                        background-color: map-get($mat-purple, 400);
+                    }
+                }
+            }
+            .list-level-6 {
+                &>p>.text:first-of-type,
+                &>.text:first-of-type {
+                    &:before {
+                        background-color: map-get($mat-pink, 400);
+                    }
                 }
             }
         }
-        .list-level-3 {
-            &>p>.text:first-of-type,
-            &>.text:first-of-type {
-                &:before {
-                    background-color: map-get($mat-light-blue, 500);
-                }
-            }
-        }
-        .list-level-4 {
-            &>p>.text:first-of-type,
-            &>.text:first-of-type {
-                &:before {
-                    background-color: map-get($mat-indigo, 400);
-                }
-            }
-        }
-        .list-level-5 {
-            &>p>.text:first-of-type,
-            &>.text:first-of-type {
-                &:before {
-                    background-color: map-get($mat-purple, 400);
-                }
-            }
-        }
-        .list-level-6 {
-            &>p>.text:first-of-type,
-            &>.text:first-of-type {
-                &:before {
-                    background-color: map-get($mat-pink, 400);
+        ol {
+            counter-reset: li;
+            &>li {
+                &>p>.text:first-of-type,
+                &>.text:first-of-type {
+                    &:before {
+                        counter-increment: li;
+                        content: counter(li);
+                        height: 3.2rem;
+                        width: 3.2rem;
+                        line-height: 3.2rem;
+                        border: .5rem solid #fff;
+                        border-radius: 3.2rem;
+                    }
                 }
             }
         }
     }
-    ol {
-        counter-reset: li;
-        &>li {
-            &>p>.text:first-of-type,
-            &>.text:first-of-type {
-                &:before {
-                    counter-increment: li;
-                    content: counter(li);
-                    height: 36px;
-                    width: 36px;
-                    line-height: 36px;
-                    border: .3em solid #fff;
-                    border-radius: 36px;
-                }
-            }
-        }
-    }
+
     code.inline-code {
         font-family: $font-code;
         margin: 0 2px;
@@ -248,11 +243,11 @@ markdown {
         background-color: map-get($primary, 50);
     }
     .code-block {
-        width: 100%;
-        margin: 40px 0;
+        @include top-block;
+        width: 95%;
         pre {
             position: relative;
-            width: 80%;
+            width: 85%;
             margin: 0 auto;
             background-color: map-get($accent, 100);
             color: inherit;
@@ -287,29 +282,7 @@ markdown {
                 white-space: pre;
                 background: 0 0;
             }
-            transition: background 400ms cubic-bezier(.25,
-            .8,
-            .25,
-            1),
-            box-shadow 280ms cubic-bezier(.4,
-            0,
-            .2,
-            1);
-            box-shadow: 0 3px 1px -2px rgba(0,
-            0,
-            0,
-            .2),
-            0 2px 2px 0 rgba(0,
-            0,
-            0,
-            .14),
-            0 1px 5px 0 rgba(0,
-            0,
-            0,
-            .12);
-            &:active {
-                box-shadow: 0 5px 5px -3px rgba(0, 0, 0, .2), 0 8px 10px 1px rgba(0, 0, 0, .14), 0 3px 14px 2px rgba(0, 0, 0, .12);
-            }
+            @include normal-shadow;
         }
     }
     aside {
@@ -318,24 +291,13 @@ markdown {
         width: 390px;
     }
     blockquote {
-        padding: 12px;
+        @include top-block;
         max-width: 80%;
-        margin: 0 auto;
-        margin-top: 8px;
-        margin-bottom: 18px;
-        padding: 15px;
-        padding-left: 30px;
+        padding: 25px;
         background: map-get($primary, 50);
         border-left: 8px solid #b2dfdb;
         border-radius: 0 0 0 25px;
-        transition: background 400ms cubic-bezier(.25, .8, .25, 1),
-        box-shadow 280ms cubic-bezier(.4, 0, .2, 1);
-        box-shadow: 0 3px 1px -2px rgba(0, 0, 0, .2),
-        0 2px 2px 0 rgba(0, 0, 0, .14),
-        0 1px 5px 0 rgba(0, 0, 0, .12);
-        &:active {
-            box-shadow: 0 5px 5px -3px rgba(0, 0, 0, .2), 0 8px 10px 1px rgba(0, 0, 0, .14), 0 3px 14px 2px rgba(0, 0, 0, .12);
-        }
+        @include normal-shadow;
         cite {
             font-size: 14px;
             line-height: 20px;
@@ -348,13 +310,7 @@ markdown {
             &:first-of-type {
                 margin-top: 0;
             }
-            margin: 0;
-            margin-top: 26px;
-            color: map-get($accent, 700);
-            text-indent: 0;
-            font-size: 20px;
-            line-height: 1.5em;
-            font-family: $font-quote-text;
+            @include paragraph-text();
         }
         .code-block {
             margin-top: 26px;
@@ -362,8 +318,7 @@ markdown {
         }
     }
     hr {
-        padding: 0;
-        margin: 16px 0;
+        @include top-block;
         border-style: inset;
         border-width: 1px;
         border-bottom: 1px solid #EFEAEA;
@@ -390,10 +345,11 @@ markdown {
         margin-left: 0;
     }
     table {
+        @include top-block;
+        padding: 0;
         border-spacing: 0;
         display: table;
         border: solid #ccc 1px;
-        margin: 20px auto;
         width: 80%;
         thead {
             background: #f7f7f7;
@@ -422,3 +378,216 @@ markdown {
         }
     }
 }
+
+@media (max-width: 768px) {
+    markdown {
+        font-size: 1.4rem;
+        .md-image {
+            @include top-block-mobile;
+            img {
+                max-width: 90%;
+            }
+        }
+        .head-1 {
+            h1 {
+                @include head-common-mobile;
+                margin: 1.5rem 0;
+                padding: 0.5rem 1.2rem;
+                font-size: 2.4rem;
+                line-height: 2.4rem;
+            }
+        }
+        .head-2 {
+            h2 {
+                @include head-common-mobile;
+                margin: 1.5rem 0;
+                padding: 0;
+                font-size: 2.2rem;
+                line-height: 2.2rem;
+                padding-bottom: .5rem;
+            }
+        }
+        .head-3 {
+            h3 {
+                @include head-common-mobile;
+                font-size: 2rem;
+                line-height: 2rem;
+            }
+        }
+        .head-4 {
+            h4 {
+                @include head-common-mobile;
+                font-size: 1.8rem;
+                line-height: 1.8rem;
+            }
+        }
+        .head-5 {
+            h5 {
+                @include head-common-mobile;
+                font-size: 1.6rem;
+                line-height: 1.6rem;
+            }
+        }
+        &>p {
+            width: 96%;
+            @include paragraph-text-mobile;
+            @include top-block-mobile;
+        }
+        code.inline-code {
+            margin: 0 0.2rem;
+            font-size: inherit;
+            padding: 3px 10px;
+            color: inherit;
+            line-height: 32px;
+            height: 32px;
+            background-color: map-get($primary, 50);
+        }
+        .code-block {
+            margin: 1rem 0;
+            pre {
+                position: relative;
+                width: 85%;
+                margin: 0 auto;
+                padding: 1rem 1.5rem;
+                .outline {
+                    font-size: 1.2rem;
+                    font-weight: 100;
+                    padding: 0.3rem 0.4rem 0.5rem .6rem;
+                    border-radius: 0 0 0 0.5rem;
+                    transition: 150ms ease-in-out;
+                    transform-origin: top right;
+                }
+                &:active {
+                    .outline {
+                        transform: rotate(-90deg);
+                    }
+                }
+                code {
+                    font-family: $font-code;
+                    border: 0;
+                    max-width: initial;
+                    padding: 0;
+                    margin: 0;
+                    display: block;
+                    overflow-x: auto;
+                    overflow-y: hidden;
+                    line-height: 1.2rem;
+                    font-size: 1.2rem;
+                    white-space: pre;
+                    background: 0 0;
+                }
+            }
+        }
+        &>.circle-list,
+        &>.rect-list {
+            width: 95%;
+            .rect-list,
+            .circle-list {
+                @include inner-block-mobile;
+            }
+            @include top-block-mobile;
+            ol,
+            ul {
+                padding: 0.5rem 1rem;
+                margin: 0;
+                list-style: none;
+                box-sizing: border-box;
+                &>li {
+                    @include inner-block-mobile;
+                    min-height: 2rem;
+                    margin: 0;
+                    margin-bottom: .8rem;
+                    line-height: 2.4rem;
+                    &>p {
+                        margin: 0;
+                    }
+                    &>p>.text:first-of-type,
+                    &>.text:first-of-type {
+                        @include paragraph-text-mobile;
+                        padding: .7rem 1.5rem .7rem 2.4rem;
+                        &:before {
+                            left: -2.8rem;
+                            top: 50%;
+                            margin-top: -1.9rem;
+                            height: 1.8rem;
+                            width: 1.8rem;
+                            line-height: 1.8rem;
+                            border: 1rem solid #fff;
+                            border-radius: 1.2rem;
+                        }
+                    }
+                    &>p>.text:not(:first-of-type),
+                    &>.text:not(:first-of-type) {
+                        margin-top: .8rem;
+                        margin-left: .9rem;
+                        @include paragraph-text-mobile;
+                    }
+                }
+            }
+
+            ol {
+                counter-reset: li;
+                &>li {
+                    &>p>.text:first-of-type,
+                    &>.text:first-of-type {
+                        padding-left: 2.4rem;
+                        &:before {
+                            counter-increment: li;
+                            content: counter(li);
+                            top: 50%;
+                            height: 2.4rem;
+                            width: 2.4rem;
+                            line-height: 2.4rem;
+                            border: .5rem solid #fff;
+                            border-radius: 2.4rem;
+                        }
+                    }
+                }
+            }
+        }
+        blockquote {
+            @include top-block-mobile;
+            max-width: initial;
+            width: 92%;
+            border-left: .4rem solid #b2dfdb;
+            border-radius: 0 0 0 1.5rem;
+            p {
+                width: 100%;
+                @include inner-block-mobile;
+                @include paragraph-text-mobile;
+                &:first-of-type {
+                    margin-top: 0;
+                }
+                margin: 0;
+                margin-top: 1.4rem;
+                text-indent: 0;
+                font-size: 1.4rem;
+                line-height: 2.4rem;
+            }
+            .code-block {
+                margin-top: 2.6rem;
+                margin-bottom: 0;
+            }
+        }
+        table {
+            margin: 1rem auto;
+            width: 95%;
+            max-width: 95%;
+            min-width: 95%;
+            font-size: 1.2rem;
+            thead {
+                line-height: 2rem;
+            }
+            td,
+            th {
+                padding: .3rem;
+            }
+            th {
+                padding: .3rem;
+            }
+        }
+    }
+}
+
+
+@media (max-width: 568px) {}
