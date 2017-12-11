@@ -1,4 +1,4 @@
-import { AboutModule } from './about.module';
+import { AboutModule } from '../about.module';
 
 describe('AboutModule', () => {
   let aboutModule: AboutModule;

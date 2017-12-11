@@ -2,20 +2,17 @@ import { Component, OnInit, OnDestroy, ViewChild, Inject } from '@angular/core';
 import { Router, ActivatedRoute, NavigationExtras } from '@angular/router';
 import { HttpClient, HttpRequest, HttpEventType, HttpResponse } from '@angular/common/http';
 import { trigger, state, style, animate, transition } from '@angular/animations';
-import { MatSnackBar, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 import { MarkdownDirective } from 'directive/markdown.directive';
+import { AccountService } from 'service/account.service';
 import { ArticleDatabaseService } from 'service/article-database.service';
 import { CategoryDatabaseService } from 'service/category-database.service';
-import { SnackBarService } from 'service/snack-bar.service';
+import { NoticeService } from 'service/notice.service';
 import { NavButtonService } from 'service/nav-button.service';
 import { ScrollorService } from 'service/scrollor.service';
 import { ArticleData, Category, Options } from 'public/data-struct-definition';
 
 import anime from 'animejs';
-
-declare var Prism: any;
-declare var InputEvent: any;
 
 @Component({
     selector: 'la-editor',
@@ -80,8 +77,8 @@ export class EditorComponent implements OnInit, OnDestroy {
         private _article_db: ArticleDatabaseService,
         private _category_db: CategoryDatabaseService,
         private _nav_button: NavButtonService,
-        public snack_bar: SnackBarService,
-        public dialog: MatDialog
+        private _notice: NoticeService,
+        private _account: AccountService,
     ) {
 
     }
@@ -271,10 +268,13 @@ export class EditorComponent implements OnInit, OnDestroy {
                     if (res['result']) {
                         this._article_db.fetch(res['data']['article_id']);
                         this._article_db.on_edit_data.next(new ArticleData({}));
-                        this.snack_bar.show('Save Article Successfully.', 'OK', null);
+                        this._notice.bar('Save Article Successfully.', 'OK', null);
                         this._category_db.clear_category_cache(this._last_category_id);
                         this._category_db.update_home(this.current_category.category_id, new Options({ flush: true }));
                         this._router.navigate(['/editor/' + res['data']['article_id']]);
+                        this._article_db.article_status = 'saved';
+                    } else {
+
                     }
                 });
         } else {
@@ -287,12 +287,46 @@ export class EditorComponent implements OnInit, OnDestroy {
                 res => {
                     if (res['result']) {
                         this._article_db.current_article = new ArticleData(res['data']);
-                        this.snack_bar.show('Save Article Successfully.', 'OK', null);
+                        this._notice.bar('Save Article Successfully.', 'OK', null);
                         if (this._last_category_id !== this.current_category.category_id) {
                             this._category_db.clear_category_cache(this._last_category_id);
                             this._last_category_id = this.current_category.category_id;
                             this._category_db.update_home(this.current_category.category_id, new Options({ flush: true }));
                         }
+                        this._article_db.article_status = 'saved';
+                    } else if (res['status'] === 3005) {
+                        this._notice.input({
+                            input_list: [{
+                                name: 'email_or_name',
+                                placeholder: '邮箱/用户名',
+                                value: '',
+                                required: true,
+                            }, {
+                                name: 'password',
+                                placeholder: '密码',
+                                value: '',
+                                required: true,
+                                type: 'password'
+                            }]
+                        }, res => {
+                            if (!res) { return; }
+                            this._http.post(
+                                '/middle/user',
+                                {
+                                    name: res.email_or_name.value,
+                                    password: res.password.value
+                                }).subscribe(
+                                data => {
+                                    if (data['result'] === 1) {
+                                        this._account.data = data['data'];
+                                        this._notice.bar('登陆成功，请重新进行保存操作', 'OK');
+                                    } else if (data['status'] === 3002) {
+                                        this._notice.bar('账户未激活，联系作者以激活账户', 'OK');
+                                    } else {
+                                        this._notice.bar(data['msg'], 'OK');
+                                    }
+                                });
+                        });
                     }
                 });
         }
@@ -305,18 +339,16 @@ export class EditorComponent implements OnInit, OnDestroy {
             publish_status: 1
         }).subscribe(
             res => {
-                this.snack_bar.show('Publish Article Successfully.', 'OK', null);
+                this._notice.bar('Publish Article Successfully.', 'OK', null);
             });
     }
 
     delete_confirm(event) {
         event.stopPropagation();
         event.preventDefault();
-        this.dialog.open(WarningComponent, {
-            data: {
-                msg: '彻底删除当前文章'
-            }
-        }).afterClosed().subscribe(res => {
+        this._notice.warn({
+            msg: '彻底删除当前文章'
+        }, res => {
             if (res) {
                 this.delete_article();
             }
@@ -383,7 +415,7 @@ export class EditorComponent implements OnInit, OnDestroy {
     save_button_click() {
         if (this._article_db.article_status === 'modified') {
             this.save_article();
-            this._article_db.article_status = 'saved';
+
         } else if (this._article_db.article_status === 'saved') {
             this.publish_article();
             this._article_db.article_status = 'published';
@@ -533,45 +565,5 @@ export class EditorComponent implements OnInit, OnDestroy {
             return event;
         }
         event.preventDefault();
-    }
-}
-
-@Component({
-    selector: 'la-input',
-    templateUrl: './input.component.html',
-    styleUrls: ['./editor.component.scss']
-})
-export class InputComponent {
-    public name = '';
-    constructor(
-        public dialogRef: MatDialogRef<InputComponent>,
-        @Inject(MAT_DIALOG_DATA) public data: any,
-    ) { }
-
-    submit(event) {
-        if (event.type === 'keyup' && event.key === 'Enter') {
-            this.dialogRef.close(this.data.name);
-            return false;
-        }
-    }
-}
-
-@Component({
-    selector: 'la-warning',
-    templateUrl: '../../public/warning.component.html',
-    styleUrls: ['./editor.component.scss']
-})
-export class WarningComponent {
-    public name = '';
-    constructor(
-        public dialogRef: MatDialogRef<WarningComponent>,
-        @Inject(MAT_DIALOG_DATA) public data: any,
-    ) { }
-
-    submit(event) {
-        if (event.type === 'keyup' && event.key === 'Enter') {
-            this.dialogRef.close(false);
-            return false;
-        }
     }
 }

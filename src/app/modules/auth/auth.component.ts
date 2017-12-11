@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 
 import { AccountService } from 'service/account.service';
-import { SnackBarService } from 'service/snack-bar.service';
+import { NoticeService } from 'service/notice.service';
 import { NavButtonService } from 'service/nav-button.service';
 import { Account } from 'public/data-struct-definition';
 
@@ -59,7 +59,7 @@ export class AuthComponent implements OnInit, OnDestroy {
         private _http: HttpClient,
         private _router: Router,
         private _active_route: ActivatedRoute,
-        private _snack_bar: SnackBarService,
+        private _notice: NoticeService,
         private _account: AccountService,
         private _nav_button: NavButtonService,
     ) { }
@@ -107,10 +107,10 @@ export class AuthComponent implements OnInit, OnDestroy {
                             this._router.navigate([params['backurl'] || '/home']);
                         });
                 } else if (data['status'] === 3002) {
-                    this._snack_bar.show('Inactivated account, connect author to active your account.', 'OK');
+                    this._notice.bar('Inactivated account, connect author to active your account.', 'OK');
                     return false;
                 } else {
-                    this._snack_bar.show(data['msg'], 'OK');
+                    this._notice.bar(data['msg'], 'OK');
                     return false;
                 }
             });
@@ -132,7 +132,7 @@ export class AuthComponent implements OnInit, OnDestroy {
             not_regular = true;
         }
         if (not_regular) {
-            this._snack_bar.show(message, 'OK');
+            this._notice.bar(message, 'OK');
             return false;
         }
         this._http.put(
@@ -144,10 +144,10 @@ export class AuthComponent implements OnInit, OnDestroy {
             }).subscribe(
             data => {
                 if (data['result'] === 1) {
-                    this._snack_bar.show('Sign Up Successfully.', 'OK');
+                    this._notice.bar('Sign Up Successfully.', 'OK');
                     this.tab_select = 0;
                 } else {
-                    this._snack_bar.show(data['msg'], 'OK');
+                    this._notice.bar(data['msg'], 'OK');
                     return false;
                 }
             });

@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { SnackBarService } from 'service/snack-bar.service';
 import { Account } from 'public/data-struct-definition';
 import { scheduleMicroTask } from '@angular/core/src/util';
 
@@ -12,7 +11,6 @@ export class ScrollorService {
 
     constructor(
         private _http: HttpClient,
-        private _snack_bar: SnackBarService,
     ) { }
 
     goto_top(event?) {
@@ -47,7 +45,6 @@ export class ScrollorService {
     }
 
     goto(from, to, steps: number = 15) {
-        // let current_scroll_top = document.scrollingElement.scrollTop;
 
         if (from > to) {
             const delta = (from - to) / steps;

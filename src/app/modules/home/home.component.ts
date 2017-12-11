@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, ElementRef, ViewChild, AfterViewInit, Inject } from '@angular/core';
-import { MatSnackBar, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatSnackBar } from '@angular/material';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { trigger, state, style, animate, transition } from '@angular/animations';
@@ -8,11 +8,14 @@ import { FocusTrap, FocusTrapFactory } from '@angular/cdk/a11y';
 import { SortablejsOptions } from 'angular-sortablejs';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
+// service
 import { NavProfileService } from 'service/nav-profile.service';
 import { CategoryDatabaseService, CategorySource } from 'service/category-database.service';
 import { AccountService } from 'service/account.service';
 import { ScrollorService } from 'service/scrollor.service';
+import { NoticeService } from 'service/notice.service';
 import { NavButtonService } from 'service/nav-button.service';
+
 import { ArticleData, Category, Options, NavButton } from 'public/data-struct-definition';
 
 import anime from 'animejs';
@@ -144,9 +147,9 @@ export class HomeComponent implements OnInit, OnDestroy {
         private _account: AccountService,
         private _category_db: CategoryDatabaseService,
         private _scrollor: ScrollorService,
+        private _notice: NoticeService,
         private _focusTrapFactory: FocusTrapFactory,
         private _nav_button: NavButtonService,
-        public dialog: MatDialog,
     ) { }
 
     get outer_width(): number {
@@ -253,12 +256,23 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     input_category() {
-        this.dialog.open(AddCategoryComponent, {
-            data: {
-                name: '',
-                placeholder: 'Enter a New Name'
-            }
-        }).afterClosed().subscribe(name => { this.add_category(name); });
+        this._notice.input(
+            {
+                input_list: [{
+                    name: 'category_name',
+                    placeholder: 'Enter a New Name',
+                    value: '',
+                    required: true
+                }, {
+                    name: 'category_outline',
+                    placeholder: 'Enter a Outline',
+                    value: '',
+                    required: false
+                }]
+            }, data => {
+                if (!data) { return; }
+                this.add_category(data.category_name.value);
+            });
     }
 
     add_category(category_name) {
@@ -275,19 +289,19 @@ export class HomeComponent implements OnInit, OnDestroy {
     modify_category(event, category) {
         event.stopPropagation();
         event.preventDefault();
-        this.dialog.open(AddCategoryComponent, {
-            data: {
-                name: category.category_name,
-                placeholder: 'Change Name of The Category'
-            }
-        }).afterClosed().subscribe(
-            res => {
-                if (!res) { return; }
-
+        this._notice.input(
+            {
+                input_list: [{
+                    name: 'category_name',
+                    placeholder: 'Change Name of The Category',
+                    value: category.category_name
+                }]
+            }, data => {
+                if (!data) { return; }
                 this._http_client.post(
                     '/middle/category', {
                         category_id: category.category_id,
-                        category_name: res
+                        category_name: data.category_name.value
                     }
                 ).subscribe(
                     update_category_data => {
@@ -301,15 +315,16 @@ export class HomeComponent implements OnInit, OnDestroy {
     delete_confirm(event, category_id) {
         event.stopPropagation();
         event.preventDefault();
-        this.dialog.open(WarningComponent, {
-            data: {
+        this._notice.warn(
+            {
                 msg: '删除分类以及分类中所有的文章'
+            },
+            res => {
+                if (res) {
+                    this.delete_category(category_id);
+                }
             }
-        }).afterClosed().subscribe(res => {
-            if (res) {
-                this.delete_category(category_id);
-            }
-        });
+        )
         return false;
     }
 
@@ -343,42 +358,3 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 }
 
-@Component({
-    selector: 'la-add-category',
-    templateUrl: './add-category.component.html',
-    styleUrls: ['./home.component.scss']
-})
-export class AddCategoryComponent {
-    public name = '';
-    constructor(
-        public dialogRef: MatDialogRef<AddCategoryComponent>,
-        @Inject(MAT_DIALOG_DATA) public data: any,
-    ) { }
-
-    submit(event) {
-        if (event.type === 'keyup' && event.key === 'Enter') {
-            this.dialogRef.close(this.data.name);
-            return false;
-        }
-    }
-}
-
-@Component({
-    selector: 'la-warning',
-    templateUrl: '../../public/warning.component.html',
-    styleUrls: ['./home.component.scss']
-})
-export class WarningComponent {
-    public name = '';
-    constructor(
-        public dialogRef: MatDialogRef<WarningComponent>,
-        @Inject(MAT_DIALOG_DATA) public data: any,
-    ) { }
-
-    submit(event) {
-        if (event.type === 'keyup' && event.key === 'Enter') {
-            this.dialogRef.close(false);
-            return false;
-        }
-    }
-}

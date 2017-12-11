@@ -1,4 +1,4 @@
-import { EditorModule } from './editor.module';
+import { EditorModule } from '../editor.module';
 
 describe('EditorModule', () => {
   let editorModule: EditorModule;

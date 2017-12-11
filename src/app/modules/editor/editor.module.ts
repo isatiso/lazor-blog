@@ -15,7 +15,9 @@ import {
 } from '@angular/material';
 
 import { EditorRoutingModule } from './editor-routing.module';
-import { EditorComponent, InputComponent, WarningComponent } from './editor.component';
+import { EditorComponent } from './editor.component';
+import { InputDialogModule } from 'public/input-dialog/input-dialog.module';
+import { WarningModule } from 'public/warning/warning.module';
 import { NavButtonModule } from 'public/nav-button/nav-button.module';
 import { MarkdownModule } from 'public/markdown/markdown.module';
 
@@ -34,16 +36,12 @@ import { MarkdownModule } from 'public/markdown/markdown.module';
         MatTooltipModule,
         MatProgressBarModule,
         NavButtonModule,
+        WarningModule,
+        InputDialogModule,
         EditorRoutingModule
     ],
-    entryComponents: [
-        InputComponent,
-        WarningComponent
-    ],
     declarations: [
-        EditorComponent,
-        InputComponent,
-        WarningComponent
+        EditorComponent
     ]
 })
 export class EditorModule { }

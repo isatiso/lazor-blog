@@ -1,10 +1,11 @@
 var gulp = require('gulp');
 var del = require('del');
 let babel = require('gulp-babel');
-var minify = require('gulp-minify');
+// var minify = require('gulp-minify');
 var uglify = require('gulp-uglify');
 var gutil = require('gulp-util');
 var pump = require('pump');
+const minify = require("gulp-babel-minify");
 
 // gulp.task('default', function () {
 //     del(['dist/*.js.map']);
@@ -16,8 +17,8 @@ var pump = require('pump');
 gulp.task('default', function () {
     gulp.src('dist/*.js')
         .pipe(minify({
-            ext: {
-                min: '.js'
+            mangle: {
+                keepClassName: true
             }
         }))
         .on('error', function (err) {

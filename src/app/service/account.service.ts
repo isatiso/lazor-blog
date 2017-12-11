@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { SnackBarService } from 'service/snack-bar.service';
+import { NoticeService } from 'service/notice.service';
 import { Account } from 'public/data-struct-definition';
 
 @Injectable()
@@ -12,7 +12,7 @@ export class AccountService {
 
     constructor(
         private _http: HttpClient,
-        private _snack_bar: SnackBarService,
+        private _notice: NoticeService,
     ) { }
 
     set data(value: Account) {
@@ -31,12 +31,12 @@ export class AccountService {
             res => {
                 if (!res['result']) {
                     if (res['status'] === 3004) {
-                        this._snack_bar.show('User name exists. Please choose another.');
+                        this._notice.bar('User name exists. Please choose another.');
                     }
                 } else {
                     this.data.user_name = username;
                     window.localStorage.setItem('user_name', username);
-                    this._snack_bar.show('Successfully.');
+                    this._notice.bar('Successfully.');
                 }
             },
             error => {

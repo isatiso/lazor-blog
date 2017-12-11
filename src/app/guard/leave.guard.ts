@@ -8,7 +8,7 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 
-import { SnackBarService } from 'service/snack-bar.service';
+import { NoticeService } from 'service/notice.service';
 import { AccountService } from 'service/account.service';
 import { ArticleDatabaseService } from 'service/article-database.service';
 
@@ -21,7 +21,7 @@ export class LeaveGuard implements CanDeactivate<null> {
         private _router: Router,
         private _account: AccountService,
         private _article_db: ArticleDatabaseService,
-        private _snack_bar: SnackBarService,
+        private _notice: NoticeService,
     ) { }
 
     canDeactivate(
@@ -31,7 +31,7 @@ export class LeaveGuard implements CanDeactivate<null> {
         nextState: RouterStateSnapshot
     ): Observable<boolean> | Promise<boolean> | boolean {
         if (this._article_db.article_status === 'modified') {
-            this._snack_bar.show('Please save your article.', 'OK');
+            this._notice.bar('Please save your article.', 'OK');
             return false;
         } else {
             return true;

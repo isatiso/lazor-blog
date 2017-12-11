@@ -9,7 +9,7 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 
 import { AccountService } from 'service/account.service';
-import { SnackBarService } from 'service/snack-bar.service';
+import { NoticeService } from 'service/notice.service';
 
 @Injectable()
 export class ArticleOwnerGuard implements CanActivate {
@@ -17,7 +17,7 @@ export class ArticleOwnerGuard implements CanActivate {
     constructor(
         private _http: HttpClient,
         private _router: Router,
-        private _snack_bar: SnackBarService,
+        private _notice: NoticeService,
         private _account: AccountService
     ) { }
 
@@ -33,7 +33,7 @@ export class ArticleOwnerGuard implements CanActivate {
             data => {
                 if (data['result'] !== 1) {
                     const message = 'You can\'t edit other\'s article.';
-                    this._snack_bar.show(message, 'OK');
+                    this._notice.bar(message, 'OK');
                     return false;
                 } else {
                     return true;

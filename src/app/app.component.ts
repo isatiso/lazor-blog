@@ -144,7 +144,6 @@ export class AppComponent implements OnInit, AfterViewInit {
         setTimeout(() => {
             wrapperEl.innerHTML = '';
         }, 1000);
-        // console.log(this.footer);
         setTimeout(() => {
             this.app_container.nativeElement.style.minHeight = window.innerHeight - this.footer.nativeElement.clientHeight + 'px';
         }, 0);
