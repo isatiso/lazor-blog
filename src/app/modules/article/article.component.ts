@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, Inject, OnInit, OnDestroy, ViewChild, AfterViewInit } from '@angular/core';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { Router, ActivatedRoute, NavigationExtras } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
@@ -32,7 +32,7 @@ import anime from 'animejs';
         ])
     ]
 })
-export class ArticleComponent implements OnInit {
+export class ArticleComponent implements OnInit, AfterViewInit {
 
     public render_latex: any;
     public page_appear: number;
@@ -72,13 +72,6 @@ export class ArticleComponent implements OnInit {
     ngOnInit() {
         document.scrollingElement.scrollTop = 0;
         this.page_appear = 1;
-        const article_id = this._activate_route.params['value']['id'];
-        const flush = Boolean(this._activate_route.queryParams['value']['from'] === 'editor');
-        this._article_db.fetch(article_id, new Options({ flush: flush })).subscribe(
-            res => {
-                this.render_latex = article_id;
-            }
-        );
         this._nav_button.button_list = [{
             name: 'navEditor',
             icon: () => 'mode_edit',
@@ -90,6 +83,16 @@ export class ArticleComponent implements OnInit {
             callback: event => this._scrollor.goto_top(event),
             tool_tip: () => '回到顶部 (ctrl + ↑)',
         }];
+    }
+
+    ngAfterViewInit() {
+        const article_id = this._activate_route.params['value']['id'];
+        const flush = Boolean(this._activate_route.queryParams['value']['from'] === 'editor');
+        this._article_db.fetch(article_id, new Options({ flush: flush })).subscribe(
+            res => {
+                setTimeout(() => { this.render_latex = article_id; }, 0);
+            }
+        );
     }
 
     show_nav_button(event) {
@@ -129,7 +132,7 @@ export class ArticleComponent implements OnInit {
                     offset: 0,
                     easing: 'linear'
                 });
-                console.log(this.nav_guide_icon._elementRef);
+
                 this.menu_anime_handler.play();
             } else {
                 this.menu_anime_handler.reverse();
@@ -189,7 +192,7 @@ export class ArticleComponent implements OnInit {
     change(article_id) {
         this.page_appear = 0;
         setTimeout(() => {
-            this._router.navigate(['/article/' + article_id]).then(() => { this.ngOnInit(); });
+            this._router.navigate(['/article/' + article_id]).then(() => { this.ngOnInit(); this.ngAfterViewInit(); });
             document.scrollingElement.scrollTop = 0;
         }, 300);
     }

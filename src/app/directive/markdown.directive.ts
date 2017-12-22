@@ -1,15 +1,18 @@
 import { Directive, ElementRef, OnInit, Input } from '@angular/core';
 import { MarkdownService } from 'service/markdown.service';
 
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+
 @Directive({
     selector: 'markdown, [laMarkdown]'
 })
 export class MarkdownDirective implements OnInit {
     private _data: string;
+    private _ticker_handler: any;
 
     constructor(
         private _markdown: MarkdownService,
-        private el: ElementRef,
+        private _el: ElementRef,
     ) { }
 
     ngOnInit() {
@@ -18,24 +21,14 @@ export class MarkdownDirective implements OnInit {
 
     @Input()
     set data(value: string) {
-        if (value !== null) {
-            this._data = value;
-            this.onDataChange(value);
-        }
+        this._data = value;
     }
 
     @Input()
     set renderLatex(value: any) {
         if (value) {
-            this._markdown.latexRender(this.el.nativeElement);
-        }
-    }
-
-    onDataChange(data: string) {
-        if (data) {
-            this.el.nativeElement.innerHTML = this._markdown.compile(data);
-        } else {
-            this.el.nativeElement.innerHTML = '';
+            this._markdown.render(this._el, this._data);
+            this._markdown.latexRender(this._el.nativeElement);
         }
     }
 }

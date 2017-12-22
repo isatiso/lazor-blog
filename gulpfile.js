@@ -36,9 +36,9 @@ gulp.task('debug', function (cb) {
     pump([
         gulp.src('dist/*.js'),
         minify({
-            ext: {
-                min: '.js'
-            }
+            mangle: {
+                keepClassName: true
+            } 
         }),
         gulp.dest('./dist/')
     ], cb);

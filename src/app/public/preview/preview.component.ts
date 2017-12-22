@@ -17,10 +17,19 @@ export class PreviewComponent implements OnInit {
     ) { }
 
     ngOnInit() {
+        console.log(this.image);
         setTimeout(() => {
+            const h = this.image.nativeElement.naturalHeight;
+            const w = this.image.nativeElement.naturalWidth;
+            const W = window.innerWidth;
+            const H = window.innerHeight;
+            const rh = h / H;
+            const rw = w / W;
+            let r = (rh > rw ? rh : rw);
+            r = r > 1 ? r : 1;
             this.dialogRef.updateSize(
-                this.image.nativeElement.naturalWidth + 48 + 'px',
-                this.image.nativeElement.naturalHeight + 48 + 'px');
+                w / r + 48 + 'px',
+                h / r + 48 + 'px');
         }, 0);
     }
 

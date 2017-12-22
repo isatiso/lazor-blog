@@ -11,7 +11,7 @@ import { ArticleData, Category, Options } from 'public/data-struct-definition';
 
 @Injectable()
 export class CategoryDatabaseService {
-    category_list_data: BehaviorSubject<Category[]> = new BehaviorSubject<Category[]>([]);
+    category_list_data: BehaviorSubject<Category[]> = new BehaviorSubject<Category[]>(null);
     home_list_data: BehaviorSubject<ArticleData[]> = new BehaviorSubject<ArticleData[]>([]);
     view_list_data: BehaviorSubject<ArticleData[]> = new BehaviorSubject<ArticleData[]>([]);
     index_article_list: BehaviorSubject<ArticleData[]> = new BehaviorSubject<ArticleData[]>([]);
@@ -171,7 +171,7 @@ export class CategoryDatabaseService {
             return article_list;
         };
 
-        if (!this.category_list.length) {
+        if (this.category_list === null) {
             this.pull(new Options({ flush: true, article_id: options.article_id }));
         } else {
             if (!category_id) {
@@ -376,6 +376,7 @@ export class CategoryDatabaseService {
         const current_index = this.view_list.findIndex(el => {
             return el.article_id === article_id;
         });
+
         if (current_index !== -1) {
             this.next = current_index === 0 ? null : this.view_list[current_index - 1];
             this.last = current_index === length - 1 ? null : this.view_list[current_index + 1];

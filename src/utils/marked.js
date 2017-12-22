@@ -1064,7 +1064,6 @@
                 {
                     var body = '';
                     const list_level = this.token.list_level;
-                    console.log(this.token);
                     while (this.next().type !== 'list_item_end') {
                         body += this.token.type === 'text' ? this.parseText() : this.tok();
                     }

@@ -1,4 +1,4 @@
-<div class="container article-container" [@pageAppear]="page_appear" (window:mousemove)="show_nav_button($event)" (window:keydown)="boss_key($event)">
+<div class="container article-container" [@pageAppear]="page_appear" (window:keydown)="boss_key($event)">
     <mat-card>
         <div class="title">
             {{ current_article.title }}
@@ -10,15 +10,6 @@
         </div>
         <div class="divider"></div>
         <markdown [data]="current_article.content" [renderLatex]="render_latex" (click)="preview_image($event)"></markdown>
-        <!-- <la-nav-button [buttonList]="button_list"></la-nav-button> -->
-        
-        <!-- <button #navGuide mat-fab color="primary" class="markdown-showup" (click)="toggle_menu($event)" (mouseenter)="toggle_menu($event)" id="nav-guide">
-                <mat-icon #navGuideIcon class="big-icon">menu</mat-icon></button>
-        <button #navEditor mat-mini-fab (click)="go_editor($event)" class="markdown-option" *ngIf="true" matTooltip="编辑文章 (ctrl + E)" matTooltipPosition="left">
-            <mat-icon class="big-icon">mode_edit</mat-icon></button>
-        <button #navTop mat-mini-fab (click)="go_top($event)" class="markdown-option" *ngIf="true" matTooltip="回到顶部 (ctrl + ↑)" matTooltipPosition="left">
-            <mat-icon class="big-icon">arrow_upward</mat-icon></button> -->
-
         <div class="last-next">
             <a *ngIf="last_article" class="last" (click)="go_last($event)">上一篇: {{ last_article.title }}</a>
             <span *ngIf="!last_article" class="last">上一篇: 没有了</span>

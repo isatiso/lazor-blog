@@ -9,15 +9,6 @@ import { NavButtonService } from 'service/nav-button.service';
 
 import anime from 'animejs';
 
-const cssSelector = anime({
-    targets: '#anime-target',
-    translateX: 250,
-    rotate: 540,
-    loop: true
-});
-
-console.log(cssSelector);
-
 @Component({
     selector: 'la-index',
     templateUrl: './index.component.html',
@@ -103,7 +94,6 @@ export class IndexComponent implements OnInit, OnDestroy {
     }
 
     trig_article_list(category_id) {
-        // console.log(category_id);
         this._router.navigate([`/index/${category_id}`]);
         this._category_db.shuffle(category_id);
     }

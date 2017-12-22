@@ -77,7 +77,6 @@
 ;
 (function () {
     const wrapperEl = document.querySelector('#loading-wrapper');
-    console.log(wrapperEl);
     const numberOfEls = 24;
     const duration = 3000;
     const delay = duration / numberOfEls;

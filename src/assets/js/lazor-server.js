@@ -1,5 +1,5 @@
 var showNotification = true;
-var VERSION = '1.0.11';
+var VERSION = '1.1.25';
 var NEED_CACHE = false;
 
 self.addEventListener('install', function (event) {
@@ -45,6 +45,7 @@ self.addEventListener('fetch', event => {
         return;
     }
     var br;
+
     if (NEED_CACHE && (br = bundle_regex.exec(this_url.pathname))) {
         // console.log(br[2] + '.' + br[3]);
         let cache_name;

@@ -133,6 +133,9 @@ markdown {
                 &>p {
                     margin: 0 0;
                 }
+                &:last-of-type {
+                    margin-bottom: 0;
+                }
                 &>p>.text:first-of-type,
                 &>.text:first-of-type {
                     @include paragraph-text();
@@ -309,6 +312,9 @@ markdown {
         p {
             &:first-of-type {
                 margin-top: 0;
+            }
+            &:last-of-type {
+                margin-bottom: 0;
             }
             @include paragraph-text();
         }
@@ -522,6 +528,10 @@ markdown {
                         margin-left: .9rem;
                         @include paragraph-text-mobile;
                     }
+                    &>p>.text:last-of-type,
+                    &>.text:last-of-type {
+                        margin-bottom: 0;
+                    }
                 }
             }
 
@@ -555,9 +565,6 @@ markdown {
                 width: 100%;
                 @include inner-block-mobile;
                 @include paragraph-text-mobile;
-                &:first-of-type {
-                    margin-top: 0;
-                }
                 margin: 0;
                 margin-top: 1.4rem;
                 text-indent: 0;

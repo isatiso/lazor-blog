@@ -23,7 +23,7 @@ export class MarkdownService {
     }
 
     // public get renderer() {
-        // return this._renderer;
+    // return this._renderer;
     // }
 
     // handle data
@@ -63,6 +63,14 @@ export class MarkdownService {
                 availableFonts: []
             }
         });
+    }
+
+    public render(el: any, data: string) {
+        if (data) {
+            el.nativeElement.innerHTML = this.compile(data);
+        } else {
+            el.nativeElement.innerHTML = '';
+        }
     }
 
     // comple markdown to html
