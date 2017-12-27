@@ -44,7 +44,7 @@ export class EditorComponent implements OnInit, OnDestroy {
     public page_appear = 'active';
     public content_rows = 0;
     public tab_select_value = 0;
-    public render_latex = false;
+    public render_latex = 0;
     public progress_value = 0;
     public progress_state = 'inactive';
     public left_scroll_top = 0;
@@ -245,12 +245,12 @@ export class EditorComponent implements OnInit, OnDestroy {
         this.tab_select = event;
         const current_scroll_top = document.scrollingElement.scrollTop;
         if (event === 1) {
-            this.render_latex = true;
+            this.render_latex = 1;
             setTimeout(() => {
                 this._scrollor.goto(current_scroll_top, this.right_scroll_top, 30);
             }, 0);
         } else {
-            this.render_latex = false;
+            this.render_latex = 0;
             setTimeout(() => {
                 this._scrollor.goto(current_scroll_top, this.left_scroll_top, 30);
             }, 0);
@@ -262,6 +262,7 @@ export class EditorComponent implements OnInit, OnDestroy {
             this._http.put('/middle/article', {
                 title: this.title,
                 content: this.content,
+                img_list: this._article_db.img_list,
                 category_id: this.current_category.category_id,
             }).subscribe(
                 res => {
@@ -308,13 +309,13 @@ export class EditorComponent implements OnInit, OnDestroy {
                                 required: true,
                                 type: 'password'
                             }]
-                        }, res => {
+                        }, login_res => {
                             if (!res) { return; }
                             this._http.post(
                                 '/middle/user',
                                 {
-                                    name: res.email_or_name.value,
-                                    password: res.password.value
+                                    name: login_res.email_or_name.value,
+                                    password: login_res.password.value
                                 }).subscribe(
                                 data => {
                                     if (data['result'] === 1) {
@@ -330,7 +331,6 @@ export class EditorComponent implements OnInit, OnDestroy {
                     }
                 });
         }
-
     }
 
     publish_article() {
@@ -377,10 +377,14 @@ export class EditorComponent implements OnInit, OnDestroy {
     }
 
     upload_file(event) {
+        if (this.image_upload.nativeElement.files.length > 15) {
+            this._notice.bar('最多同时上传 15 个文件');
+            return false;
+        }
         const file = new FormData(this.image_form.nativeElement);
         this._article_db.article_status = 'modified';
         this.image_upload.nativeElement.value = '';
-        const req = new HttpRequest('PUT', '/middle/file', file, {
+        const req = new HttpRequest('PUT', '/middle/image', file, {
             reportProgress: true,
         });
         this.progress_bar.color = 'primary';
@@ -392,10 +396,15 @@ export class EditorComponent implements OnInit, OnDestroy {
                     this.progress_value = percentDone;
                 } else if (next instanceof HttpResponse) {
                     const content_index = this.content_ref.nativeElement.selectionStart;
-                    const file_path = 'https://lazor.cn' + next.body['data']['file_path'];
+
                     const left = this.content.slice(0, content_index);
                     const right = this.content.slice(content_index);
-                    const content = `![${next.body['data']['file_name']}](${file_path} "${next.body['data']['file_name']}")\n`;
+                    const file_list = next.body['data']['file_list'];
+                    let content = '';
+                    for (const fp of file_list) {
+                        const file_path = 'https://lazor.cn' + fp['path'];
+                        content += `![${fp['name']}](${file_path} "${fp['name']}")\n`;
+                    }
 
                     this.content = left + content + right;
                     setTimeout(() => {

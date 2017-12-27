@@ -5,6 +5,7 @@ import 'rxjs/add/observable/throw';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
 
+import { ArticleDatabaseService } from 'service/article-database.service';
 import { Marked } from './marked';
 
 // A javascript lib has import, so here is just a delaration
@@ -15,8 +16,11 @@ export class MarkdownService {
 
     // private _renderer: any = new marked.Renderer();
     private _marked: any = new Marked();
+    public img_list: string[] = [];
 
-    constructor() {
+    constructor(
+        private _article_db: ArticleDatabaseService,
+    ) {
         // this.extendRenderer();
         this.setMarkedOptions({});
         this.setMathJaxOptions({});
@@ -68,6 +72,7 @@ export class MarkdownService {
     public render(el: any, data: string) {
         if (data) {
             el.nativeElement.innerHTML = this.compile(data);
+            this._article_db.img_list = this._marked.img_list.slice();
         } else {
             el.nativeElement.innerHTML = '';
         }

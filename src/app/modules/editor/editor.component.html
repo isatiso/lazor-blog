@@ -33,9 +33,10 @@
         </mat-tab-group>
         <!-- <la-nav-button [buttonList]="button_list"></la-nav-button> -->
     </mat-card>
-    <form class="add-image-form" action="/middle/file" method="post" enctype="multipart/form-data" #imageForm>
+    <form class="add-image-form" action="" method="post" enctype="multipart/form-data" #imageForm>
         <label for="image_uploads">Choose file to upload</label>
-        <input type="file" id="image_uploads" name="file" multiple #imageUpload (change)="upload_file($event)" />
+        <input type="file" accept="image/*" id="image_uploads" name="file" multiple #imageUpload (change)="upload_file($event)" />
+        <input type="text" name="image_type" value="image" />
         <input type="submit" value="Save" (click)="upload_file($event)" />
     </form>
 

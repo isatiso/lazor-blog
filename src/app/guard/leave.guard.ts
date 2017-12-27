@@ -31,8 +31,11 @@ export class LeaveGuard implements CanDeactivate<null> {
         nextState: RouterStateSnapshot
     ): Observable<boolean> | Promise<boolean> | boolean {
         if (this._article_db.article_status === 'modified') {
-            this._notice.bar('Please save your article.', 'OK');
-            return false;
+            return this._notice.warn({
+                msg: '丢弃所有未保存的数据并离开'
+            }, res => {
+                return res;
+            });
         } else {
             return true;
         }

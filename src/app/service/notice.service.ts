@@ -1,9 +1,13 @@
 import { Injectable, Input } from '@angular/core';
 import { MatSnackBar, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/catch';
+
 import { WarningComponent } from 'public/warning/warning.component';
 import { InputDialogComponent } from 'public/input-dialog/input-dialog.component';
 import { PreviewComponent } from 'public/preview/preview.component';
+import { Observable } from 'rxjs/Observable';
 
 @Injectable()
 export class NoticeService {
@@ -21,25 +25,40 @@ export class NoticeService {
                 duration: 2000
             }
         );
-        snack_ref.onAction().subscribe(action);
+        if (action) {
+            snack_ref.onAction().map(action).catch(
+                error => {
+                    console.log(error); return new Observable();
+                });
+        }
+
     }
 
     input(data: any, callback: (res) => any) {
-        this._dialog.open(InputDialogComponent, {
+        return this._dialog.open(InputDialogComponent, {
             data: data
-        }).afterClosed().subscribe(callback);
+        }).afterClosed().map(callback).catch(
+            (error, caught) => {
+                console.log(error, caught); return new Observable();
+            });
     }
 
     preview(data: any, callback: () => any) {
-        this._dialog.open(PreviewComponent, {
+        return this._dialog.open(PreviewComponent, {
             data: data
-        }).afterClosed().subscribe(callback);
+        }).afterClosed().map(callback).catch(
+            (error, caught) => {
+                console.log(error, caught); return new Observable();
+            });
     }
 
     warn(data: any, callback: (res) => any) {
-        this._dialog.open(WarningComponent, {
+        return this._dialog.open(WarningComponent, {
             data: data
-        }).afterClosed().subscribe(callback);
+        }).afterClosed().map(callback).catch(
+            (error, caught) => {
+                console.log(error, caught); return new Observable();
+            });
     }
 }
 

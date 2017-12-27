@@ -17,7 +17,6 @@ export class PreviewComponent implements OnInit {
     ) { }
 
     ngOnInit() {
-        console.log(this.image);
         setTimeout(() => {
             const h = this.image.nativeElement.naturalHeight;
             const w = this.image.nativeElement.naturalWidth;

@@ -77,3 +77,15 @@ export interface NavButton {
     color?: () => string;
     tool_tip?: () => string;
 }
+
+export class ImageItem {
+    name: string;
+    path: string;
+    image_id: string;
+
+    constructor(options: object) {
+        this.name = options['name'] || '';
+        this.path = options['path'] || '';
+        this.image_id = options['image_id'] || '';
+    }
+}

@@ -683,6 +683,7 @@ class InlineLexer {
     rules: any;
     renderer: any;
     inLink: any;
+    img_checker = /^(.*)\/lazor\.cn\/(.*)\/([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})\.(jpg|gif|png)$/;
 
     constructor(links, options?, renderer?) {
         this.options = options || defaults;
@@ -862,6 +863,15 @@ class InlineLexer {
             }
         }
 
+        for (let i = 0; i < defaults.img_list.length; i++) {
+            const checkout = this.img_checker.exec(defaults.img_list[i].toLowerCase());
+            if (checkout) {
+                defaults.img_list[i] = checkout[3];
+            } else {
+                defaults.img_list[i] = '';
+            }
+        }
+
         return out;
     }
 
@@ -873,9 +883,12 @@ class InlineLexer {
         const href = escape(link.href);
         const title = link.title ? escape(link.title) : null;
 
-        return cap[0].charAt(0) !== '!' ?
-            this.renderer.link(href, title, this.output(cap[1])) :
-            this.renderer.image(href, title, escape(cap[1]));
+        if (cap[0].charAt(0) !== '!') {
+            return this.renderer.link(href, title, this.output(cap[1]));
+        } else {
+            defaults.img_list.push(href);
+            return this.renderer.image(href, title, escape(cap[1]));
+        }
     }
 
     /**
@@ -972,7 +985,7 @@ class Renderer {
 
         return `<div class="code-block"><pre><div class="outline">${escape(lang, true)}</div>` +
             `<code>${(escaped ? code : escape(code, true))}\n</code></pre></div>\n`;
-            // class="${this.options.langPrefix}${escape(lang, true)}"
+        // class="${this.options.langPrefix}${escape(lang, true)}"
     }
 
     blockquote(quote) {
@@ -1097,6 +1110,7 @@ class Parser {
     options: any;
     renderer: any;
     inline: any;
+    img_list: string[];
 
     constructor(options, renderer?) {
         this.tokens = [];
@@ -1289,7 +1303,8 @@ const defaults: any = {
     smartypants: false,
     headerPrefix: '',
     renderer: new Renderer(),
-    xhtml: false
+    xhtml: false,
+    img_list: []
 };
 
 /**
@@ -1307,6 +1322,7 @@ export class Marked {
     inlineLexer: any;
     parse: any;
     defaults: any = defaults;
+    img_list = defaults.img_list;
 
 
     constructor() {
@@ -1319,6 +1335,7 @@ export class Marked {
         this.InlineLexer = InlineLexer;
         this.inlineLexer = InlineLexer.output;
         this.parse = this.render;
+
     }
 
     setOptions(opt?) {
@@ -1327,6 +1344,8 @@ export class Marked {
     }
 
     render(src, opt, callback) {
+        defaults.img_list = [];
+        this.img_list = defaults.img_list;
         if (callback || typeof opt === 'function') {
             if (!callback) {
                 callback = opt;
@@ -1406,9 +1425,11 @@ export class Marked {
             if (opt) {
                 opt = merge({}, this.defaults, opt);
             }
-            return Parser.parse(Lexer.lex(src, opt), opt);
+            const res = Parser.parse(Lexer.lex(src, opt), opt);
+            return res;
+
         } catch (e) {
-            e.message += '\nPlease report this to https://github.com/chjj/marked.';
+            e.message += '\nPlease report this to https://github.com/isatiso/lazor-blog.';
             if ((opt || this.defaults).silent) {
                 return '<p>An error occured:</p><pre>' +
                     escape(e.message + '', true) +

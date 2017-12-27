@@ -12,6 +12,7 @@ export class ArticleDatabaseService {
     current_article_data: BehaviorSubject<ArticleData>;
     on_edit_data: BehaviorSubject<ArticleData>;
     article_status = 'published';
+    current_img_list: BehaviorSubject<string[]>;
 
     constructor(
         private _http: HttpClient,
@@ -20,6 +21,15 @@ export class ArticleDatabaseService {
     ) {
         this.current_article_data = new BehaviorSubject<ArticleData>(new ArticleData({}));
         this.on_edit_data = new BehaviorSubject<ArticleData>(new ArticleData({}));
+        this.current_img_list = new BehaviorSubject<string[]>([]);
+    }
+
+    get img_list(): string[] {
+        return this.current_img_list.value;
+    }
+
+    set img_list(source: string[]) {
+        this.current_img_list.next(source);
     }
 
     get current_article(): ArticleData {

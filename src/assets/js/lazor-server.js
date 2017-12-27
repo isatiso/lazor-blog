@@ -38,6 +38,7 @@ self.addEventListener('fetch', event => {
         return;
     }
 
+    let img_checker = /(.*)\/lazor\.cn\/(.*)\/([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})\.(jpg|gif|png)/;
     let bundle_regex = /(\/(.*)\.(js|ttf|woff2|png|ico|jpg|gif))/;
     let forever_regex = /(\/(.*)\.(ttf|woff2))/;
     var this_url = new URL(event.request.url);
@@ -45,6 +46,9 @@ self.addEventListener('fetch', event => {
         return;
     }
     var br;
+    if (br = img_checker.exec(this_url.pathname)) {
+
+    }
 
     if (NEED_CACHE && (br = bundle_regex.exec(this_url.pathname))) {
         // console.log(br[2] + '.' + br[3]);
