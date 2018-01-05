@@ -1,21 +1,21 @@
-<div class="container article-container" [@pageAppear]="page_appear" (window:keydown)="boss_key($event)">
+<div class="container article-container" [@pageAppear]="page_appear" (window:keydown)="boss_key_down($event)">
     <mat-card>
         <div class="title">
-            {{ current_article.title }}
+            {{ source.current_article.title }}
         </div>
         <div class="description">
-            <div class="username">作者：{{ current_article.author }}</div>
-            <div class="date">发布时间：{{ current_article.create_time * 1000 | date: 'y年MM月dd日' }}</div>
+            <div class="username">作者：{{ source.current_article.author }}</div>
+            <div class="date">发布时间：{{ source.current_article.create_time * 1000 | date: 'y年MM月dd日' }}</div>
             <div class="spacer"></div>
         </div>
         <div class="divider"></div>
-        <markdown [data]="current_article.content" [renderLatex]="render_latex" (click)="preview_image($event)"></markdown>
+        <markdown [data]="source.current_article.content" [renderLatex]="render_latex" (click)="preview_image($event)"></markdown>
         <div class="last-next">
-            <a *ngIf="last_article" class="last" (click)="go_last($event)">上一篇: {{ last_article.title }}</a>
-            <span *ngIf="!last_article" class="last">上一篇: 没有了</span>
+            <a *ngIf="source.last_article" class="last" (click)="action.go_last($event)">上一篇: {{ source.last_article.title }}</a>
+            <span *ngIf="!source.last_article" class="last">上一篇: 没有了</span>
             <span class="spacer"> </span>
-            <a *ngIf="next_article" class="next" (click)="go_next($event)">下一篇: {{ next_article.title }}</a>
-            <span *ngIf="!next_article" class="next">下一篇: 没有了</span>
+            <a *ngIf="source.next_article" class="next" (click)="action.go_next($event)">下一篇: {{ source.next_article.title }}</a>
+            <span *ngIf="!source.next_article" class="next">下一篇: 没有了</span>
         </div>
     </mat-card>
 </div>

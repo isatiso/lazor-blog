@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 
+import { LoggingService } from 'service/logging.service';
+
 @Component({
     selector: 'la-error',
     templateUrl: './error.component.html',
@@ -23,9 +25,13 @@ export class ErrorComponent implements OnInit {
     public message: string;
     public sub_message: string;
 
-    constructor(private _router: Router) { }
+    constructor(
+        private _router: Router,
+        private _log: LoggingService
+    ) { }
 
     ngOnInit() {
+
         this._router.routerState.root.queryParams.subscribe(
             value => {
                 if (value.message) {
@@ -35,6 +41,7 @@ export class ErrorComponent implements OnInit {
                     this.message = 'Page Not Found';
                     this.sub_message = 'Sorry for that.';
                 }
+                this._log.send('error', { message: this.message, sub_message: this.sub_message });
             }
         );
     }

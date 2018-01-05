@@ -7,8 +7,6 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
     styleUrls: ['./preview.component.scss']
 })
 export class PreviewComponent implements OnInit {
-    public name = '';
-
     @ViewChild('Image') image;
 
     constructor(
@@ -17,6 +15,7 @@ export class PreviewComponent implements OnInit {
     ) { }
 
     ngOnInit() {
+        this.data = this.data || {};
         setTimeout(() => {
             const h = this.image.nativeElement.naturalHeight;
             const w = this.image.nativeElement.naturalWidth;

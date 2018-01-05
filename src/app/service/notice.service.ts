@@ -44,6 +44,7 @@ export class NoticeService {
     }
 
     preview(data: any, callback: () => any) {
+        console.log('data', data);
         return this._dialog.open(PreviewComponent, {
             data: data
         }).afterClosed().map(callback).catch(

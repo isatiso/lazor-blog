@@ -1,33 +1,33 @@
-<div (window:keydown)="boss_key($event)" class="container editor-container" #editorContainer [@pageAppear]="page_appear">
+<div (window:keydown)="boss_key_down($event)" class="container editor-container" #editorContainer [@pageAppear]="page_appear">
     <mat-card>
         <div class="editor-title-container">
-            <input [(ngModel)]="title" class="editor-title" placeholder="Untitled" maxlength="50" #titleRef/>
+            <input [(ngModel)]="source.title" class="editor-title" placeholder="Untitled" maxlength="50" #titleRef/>
         </div>
         <div class="category-editor">
             <mat-form-field>
-                <mat-select [(ngModel)]="current_category.category_id" (change)="article_change($event)">
-                    <mat-option *ngFor="let category of categories" [value]="category.category_id">
+                <mat-select [(ngModel)]="source.current_category.category_id" (change)="action.set_modified($event)">
+                    <mat-option *ngFor="let category of source.categories" [value]="category.category_id">
                         {{ category.category_name }}
                     </mat-option>
                 </mat-select>
             </mat-form-field>
         </div>
-        <div class="divider" *ngIf="outer_width > 768"></div>
+        <div class="divider" *ngIf="source.outer_width > 768"></div>
         <div class="page-progress" #progressBarContainer [@progressAppear]="progress_state">
-            <mat-progress-bar #progressBar color="accent" mode="determinate" [value]="progress_value"> </mat-progress-bar>
+            <mat-progress-bar #progressBar color="accent" mode="determinate" [value]="progress_rate"> </mat-progress-bar>
         </div>
-        <mat-tab-group MatTabGroup dynamicHeight="true" [selectedIndex]="tab_select" (selectedIndexChange)="select_change($event)">
-            <mat-tab label="{{ unsaved() }} 编辑">
+        <mat-tab-group MatTabGroup dynamicHeight="true" [selectedIndex]="tab_select_value" (selectedIndexChange)="source.select_change($event)">
+            <mat-tab label="{{ action.is_unsaved() }} 编辑">
                 <div class="input-test" id="tab1">
                     <mat-input-container class="editor-input">
-                        <textarea matInput matTextareaAutosize [(ngModel)]="content" [matAutosizeMinRows]="content_rows" (keydown)="input_translate($event)"
+                        <textarea matInput matTextareaAutosize [(ngModel)]="source.content" [matAutosizeMinRows]="0" (keydown)="input_translate($event)"
                             #contentRef></textarea>
                     </mat-input-container>
                 </div>
             </mat-tab>
             <mat-tab label="预览">
                 <div id="tab2">
-                    <markdown [data]="content" [renderLatex]="render_latex"></markdown>
+                    <markdown [data]="source.content" [renderLatex]="render_latex"></markdown>
                 </div>
             </mat-tab>
         </mat-tab-group>

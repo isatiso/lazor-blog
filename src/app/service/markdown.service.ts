@@ -6,7 +6,7 @@ import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
 
 import { ArticleDatabaseService } from 'service/article-database.service';
-import { Marked } from './marked';
+import { Marked } from 'public/lib/marked';
 
 // A javascript lib has import, so here is just a delaration
 declare var MathJax: any;

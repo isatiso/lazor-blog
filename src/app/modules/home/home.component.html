@@ -1,31 +1,31 @@
 <div class="container home-container" [@pageAppear]="page_appear">
-    <mat-card *ngIf="outer_width > 768">
+    <mat-card *ngIf="source.outer_width > 768">
         <div class="header-area">
             <p class="title home-title">
-                Hi, {{ user_name }}
+                Hi, {{ source.user_name }}
             </p>
             <p class="create-button">
-                <button mat-raised-button class="create-article" color="primary" routerLink="/editor/new-article">写新文章</button>
-                <mat-slide-toggle class="can-sort" color="primary" [checked]="can_sort" (change)="set_sortable($event)">Surprise！</mat-slide-toggle>
+                <button mat-raised-button class="create-article" color="primary" (click)="action.create_article($event)">写新文章</button>
+                <mat-slide-toggle class="can-sort" color="primary" [checked]="can_sort" (change)="action.toggle_sortable($event)">Surprise！</mat-slide-toggle>
                 <span *ngIf="can_sort" class="can-sort-info" [@infoAppear]="1">Now You Can Drag And Sort!</span>
             </p>
         </div>
         <div class="divider"></div>
-        <div class="content-container" #categoryListPad>
+        <div class="content-container">
             <div class="category-list">
-                <ul *ngIf="categories.length; else emptyInfo" [sortablejs]="categories" [sortablejsOptions]="category_sort_options">
-                    <li *ngFor="let category of categories;" class="category-item" (click)="set_step(category)">
-                        <mat-card [@showOptions]="show_options(category)" [@sortState]="can_sort">
+                <ul *ngIf="source.categories.length; else emptyInfo" [sortablejs]="source.categories" [sortablejsOptions]="category_sort_options">
+                    <li *ngFor="let category of source.categories;" class="category-item" (click)="action.set_current_category(category)">
+                        <mat-card [@showOptions]="info.show_options(category)" [@sortState]="can_sort">
                             {{ category.category_name }}
                         </mat-card>
                         <div class="options-button">
                             <div class="spacer"></div>
                             <div class="button-container">
                                 <div class="helper"></div>
-                                <button mat-icon-button class="modify-button" color="primary" (click)="modify_category($event, category)">
+                                <button mat-icon-button class="modify-button" color="primary" (click)="action.modify_category($event, category)">
                                     <mat-icon>create</mat-icon>
                                 </button>
-                                <button *ngIf="category.category_type" mat-icon-button class="delete-button" color="warn" (click)="delete_confirm($event, category.category_id)">
+                                <button *ngIf="category.category_type" mat-icon-button class="delete-button" color="warn" (click)="action.delete_category($event, category.category_id)">
                                     <mat-icon>delete</mat-icon>
                                 </button>
                             </div>
@@ -36,7 +36,7 @@
                     <p style="width: 100%; text-align: center;">添加分类
                         <br/>
                         <br/>
-                        <button mat-raised-button color="primary" (click)="add_category()">Add Category</button>
+                        <button mat-raised-button color="primary" (click)="action.add_category()">Add Category</button>
                     </p>
                 </ng-template>
             </div>
@@ -49,8 +49,8 @@
                         Article
                     </div>
                 </div>
-                <ul [sortablejs]="article_list" [sortablejsOptions]="article_sort_options" class="sortable">
-                    <li *ngFor="let article of article_list" class="article-item" [@sortState]="can_sort">
+                <ul [sortablejs]="source.article_list" [sortablejsOptions]="article_sort_options" class="sortable">
+                    <li *ngFor="let article of source.article_list" class="article-item" [@sortState]="can_sort">
                         <div class="helper"></div>
                         <mat-chip-list [@loadArticle]="load_article">
                             <mat-chip routerLink="/article/{{article.article_id}}" selected="true" color="primary">
@@ -62,23 +62,23 @@
             </div>
         </div>
     </mat-card>
-    <div class="category-card-container" (click)="toggle_show_cate($event)" #smallViewLeft [@showCate]="show_cate_state" *ngIf="outer_width <= 768">
+    <div class="category-card-container" (click)="action.toggle_show_cate($event)" #smallViewLeft [@showCate]="show_cate_state" *ngIf="source.outer_width <= 768">
         <mat-card class="category-card" >
-            <div class="content-container" #categoryListPad>
+            <div class="content-container">
                 <div class="category-list">
-                    <ul *ngIf="categories.length; else emptyInfo" [sortablejs]="categories" [sortablejsOptions]="category_sort_options">
-                        <li *ngFor="let category of categories;" class="category-item" (click)="set_step(category)">
-                            <mat-card [@showOptions]="show_options(category)" [@sortState]="can_sort">
+                    <ul *ngIf="source.categories.length; else emptyInfo" [sortablejs]="source.categories" [sortablejsOptions]="category_sort_options">
+                        <li *ngFor="let category of source.categories;" class="category-item" (click)="action.set_current_category(category)">
+                            <mat-card [@showOptions]="info.show_options(category)" [@sortState]="can_sort">
                                 {{ category.category_name }}
                             </mat-card>
                             <div class="options-button">
                                 <div class="spacer"></div>
                                 <div class="button-container">
                                     <div class="helper"></div>
-                                    <button mat-icon-button class="modify-button" color="primary" (click)="modify_category($event, category)">
+                                    <button mat-icon-button class="modify-button" color="primary" (click)="action.modify_category($event, category)">
                                         <mat-icon>create</mat-icon>
                                     </button>
-                                    <button *ngIf="category.category_type" mat-icon-button class="delete-button" color="warn" (click)="delete_confirm($event, category.category_id)">
+                                    <button *ngIf="category.category_type" mat-icon-button class="delete-button" color="warn" (click)="action.delete_category($event, category.category_id)">
                                         <mat-icon>delete</mat-icon>
                                     </button>
                                 </div>
@@ -89,18 +89,17 @@
                         <p style="width: 100%; text-align: center;">添加分类
                             <br/>
                             <br/>
-                            <button mat-raised-button color="primary" (click)="add_category()">Add Category</button>
+                            <button mat-raised-button color="primary" (click)="action.add_category()">Add Category</button>
                         </p>
                     </ng-template>
                 </div>
             </div>
         </mat-card>
     </div>
-
-    <mat-card class="small-view-right" #smallViewRight *ngIf="outer_width <= 768">
+    <mat-card class="small-view-right" *ngIf="source.outer_width <= 768">
         <div class="header-area">
             <p class="title home-title">
-                Hi, {{ user_name }}
+                Hi, {{ source.user_name }}
             </p>
         </div>
         <div class="divider"></div>
@@ -111,8 +110,8 @@
                         Article
                     </div>
                 </div>
-                <ul [sortablejs]="article_list" [sortablejsOptions]="article_sort_options" class="sortable">
-                    <li *ngFor="let article of article_list" class="article-item" [@sortState]="can_sort">
+                <ul [sortablejs]="source.article_list" [sortablejsOptions]="article_sort_options" class="sortable">
+                    <li *ngFor="let article of source.article_list" class="article-item" [@sortState]="can_sort">
                         <div class="helper"></div>
                         <span [@loadArticle]="load_article" class="article-item-content" routerLink="/article/{{article.article_id}}" color="primary">
                             {{ article.title }}

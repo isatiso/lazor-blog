@@ -1,13 +1,11 @@
-import { Component, OnInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Router, ActivatedRoute, NavigationExtras } from '@angular/router';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 
-import { CategoryDatabaseService, CategorySource } from 'service/category-database.service';
+import { CategoryDatabaseService } from 'service/category-database.service';
+import { LoggingService } from 'service/logging.service';
 import { ArticleData, Category } from 'public/data-struct-definition';
 import { NavButtonService } from 'service/nav-button.service';
-
-import anime from 'animejs';
 
 @Component({
     selector: 'la-index',
@@ -43,69 +41,57 @@ import anime from 'animejs';
                 boxShadow: '0 3px 1px -2px rgba(0, 0, 0, .2), 0 2px 2px 0 rgba(0, 0, 0, .14), 0 1px 5px 0 rgba(0, 0, 0, .12)'
             })),
             transition('1 <=> 0', animate('300ms cubic-bezier(0.5, 2, 0.5, 0.5)')),
-            transition('void => 1', animate('300ms cubic-bezier(0.5, 2, 0.5, 0.5)')),
-            // transition('void <=> 0', animate('300ms cubic-bezier(0.5, 2, 0.5, 0.5)'))
+            transition('void => 1', animate('300ms cubic-bezier(0.5, 2, 0.5, 0.5)'))
         ])
     ]
 })
 export class IndexComponent implements OnInit, OnDestroy {
     public banner_move = 'active';
     public page_appear = 'active';
-    public display_columns = ['title'];
-    public category_source: CategorySource | null;
-    private _scroll_height_limit = 100;
-
-    @ViewChild('banner') private banner;
 
     constructor(
-        private _el: ElementRef,
-        private _http: HttpClient,
+        private _log: LoggingService,
         private _router: Router,
         private _active_route: ActivatedRoute,
         private _category_db: CategoryDatabaseService,
         private _nav_button: NavButtonService,
     ) { }
 
-    get category_list(): Category[] {
-        return this._category_db.index_category_list.value;
-    }
+    public source = {
+        self: this,
+        get category_list(): Category[] {
+            return this.self._category_db.index_category_list.value;
+        },
+        get current_category(): Category {
+            return this.self._category_db.current_index_category;
+        },
+    };
 
-    get current_category(): Category {
-        return this._category_db.current_index_category;
-    }
-
-    get article_list(): ArticleData[] {
-        return this._category_db.index_article_list.value;
-    }
+    public action = Object.assign(Object.create(this.source), {
+        trig_article_list(category_id) {
+            this.self._router.navigate([`/index/${category_id}`]);
+            this.self._category_db.shuffle(category_id);
+        }
+    });
 
     ngOnInit() {
-        document.scrollingElement.scrollTop = 0;
-        this.page_appear = 'active';
+
+        this._log.send('index', { des: '索引页' });
+
         if (this._active_route.firstChild) {
             this._category_db.get_index_category_list(this._active_route.firstChild.params['value']['category_id'] || null);
         } else {
             this._category_db.get_index_category_list(null);
         }
+
+        document.scrollingElement.scrollTop = 0;
+        this.page_appear = 'active';
         this._nav_button.button_list = [];
     }
 
     ngOnDestroy() {
         this.page_appear = 'inactive';
     }
-
-    trig_article_list(category_id) {
-        this._router.navigate([`/index/${category_id}`]);
-        this._category_db.shuffle(category_id);
-    }
-
-    // onscroll(event) {
-    //     const scroll_top = event.target.scrollingElement.scrollTop;
-    //     if (scroll_top <= this._scroll_height_limit) {
-    //         this.banner.nativeElement.firstElementChild.style.opacity = 1 - (scroll_top / (window.outerWidth > 769 ? 100 : 45));
-    //     } else {
-    //         this.banner.nativeElement.firstElementChild.style.opacity = 0;
-    //     }
-    // }
 }
 
 @Component({
@@ -126,20 +112,8 @@ export class IndexComponent implements OnInit, OnDestroy {
 export class IndexArticleComponent {
 
     constructor(
-        private _el: ElementRef,
-        private _http: HttpClient,
-        private _router: Router,
-        private _active_route: ActivatedRoute,
         private _category_db: CategoryDatabaseService
     ) { }
-
-    get category_list(): Category[] {
-        return this._category_db.index_category_list.value;
-    }
-
-    get current_category(): Category {
-        return this._category_db.current_index_category;
-    }
 
     get article_list(): ArticleData[] {
         return this._category_db.index_article_list.value;

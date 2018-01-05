@@ -7,7 +7,7 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
     styleUrls: ['./warning.component.scss']
 })
 export class WarningComponent {
-    public name = '';
+
     constructor(
         public dialogRef: MatDialogRef<WarningComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
@@ -15,8 +15,10 @@ export class WarningComponent {
 
     submit(event) {
         if (event.type === 'keyup' && event.key === 'Enter') {
+            this.dialogRef.close(true);
+        } else {
             this.dialogRef.close(false);
-            return false;
         }
+        return false;
     }
 }

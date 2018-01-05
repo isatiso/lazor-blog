@@ -16,7 +16,7 @@ import {
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from 'app-routing.module';
-import { AppComponent, ProfileComponent } from 'app.component';
+import { AppComponent } from 'app.component';
 import { NavBgDirective } from 'directive/nav-bg.directive';
 import { MarkdownDirective } from 'directive/markdown.directive';
 import { NavProfileService } from 'service/nav-profile.service';
@@ -26,6 +26,7 @@ import { CategoryDatabaseService } from 'service/category-database.service';
 import { ArticleDatabaseService } from 'service/article-database.service';
 import { NoticeService } from 'service/notice.service';
 import { ScrollorService } from 'service/scrollor.service';
+import { LoggingService } from 'service/logging.service';
 import { NavButtonService } from 'service/nav-button.service';
 import { AuthGuard } from 'guard/auth.guard';
 import { ArticleOwnerGuard } from 'guard/article-owner.guard';
@@ -38,7 +39,6 @@ import { WarningModule } from 'public/warning/warning.module';
 @NgModule({
     declarations: [
         AppComponent,
-        ProfileComponent,
         NavBgDirective
     ],
     imports: [
@@ -64,6 +64,7 @@ import { WarningModule } from 'public/warning/warning.module';
         NavProfileService,
         MarkdownService,
         AccountService,
+        LoggingService,
         CategoryDatabaseService,
         ArticleDatabaseService,
         NoticeService,
@@ -74,9 +75,6 @@ import { WarningModule } from 'public/warning/warning.module';
         AuthGuard,
         LeaveGuard,
         ArticleOwnerGuard],
-    entryComponents: [
-        ProfileComponent
-    ],
     bootstrap: [AppComponent]
 })
 export class AppModule { }

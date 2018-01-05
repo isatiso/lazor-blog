@@ -1,13 +1,14 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MatSnackBar } from '@angular/material';
-import { Router, ActivatedRoute } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 
 import { AccountService } from 'service/account.service';
 import { NoticeService } from 'service/notice.service';
+import { LoggingService } from 'service/logging.service';
 import { NavButtonService } from 'service/nav-button.service';
-import { Account } from 'public/data-struct-definition';
+
+import { Account } from 'data-struct-definition';
 
 @Component({
     selector: 'la-auth',
@@ -21,7 +22,7 @@ import { Account } from 'public/data-struct-definition';
             state('0', style({
                 opacity: 0,
             })),
-            transition('* <=> *', animate('300ms ease-out'))
+            transition('* => *', animate('300ms ease-out'))
         ]),
         trigger('childrenAppear', [
             state('active', style({
@@ -37,7 +38,6 @@ import { Account } from 'public/data-struct-definition';
 export class AuthComponent implements OnInit, OnDestroy {
     auth_exists = 'active';
     tab_select = 0;
-    dynamic_height = true;
     public sign_in_data = {
         name: '',
         password: '',
@@ -49,33 +49,44 @@ export class AuthComponent implements OnInit, OnDestroy {
         password: '',
     };
 
-    public pattern = {
-        email: /^([\w-.]+)@([\w-]+)(\.([\w-]+))+$/,
-        password: /^[0-9A-Za-z`~!@#$%^&*()_+\-=\{\}\[\]:;"'<>,.\\|?/ ]{6,24}$/,
-        nickname: /^[\w\-\u4e00-\u9fa5]{1,12}$/,
+    public action = {
+        self: this,
+        select_change(event) {
+            this.self.tab_select = event;
+        },
+        go_sign_in(event?) {
+            this.select_change(0);
+        },
+        go_sign_up(event?) {
+            this.select_change(1);
+        },
     };
 
+    private _boss_key = Object.assign(Object.create(this.action), {
+        ArrowLeft: this.action.go_sign_in,
+        ArrowRight: this.action.go_sign_up,
+    });
+
     constructor(
-        private _http: HttpClient,
-        private _router: Router,
         private _active_route: ActivatedRoute,
+        private _log: LoggingService,
         private _notice: NoticeService,
         private _account: AccountService,
         private _nav_button: NavButtonService,
     ) { }
 
     ngOnInit() {
+        this._active_route.queryParams.subscribe(
+            params => {
+                this._log.send('auth', {
+                    des: '登录页',
+                    from: (params['backurl'] || '/home')
+                });
+            });
+        this._account.check_log();
+
         document.scrollingElement.scrollTop = 0;
         this.auth_exists = 'active';
-        this._http.get('/middle/guard/auth').subscribe(
-            data => {
-                if (data['result'] === 1) {
-                    window.localStorage.setItem('user_name', data['data']['user_name']);
-                    this._account.data = data['data'];
-                    this._router.navigate(['/home']);
-                }
-            },
-        );
         this._nav_button.button_list = [];
     }
 
@@ -83,73 +94,32 @@ export class AuthComponent implements OnInit, OnDestroy {
         this.auth_exists = 'inactive';
     }
 
-    select_change(event) {
-        this.tab_select = event;
-    }
-
-    signIn(event) {
-        if (event.type === 'keydown' && event.key !== 'Enter') {
-            return event;
-        }
-        this.sign_in_data.name = this.sign_in_data.name.trim();
-
-        this._http.post(
-            '/middle/user',
-            {
-                name: this.sign_in_data.name,
-                password: this.sign_in_data.password
-            }).subscribe(
-            data => {
-                if (data['result'] === 1) {
-                    this._account.data = data['data'];
-                    this._active_route.queryParams.subscribe(
-                        params => {
-                            this._router.navigate([params['backurl'] || '/home']);
-                        });
-                } else if (data['status'] === 3002) {
-                    this._notice.bar('Inactivated account, connect author to active your account.', 'OK');
-                    return false;
-                } else {
-                    this._notice.bar(data['msg'], 'OK');
-                    return false;
-                }
-            });
-    }
-
-    signUp(event) {
+    sign_in(event) {
         if (event.type === 'keydown' && event.key !== 'Enter') {
             return event;
         }
 
-        this.sign_up_data.email = this.sign_up_data.email.trim();
-        let message = '';
-        let not_regular = null;
-        if (!this.sign_up_data.email.match(this.pattern.email)) {
-            message = 'Invalid Email.';
-            not_regular = true;
-        } else if (!this.sign_up_data.password.match(this.pattern.password)) {
-            message = 'Invalid Password.';
-            not_regular = true;
+        this._account.sign_in(this.sign_in_data);
+    }
+
+    sign_up(event) {
+        if (event.type === 'keydown' && event.key !== 'Enter') {
+            return event;
         }
-        if (not_regular) {
-            this._notice.bar(message, 'OK');
-            return false;
-        }
-        this._http.put(
-            '/middle/user',
-            {
-                username: this.sign_up_data.username,
-                email: this.sign_up_data.email,
-                password: this.sign_up_data.password
-            }).subscribe(
-            data => {
-                if (data['result'] === 1) {
-                    this._notice.bar('Sign Up Successfully.', 'OK');
+        this._account.sign_up(
+            this.sign_up_data, res => {
+                if (res) {
                     this.tab_select = 0;
-                } else {
-                    this._notice.bar(data['msg'], 'OK');
-                    return false;
                 }
             });
+    }
+
+    boss_key_down(event) {
+        if (event.ctrlKey && event.key in this._boss_key) {
+            this._boss_key[event.key]();
+            event.preventDefault();
+        }
+
+        return event;
     }
 }

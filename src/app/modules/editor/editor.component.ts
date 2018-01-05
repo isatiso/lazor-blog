@@ -1,18 +1,16 @@
-import { Component, OnInit, OnDestroy, ViewChild, Inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute, NavigationExtras } from '@angular/router';
 import { HttpClient, HttpRequest, HttpEventType, HttpResponse } from '@angular/common/http';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 
 import { MarkdownDirective } from 'directive/markdown.directive';
-import { AccountService } from 'service/account.service';
 import { ArticleDatabaseService } from 'service/article-database.service';
 import { CategoryDatabaseService } from 'service/category-database.service';
 import { NoticeService } from 'service/notice.service';
+import { LoggingService } from 'service/logging.service';
 import { NavButtonService } from 'service/nav-button.service';
 import { ScrollorService } from 'service/scrollor.service';
 import { ArticleData, Category, Options } from 'public/data-struct-definition';
-
-import anime from 'animejs';
 
 @Component({
     selector: 'la-editor',
@@ -20,13 +18,13 @@ import anime from 'animejs';
     styleUrls: ['./editor.component.scss'],
     animations: [
         trigger('pageAppear', [
-            state('active', style({
+            state('1', style({
                 opacity: 1,
             })),
-            state('inactive', style({
+            state('0', style({
                 opacity: 0,
             })),
-            transition('* => active', animate('300ms cubic-bezier(0, 1, 1, 1)'))
+            transition('* => 1', animate('300ms cubic-bezier(0, 1, 1, 1)'))
         ]),
         trigger('progressAppear', [
             state('active', style({
@@ -41,28 +39,12 @@ import anime from 'animejs';
 })
 export class EditorComponent implements OnInit, OnDestroy {
 
-    public page_appear = 'active';
-    public content_rows = 0;
-    public tab_select_value = 0;
+    public page_appear = 0;
     public render_latex = 0;
-    public progress_value = 0;
+    public progress_rate = 0;
     public progress_state = 'inactive';
-    public left_scroll_top = 0;
-    public right_scroll_top = 0;
-    private _nav_zone_width = 125;
-    private _nav_zone_leave_width = 375;
-    private _nav_show = false;
-    private _last_category_id: string = null;
+    public tab_select_value = 0;
 
-    @ViewChild('navView') nav_view;
-    @ViewChild('navTop') nav_top;
-    @ViewChild('navHome') nav_home;
-    @ViewChild('navAddImage') nav_add_image;
-    @ViewChild('navDelete') nav_delete;
-    @ViewChild('navGuide') nav_guide;
-    @ViewChild('navGuideIcon') nav_guide_icon;
-
-    @ViewChild('editorContainer') editor_container;
     @ViewChild('imageForm') image_form;
     @ViewChild('imageUpload') image_upload;
     @ViewChild('titleRef') title_ref;
@@ -72,82 +54,231 @@ export class EditorComponent implements OnInit, OnDestroy {
     constructor(
         private _http: HttpClient,
         private _router: Router,
-        private _scrollor: ScrollorService,
         private _activate_route: ActivatedRoute,
+        private _log: LoggingService,
+        private _scrollor: ScrollorService,
         private _article_db: ArticleDatabaseService,
         private _category_db: CategoryDatabaseService,
         private _nav_button: NavButtonService,
         private _notice: NoticeService,
-        private _account: AccountService,
-    ) {
+    ) { }
 
-    }
 
-    get outer_width(): number {
-        return window.outerWidth;
-    }
 
-    get content(): string {
-        return this.current_article.content;
-    }
+    public source = {
+        self: this,
+        last_category_id: '',
+        left_scroll_top: 0,
+        right_scroll_top: 0,
 
-    set content(value: string) {
-        this.current_article.content = value;
-        this._article_db.article_status = 'modified';
-        this.remove_extra_lines();
-    }
+        get outer_width(): number {
+            return window.outerWidth;
+        },
+        get content(): string {
+            return this.self._article_db.on_edit.content;
+        },
+        set content(value: string) {
+            this.self._article_db.on_edit.content = value;
+            this.self._article_db.article_status = 'modified';
+        },
+        get title(): string {
+            return this.self._article_db.on_edit.title;
+        },
+        set title(value: string) {
+            this.self._article_db.on_edit.title = value;
+            this.self._article_db.article_status = 'modified';
+        },
+        get categories(): Category[] {
+            return this.self._category_db.category_list;
+        },
+        get current_category(): Category {
+            return this.self._category_db.current_category;
+        },
+        set current_category(source: Category) {
+            this.self._category_db.current_category = source;
+            this.self._article_db.article_status = 'modified';
+        },
 
-    get title(): string {
-        return this.current_article.title;
-    }
-
-    set title(value: string) {
-        this.current_article.title = value;
-        this._article_db.article_status = 'modified';
-    }
-
-    get tab_select(): number {
-        return this.tab_select_value;
-    }
-
-    set tab_select(value: number) {
-        if (value !== this.tab_select_value) {
-            if (value === 1) {
-                this.left_scroll_top = document.scrollingElement.scrollTop;
-            } else if (value === 0) {
-                this.right_scroll_top = document.scrollingElement.scrollTop;
+        set tab_select(value: number) {
+            if (value !== this.self.tab_select_value) {
+                if (value === 1) {
+                    this.left_scroll_top = document.scrollingElement.scrollTop;
+                } else if (value === 0) {
+                    this.right_scroll_top = document.scrollingElement.scrollTop;
+                }
+                this.self.tab_select_value = value;
             }
-            this.tab_select_value = value;
-        }
-    }
+        },
+        get tab_select(): number {
+            return this.self.tab_select_value;
+        },
+        select_change(event) {
+            this.tab_select = event;
+            const current_scroll_top = document.scrollingElement.scrollTop;
+            if (event === 1) {
+                this.self.render_latex = 1;
+                setTimeout(() => {
+                    this.self._scrollor.goto(current_scroll_top, this.right_scroll_top, 30);
+                }, 0);
+            } else {
+                this.self.render_latex = 0;
+                setTimeout(() => {
+                    this.self._scrollor.goto(current_scroll_top, this.left_scroll_top, 30);
+                }, 0);
+            }
+        },
+    };
 
-    get categories(): Category[] {
-        return this._category_db.category_list;
-    }
+    public action = Object.assign(Object.create(this.source), {
+        go_home(event?) {
+            this.self._router.navigate(['/home']);
+        },
+        go_editor() {
+            this.tab_select = 0;
+            setTimeout(() => { this.self.content_ref.nativeElement.focus(); }, 0);
+        },
+        go_preview() {
+            this.self.content_ref.nativeElement.blur();
+            this.tab_select = 1;
+        },
+        go_top(event?) {
+            this.self._scrollor.goto_top();
+        },
+        go_bottom(event?) {
+            this.self._scrollor.goto_bottom();
+        },
+        set_modified(event) {
+            this.self._article_db.article_status = 'modified';
+        },
+        is_unsaved() {
+            return this.self._article_db.article_status === 'modified' ? '●' : '';
+        },
+        click_preview_button(event) {
+            this.tab_select ^= 1;
+        },
+        click_save_button() {
+            switch (this.self._article_db.article_status) {
+                case 'modified':
+                    this.save_article(); break;
+                case 'saved':
+                    this.publish_article();
+                    this.self._article_db.article_status = 'published'; break;
+                case 'published':
+                    const params: NavigationExtras = {
+                        queryParams: { 'from': 'editor' },
+                    };
+                    this.self._router.navigate(['/article/' + this.self._article_db.current_article.article_id], params);
+                    break;
+            }
+        },
+        click_upload_button(event?) {
+            this.self.image_upload.nativeElement.click();
+            return false;
+        },
+        click_delete_button(event) {
+            event.stopPropagation();
+            event.preventDefault();
+            const result = this.self._notice.warn({
+                msg: '彻底删除当前文章'
+            }, res => {
+                if (res) {
+                    this.self._article_db.remove(this.self._article_db.current_article.article_id);
+                    this.self._router.navigate(['/home']);
+                }
+            }).subscribe();
+            return false;
+        },
+        save_article() {
+            this.self._article_db.save({
+                article_id: this.self._activate_route.params['value']['id'],
+                title: this.title,
+                content: this.content,
+                category_id: this.self._category_db.current_category.category_id,
+                last_category_id: this.last_category_id,
+            });
+        },
+        publish_article() {
+            this.self._article_db.publish_current_article();
+        },
+    });
 
-    get current_category(): Category {
-        return this._category_db.current_category;
-    }
+    private info = Object.assign(Object.create(this.action), {
+        save_button_icon() {
+            switch (this.self._article_db.article_status) {
+                case 'modified':
+                    return 'save';
+                case 'saved':
+                    return 'publish';
+                case 'published':
+                    return 'description';
+            }
+        },
+        save_button_outlet() {
+            switch (this.self._article_db.article_status) {
+                case 'modified':
+                    return '保存文章 (ctrl + S)';
+                case 'saved':
+                    return '发布文章 (ctrl + S)';
+                case 'published':
+                    return '查看文章 (ctrl + S)';
+                default:
+                    return '';
+            }
+        },
+        preview_button_icon() {
+            switch (this.tab_select) {
+                case 0:
+                    return 'remove_red_eye';
+                case 1:
+                    return 'mode_edit';
+            }
+        },
+        preview_button_outlet() {
+            switch (this.tab_select) {
+                case 0:
+                    return '预览文章 (ctrl + →)';
+                case 1:
+                    return '编辑文章 (ctrl + ←)';
+                default:
+                    return '';
+            }
+        },
+    });
 
-    set current_category(source: Category) {
-        this._category_db.current_category = source;
-    }
+    private tool = {
+        split_content(content, pl, pr?) {
+            pr = pr || pl;
+            return [content.slice(0, pl), '', content.slice(pl, pr), '', content.slice(pr)];
+        },
 
-    get current_article(): ArticleData {
-        if (this._activate_route.params['value']['id'] === 'new-article') {
-            return this._article_db.on_edit_data.value;
-        } else {
-            return this._article_db.current_article;
-        }
-    }
+        concat_content(content_arr, pos1, pos3?) {
+            pos3 = pos3 || '';
+            content_arr[1] = pos1;
+            content_arr[3] = pos3;
+            return content_arr.join('');
+        },
+    };
 
-    set current_article(source: ArticleData) {
-        if (this._activate_route.params['value']['id'] === 'new-article') {
-            this._article_db.on_edit_data.next(source);
-        } else {
-            this._article_db.current_article = source;
-        }
-    }
+    private _boss_key = Object.assign(Object.create(this.action), {
+        ArrowLeft() {
+            this.go_editor();
+        },
+        ArrowRight() {
+            this.go_preview();
+        },
+        ArrowUp() {
+            this.go_top();
+        },
+        ArrowDown() {
+            this.go_bottom();
+        },
+        s() {
+            this.click_save_button();
+        },
+        p() {
+            this.click_upload_button(null);
+        },
+    });
 
     private _before_unload = event => {
         const confirmMessage = '\\o/';
@@ -160,260 +291,103 @@ export class EditorComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        document.scrollingElement.scrollTop = 0;
         window.addEventListener('beforeunload', this._before_unload);
+        this._activate_route.params.subscribe(value => {
+            if (!this._category_db.init_status) {
+                this._category_db.pull(new Options({ flush: true }));
+            }
 
-        const total_width = document.scrollingElement.clientWidth;
-        const editor_width = this.editor_container.nativeElement.clientWidth;
-        const article_id = this._activate_route.params['value']['id'];
+            this._article_db.update_on_edit(
+                value.id
+            ).subscribe(data => {
+                this._log.send('editor/' + value.id, { des: '文章编辑页面', title: data.title });
+            });
 
-        this._nav_zone_width = Math.max((total_width - editor_width) / 2, 50);
-        if (!this._category_db.init_status) {
-            this._category_db.pull(new Options({ flush: true }));
-        }
-        this._article_db.article_status = 'saved';
-        this.page_appear = 'active';
+            document.scrollingElement.scrollTop = 0;
+            this.page_appear = 1;
+            this._article_db.article_status = 'saved';
+            this.source.last_category_id = this._category_db.current_category.category_id;
+            this.title_ref.nativeElement.focus();
+        });
 
-        if (article_id !== 'new-article') {
-            this._article_db.fetch(article_id).subscribe(
-                data => {
-                    this._category_db.update_home(data.category_id);
-                }
-            );
-        } else {
-            // this._article_db.on_edit_data.next(new ArticleData({}));
-        }
-
-        this._last_category_id = this.current_category.category_id;
-        this.remove_extra_lines();
-        this.title_ref.nativeElement.focus();
         this._nav_button.button_list = [{
             name: 'navHome',
-            icon: () => this.save_button_icon(),
-            callback: event => this.save_button_click(),
+            icon: () => this.info.save_button_icon(),
+            callback: event => this.action.click_save_button(),
             color: () => 'primary',
-            tool_tip: () => this.save_button_outlet(),
+            tool_tip: () => this.info.save_button_outlet(),
         }, {
             name: 'navDelete',
             icon: () => 'delete',
-            callback: event => this.delete_confirm(event),
+            callback: event => this.action.click_delete_button(event),
             color: () => 'warn',
             tool_tip: () => '删除文章',
         }, {
             name: 'navAddImage',
             icon: () => 'insert_photo',
-            callback: event => this.select_file_click(event),
+            callback: event => this.action.click_upload_button(event),
             tool_tip: () => '添加图片 (ctrl + P)',
         }, {
             name: 'navView',
-            icon: () => this.preview_button_icon(),
-            callback: event => this.preview_button_click(event),
-            tool_tip: () => this.preview_button_outlet(),
+            icon: () => this.info.preview_button_icon(),
+            callback: event => this.action.click_preview_button(event),
+            tool_tip: () => this.info.preview_button_outlet(),
         }, {
             name: 'navTop',
             icon: () => 'arrow_upward',
-            callback: event => this.go_top(),
+            callback: event => this.action.go_top(),
             tool_tip: () => '回到顶部 (ctrl + ↑)',
         }];
     }
 
     ngOnDestroy() {
-        this.page_appear = 'inactive';
         window.removeEventListener('beforeunload', this._before_unload);
     }
 
-    remove_extra_lines() {
-        this.content_rows = this.content.split('\n').length;
-        setTimeout(() => {
-            this.content_rows = this.content_ref.nativeElement.style.height.slice(0, -2) / 28 - 2;
-        }, 100);
-    }
 
-    go_top(event?) {
-        this._scrollor.goto_top();
-    }
-
-    go_bottom(event?) {
-        this._scrollor.goto_bottom();
-    }
-
-    go_home(event) {
-        this._router.navigate(['/home']);
-    }
-
-    select_change(event) {
-        this.tab_select = event;
-        const current_scroll_top = document.scrollingElement.scrollTop;
-        if (event === 1) {
-            this.render_latex = 1;
-            setTimeout(() => {
-                this._scrollor.goto(current_scroll_top, this.right_scroll_top, 30);
-            }, 0);
-        } else {
-            this.render_latex = 0;
-            setTimeout(() => {
-                this._scrollor.goto(current_scroll_top, this.left_scroll_top, 30);
-            }, 0);
-        }
-    }
-
-    save_article() {
-        if (this._activate_route.params['value']['id'] === 'new-article') {
-            this._http.put('/middle/article', {
-                title: this.title,
-                content: this.content,
-                img_list: this._article_db.img_list,
-                category_id: this.current_category.category_id,
-            }).subscribe(
-                res => {
-                    if (res['result']) {
-                        this._article_db.fetch(res['data']['article_id']);
-                        this._article_db.on_edit_data.next(new ArticleData({}));
-                        this._notice.bar('Save Article Successfully.', 'OK', null);
-                        this._category_db.clear_category_cache(this._last_category_id);
-                        this._category_db.update_home(this.current_category.category_id, new Options({ flush: true }));
-                        this._router.navigate(['/editor/' + res['data']['article_id']]);
-                        this._article_db.article_status = 'saved';
-                    } else {
-
-                    }
-                });
-        } else {
-            this._http.post('/middle/article', {
-                article_id: this.current_article.article_id,
-                title: this.title,
-                content: this.content,
-                category_id: this.current_category.category_id,
-            }).subscribe(
-                res => {
-                    if (res['result']) {
-                        this._article_db.current_article = new ArticleData(res['data']);
-                        this._notice.bar('Save Article Successfully.', 'OK', null);
-                        if (this._last_category_id !== this.current_category.category_id) {
-                            this._category_db.clear_category_cache(this._last_category_id);
-                            this._last_category_id = this.current_category.category_id;
-                            this._category_db.update_home(this.current_category.category_id, new Options({ flush: true }));
-                        }
-                        this._article_db.article_status = 'saved';
-                    } else if (res['status'] === 3005) {
-                        this._notice.input({
-                            input_list: [{
-                                name: 'email_or_name',
-                                placeholder: '邮箱/用户名',
-                                value: '',
-                                required: true,
-                            }, {
-                                name: 'password',
-                                placeholder: '密码',
-                                value: '',
-                                required: true,
-                                type: 'password'
-                            }]
-                        }, login_res => {
-                            if (!res) { return; }
-                            this._http.post(
-                                '/middle/user',
-                                {
-                                    name: login_res.email_or_name.value,
-                                    password: login_res.password.value
-                                }).subscribe(
-                                data => {
-                                    if (data['result'] === 1) {
-                                        this._account.data = data['data'];
-                                        this._notice.bar('登陆成功，请重新进行保存操作', 'OK');
-                                    } else if (data['status'] === 3002) {
-                                        this._notice.bar('账户未激活，联系作者以激活账户', 'OK');
-                                    } else {
-                                        this._notice.bar(data['msg'], 'OK');
-                                    }
-                                });
-                        });
-                    }
-                });
-        }
-    }
-
-    publish_article() {
-        this._http.post('/middle/article/publish-state', {
-            article_id: this._article_db.current_article.article_id,
-            publish_status: 1
-        }).subscribe(
-            res => {
-                this._notice.bar('Publish Article Successfully.', 'OK', null);
-            });
-    }
-
-    delete_confirm(event) {
-        event.stopPropagation();
-        event.preventDefault();
-        this._notice.warn({
-            msg: '彻底删除当前文章'
-        }, res => {
-            if (res) {
-                this.delete_article();
-            }
-        });
-        return false;
-    }
-
-    delete_article() {
-        this._article_db.remove(this._article_db.current_article.article_id);
-        this._category_db.update_home(this.current_category.category_id, new Options({ flush: true }));
-        this._router.navigate(['/home']);
-    }
-
-    select_file(event) {
-        if (!event.altKey) {
-            return event;
-        }
-        event.preventDefault();
-        this.image_upload.nativeElement.click();
-        return false;
-    }
-
-    select_file_click(event) {
-        this.image_upload.nativeElement.click();
-        return false;
-    }
 
     upload_file(event) {
+
         if (this.image_upload.nativeElement.files.length > 15) {
             this._notice.bar('最多同时上传 15 个文件');
             return false;
         }
-        const file = new FormData(this.image_form.nativeElement);
+
         this._article_db.article_status = 'modified';
+
+        const file = new FormData(this.image_form.nativeElement);
         this.image_upload.nativeElement.value = '';
+
         const req = new HttpRequest('PUT', '/middle/image', file, {
             reportProgress: true,
         });
+
         this.progress_bar.color = 'primary';
         this.progress_state = 'active';
+
         this._http.request(req).subscribe(
             next => {
                 if (next.type === HttpEventType.UploadProgress) {
-                    const percentDone = Math.round(100 * next.loaded / next.total);
-                    this.progress_value = percentDone;
+                    this.progress_rate = Math.round(100 * next.loaded / next.total);
                 } else if (next instanceof HttpResponse) {
-                    const content_index = this.content_ref.nativeElement.selectionStart;
+                    const e = this.content_ref.nativeElement.selectionEnd;
+                    const text = next.body['data']['file_list'].map(fp => {
+                        return `![${fp['name']}](https://lazor.cn${fp['path']} "${fp['name']}")\n`;
+                    }).join('');
 
-                    const left = this.content.slice(0, content_index);
-                    const right = this.content.slice(content_index);
-                    const file_list = next.body['data']['file_list'];
-                    let content = '';
-                    for (const fp of file_list) {
-                        const file_path = 'https://lazor.cn' + fp['path'];
-                        content += `![${fp['name']}](${file_path} "${fp['name']}")\n`;
-                    }
+                    this.source.content = this.tool.concat_content(
+                        this.tool.split_content(
+                            this.source.content,
+                            e), text);
 
-                    this.content = left + content + right;
-                    setTimeout(() => {
-                        const pos = content_index + content.length;
-                        this.content_ref.nativeElement.setSelectionRange(pos, pos);
-                    }, 0);
-                    this.progress_bar.color = 'accent';
                     this.progress_state = 'inactive';
-                    setTimeout(() => { this.progress_value = 0; }, 200);
+                    setTimeout(() => {
+                        this.content_ref.nativeElement.setSelectionRange(e + text.length, e + text.length);
+                        this.progress_rate = 0;
+                        this.progress_bar.color = 'accent';
+                    }, 0);
+                } else {
+                    console.log(next);
                 }
             },
             error => {
@@ -421,158 +395,47 @@ export class EditorComponent implements OnInit, OnDestroy {
         );
     }
 
-    save_button_click() {
-        if (this._article_db.article_status === 'modified') {
-            this.save_article();
-
-        } else if (this._article_db.article_status === 'saved') {
-            this.publish_article();
-            this._article_db.article_status = 'published';
-        } else if (this._article_db.article_status === 'published') {
-            const params: NavigationExtras = {
-                queryParams: { 'from': 'editor' },
-            };
-            this._router.navigate(['/article/' + this._article_db.current_article.article_id], params);
-        }
-    }
-
-    save_button_icon() {
-        if (this._article_db.article_status === 'modified') {
-            return 'save';
-        } else if (this._article_db.article_status === 'saved') {
-            return 'publish';
-        } else if (this._article_db.article_status === 'published') {
-            return 'description';
-        }
-    }
-
-    save_button_outlet() {
-        switch (this._article_db.article_status) {
-            case 'modified':
-                return '保存文章 (ctrl + S)';
-            case 'saved':
-                return '发布文章 (ctrl + S)';
-            case 'published':
-                return '查看文章 (ctrl + S)';
-            default:
-                return '';
-        }
-    }
-
-    preview_button_click(event) {
-        if (this.tab_select === 1) {
-            this.tab_select = 0;
-        } else if (this.tab_select === 0) {
-            this.tab_select = 1;
-        }
-    }
-
-    preview_button_icon() {
-        if (this.tab_select === 0) {
-            return 'remove_red_eye';
-        } else if (this.tab_select === 1) {
-            return 'mode_edit';
-        }
-    }
-
-    preview_button_outlet() {
-        switch (this.tab_select) {
-            case 0:
-                return '预览文章 (ctrl + →)';
-            case 1:
-                return '编辑文章 (ctrl + ←)';
-            default:
-                return '';
-        }
-    }
-
-    article_change(event) {
-        this._article_db.article_status = 'modified';
-    }
-
-    unsaved() {
-        return this._article_db.article_status === 'modified' ? '●' : '';
-    }
-
     input_translate(event) {
-
         if (!(event.ctrlKey || event.key === 'Tab')) {
             return event;
         }
+
+        const s = this.content_ref.nativeElement.selectionStart;
+        const e = this.content_ref.nativeElement.selectionEnd;
+        let n = 0;
+
+        if (event.ctrlKey && (s === e)) {
+            return event;
+        }
+
         if (event.key === 'Tab') {
-            const content_index = this.content_ref.nativeElement.selectionStart;
-            const left = this.content.slice(0, content_index);
-            const right = this.content.slice(content_index);
-            this.content_ref.nativeElement.value = left + '\t' + right;
-            setTimeout(() => {
-                this.content_ref.nativeElement.setSelectionRange(content_index + 1, content_index + 1);
-            }, 0);
+            n = 1;
+            this.source.content = this.tool.concat_content(
+                this.tool.split_content(
+                    this.source.content, e), '\t');
         } else if (event.ctrlKey && event.key === 'b') {
-            const s = this.content_ref.nativeElement.selectionStart;
-            const e = this.content_ref.nativeElement.selectionEnd;
-            if (s === e) {
-                return;
-            }
-            const left = this.content.slice(0, s);
-            const content = this.content.slice(s, e);
-            const right = this.content.slice(e);
-            this.content = `${left}**${content}**${right}`;
-            setTimeout(() => {
-                this.content_ref.nativeElement.setSelectionRange(e + 4, e + 4);
-            }, 0);
+            n = 4;
+            this.source.content = this.tool.concat_content(
+                this.tool.split_content(this.source.content, s, e), '**', '**');
         } else if (event.ctrlKey && event.key === 'i') {
-            const s = this.content_ref.nativeElement.selectionStart;
-            const e = this.content_ref.nativeElement.selectionEnd;
-            if (s === e) {
-                return;
-            }
-            const left = this.content.slice(0, s);
-            const content = this.content.slice(s, e);
-            const right = this.content.slice(e);
-            this.content = `${left}*${content}*${right}`;
-            setTimeout(() => {
-                this.content_ref.nativeElement.setSelectionRange(e + 2, e + 2);
-            }, 0);
+            n = 2;
+            this.source.content = this.tool.concat_content(
+                this.tool.split_content(this.source.content, s, e), '*', '*');
         } else {
             return event;
         }
 
-
-
+        setTimeout(() => {
+            this.content_ref.nativeElement.setSelectionRange(e + n, e + n);
+        }, 0);
         event.preventDefault();
     }
 
-    boss_key(event) {
-        const access_key = [
-            'ArrowLeft',
-            'ArrowRight',
-            'ArrowUp',
-            'ArrowDown',
-            's',
-            'p'
-        ];
-
-        if (!event.ctrlKey || access_key.indexOf(event.key) === -1) {
-            return event;
+    boss_key_down(event) {
+        if (event.ctrlKey && event.key in this._boss_key) {
+            this._boss_key[event.key]();
+            event.preventDefault();
         }
-        if (event.key === 'ArrowLeft') {
-            this.tab_select = 0;
-            setTimeout(() => { this.content_ref.nativeElement.focus(); }, 0);
-        } else if (event.key === 'ArrowRight') {
-            this.content_ref.nativeElement.blur();
-            this.tab_select = 1;
-        } else if (event.key === 'ArrowUp') {
-            this.go_top(null);
-        } else if (event.key === 'ArrowDown') {
-            this.go_bottom(null);
-        } else if (event.key === 's') {
-            this.save_button_click();
-        } else if (event.key === 'p') {
-            this.select_file_click(null);
-        } else {
-
-            return event;
-        }
-        event.preventDefault();
+        return event;
     }
 }

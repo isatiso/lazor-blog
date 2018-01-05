@@ -26,7 +26,8 @@ export class NavButtonComponent implements OnInit, OnChanges {
     @ViewChild('navGuideIcon') nav_guide_icon;
     @ViewChildren('navOption') nav_options;
 
-    @Input() set buttonList(bl: BehaviorSubject<NavButton[]>) {
+    @Input()
+    set buttonList(bl: BehaviorSubject<NavButton[]>) {
         bl.subscribe(data => {
             this.button_list = data;
             this.menu_anime_handler = null;

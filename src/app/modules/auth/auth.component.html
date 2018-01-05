@@ -1,14 +1,14 @@
-<div class="container auth-container" [@childrenAppear]="auth_exists">
+<div class="container auth-container" [@childrenAppear]="auth_exists" (window:keydown)="boss_key_down($event)">
     <mat-card>
         <p class="title">
-            <span class="tab-info" style="opacity: 0" [@tab]="!tab_select">欢迎登陆Lazor Blog</span>
+            <span class="tab-info" style="opacity: 0" [@tab]="!tab_select">欢迎登录Lazor Blog</span>
             <span class="tab-info" style="opacity: 0" [@tab]="tab_select">欢迎加入Lazor Blog</span>
         </p>
         <div class="divider"></div>
-        <mat-tab-group MatTabGroup [dynamicHeight]="dynamic_height" [selectedIndex]="tab_select" (selectedIndexChange)="select_change($event)" disableRipple="false" class="mat-editor">
+        <mat-tab-group MatTabGroup [dynamicHeight]="true" [selectedIndex]="tab_select" (selectedIndexChange)="action.select_change($event)" disableRipple="false" class="mat-editor">
             <mat-tab label="登陆">
                 <div class="tab-content-container">
-                    <div class="big-box" (keydown)="signIn($event)">
+                    <div class="big-box" (keydown)="sign_in($event)">
                         <mat-input-container class="long-input">
                             <mat-placeholder>
                                 邮箱/用户名
@@ -25,7 +25,7 @@
                             <input matInput [(ngModel)]="sign_in_data.password" type="password" />
                         </mat-input-container>
                         <div>
-                            <button mat-raised-button color="primary" (click)="signIn($event)">提交</button>
+                            <button mat-raised-button color="primary" (click)="sign_in($event)">提交</button>
                         </div>
                     </div>
                     <div class="info-box">
@@ -40,7 +40,7 @@
             </mat-tab>
             <mat-tab label="注册">
                 <div class="tab-content-container">
-                    <div class="big-box" (keydown)="signUp($event)">
+                    <div class="big-box" (keydown)="sign_up($event)">
                         <mat-input-container class="long-input">
                             <mat-placeholder>
                                 用户名
@@ -65,7 +65,7 @@
                             <input matInput [(ngModel)]="sign_up_data.password" type="password" />
                         </mat-input-container>
                         <div>
-                            <button mat-raised-button color="primary" (click)="signUp($event)">提交</button>
+                            <button mat-raised-button color="primary" (click)="sign_up($event)">提交</button>
                         </div>
                     </div>
                     <div class="info-box">

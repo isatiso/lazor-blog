@@ -240,7 +240,9 @@ export class CategoryDatabaseService {
                 }
             );
         } else {
-            update_data(JSON.parse(cache_info));
+            setTimeout(() => {
+                update_data(JSON.parse(cache_info));
+            }, 0);
         }
     }
 
@@ -261,8 +263,8 @@ export class CategoryDatabaseService {
     }
 
     push_category_order() {
-        clearTimeout(this.article_settimeout_handler);
-        this.article_settimeout_handler = setTimeout(() => {
+        clearTimeout(this.category_settimeout_handler);
+        this.category_settimeout_handler = setTimeout(() => {
             const order_list = this.category_list.map(
                 item => {
                     return item.category_id;
@@ -388,6 +390,36 @@ export class CategoryDatabaseService {
 
     change_order(order_list: number[]) {
 
+    }
+
+    create(category_name) {
+        if (category_name) {
+            this._http.put(
+                '/middle/category', { category_name: category_name }
+            ).subscribe(res => {
+                this.pull(new Options({ flush: true }));
+            });
+        }
+    }
+
+    modify(category_id, category_name) {
+        this._http.post(
+            '/middle/category', {
+                category_id: category_id,
+                category_name: category_name
+            }
+        ).subscribe(data => {
+            console.log(data);
+            this.pull(new Options({ flush: true }));
+        });
+    }
+
+    delete(category_id) {
+        this._http.delete(
+            '/middle/category?category_id=' + category_id
+        ).subscribe(res => {
+            this.pull(new Options({ flush: true }));
+        });
     }
 }
 

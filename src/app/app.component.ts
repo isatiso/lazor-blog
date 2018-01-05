@@ -6,9 +6,11 @@ import { MatSnackBar, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/
 
 import { NavBgDirective } from 'directive/nav-bg.directive';
 import { NavProfileService } from 'service/nav-profile.service';
+import { NoticeService } from 'service/notice.service';
 import { ArticleDatabaseService } from 'service/article-database.service';
 import { CategoryDatabaseService } from 'service/category-database.service';
 import { AccountService } from 'service/account.service';
+import { LoggingService } from 'service/logging.service';
 import { NavButtonService } from 'service/nav-button.service';
 
 import { NavButton } from 'public/data-struct-definition';
@@ -56,6 +58,8 @@ export class AppComponent implements OnInit, AfterViewInit {
         private _http: HttpClient,
         private activatedRoute: ActivatedRoute,
         private _account: AccountService,
+        private _log: LoggingService,
+        private _notice: NoticeService,
         public dialog: MatDialog,
         private _article_db: ArticleDatabaseService,
         private _category_db: CategoryDatabaseService,
@@ -177,17 +181,17 @@ export class AppComponent implements OnInit, AfterViewInit {
         const rate = window.outerWidth > 1024 ? .5 : .9;
         const editor_width = (window.outerWidth * rate) + 'px';
 
-        this.dialog.open(ProfileComponent, {
-            width: editor_width,
-            data: {
-                name: this._account.data.user_name,
+        this._notice.input({
+            input_list: [{
+                name: 'user_name',
+                value: this._account.data.user_name,
                 placeholder: 'Enter a New Name'
+            }]
+        }, res => {
+            if (res) {
+                this._account.update_username(res.user_name.value);
             }
-        }).afterClosed().subscribe(data => {
-            if (data) {
-                this._account.update_username(data.name);
-            }
-        });
+        }).subscribe();
     }
 
     log_out() {
@@ -197,25 +201,5 @@ export class AppComponent implements OnInit, AfterViewInit {
             }
         );
         this.router.navigate(['/auth']);
-    }
-}
-
-@Component({
-    selector: 'la-profile',
-    templateUrl: './profile.component.html',
-    styleUrls: ['./app.component.scss']
-})
-export class ProfileComponent {
-    public name = '';
-    constructor(
-        public dialogRef: MatDialogRef<ProfileComponent>,
-        @Inject(MAT_DIALOG_DATA) public data: any,
-    ) { }
-
-    submit(event) {
-        if (event.type === 'keyup' && event.key === 'Enter') {
-            this.dialogRef.close(this.data);
-            return false;
-        }
     }
 }

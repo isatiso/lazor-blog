@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { trigger, state, style, animate, transition } from '@angular/animations';
-import { MatDialog } from '@angular/material';
 
 import { AboutContent } from './about.md';
-import { PreviewComponent } from 'public/preview/preview.component';
 import { NavButtonService } from 'service/nav-button.service';
+import { LoggingService } from 'service/logging.service';
+import { NoticeService } from 'service/notice.service';
+
 
 @Component({
     selector: 'la-about',
@@ -24,23 +25,22 @@ export class AboutComponent implements OnInit {
 
     constructor(
         private _nav_button: NavButtonService,
-        public dialog: MatDialog,
+        private _notice: NoticeService,
+        private _log: LoggingService,
     ) { }
 
     ngOnInit() {
         document.scrollingElement.scrollTop = 0;
         this._nav_button.button_list = [];
+        this._log.send('about', { des: '关于 Lazor Blog 页面' });
     }
 
     preview_image(event) {
         if (window['current_image']) {
-            this.dialog.open(PreviewComponent, {
-                data: {
-                    name: '',
-                    src: window['current_image']
-                }
-            }).afterClosed().subscribe(
-                res => { });
+            this._notice.preview({
+                name: '',
+                src: window['current_image']
+            }, () => { }).subscribe();
             window['current_image'] = null;
         }
     }

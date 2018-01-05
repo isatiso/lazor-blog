@@ -1,28 +1,16 @@
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import {
-    MatCardModule,
-    MatTableModule,
-    MatInputModule,
-    MatChipsModule,
-    MatButtonModule
-} from '@angular/material';
-import { CdkTableModule } from '@angular/cdk/table';
+import { MatCardModule } from '@angular/material';
 
 import { IndexRoutingModule } from './index-routing.module';
 import { IndexComponent, IndexArticleComponent } from './index.component';
 
 @NgModule({
     imports: [
-        CommonModule,
         FormsModule,
+        CommonModule,
         MatCardModule,
-        MatInputModule,
-        MatTableModule,
-        MatChipsModule,
-        MatButtonModule,
-        CdkTableModule,
         IndexRoutingModule
     ],
     declarations: [

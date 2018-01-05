@@ -26,7 +26,19 @@ gulp.task('default', function () {
                 gutil.colors.red('[Error]'), err.toString()
             );
         })
-        .pipe(gulp.dest('./dist/'))
+        .pipe(gulp.dest('./dist/'));
+    gulp.src('dist/assets/js/*.js')
+        .pipe(minify({
+            mangle: {
+                keepClassName: true
+            }
+        }))
+        .on('error', function (err) {
+            gutil.log(
+                gutil.colors.red('[Error]'), err.toString()
+            );
+        })
+        .pipe(gulp.dest('./dist/assets/js'))
     del(['dist/*.js.map']);
 });
 
@@ -38,7 +50,7 @@ gulp.task('debug', function (cb) {
         minify({
             mangle: {
                 keepClassName: true
-            } 
+            }
         }),
         gulp.dest('./dist/')
     ], cb);
