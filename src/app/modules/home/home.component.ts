@@ -10,8 +10,10 @@ import { CategoryDatabaseService } from 'service/category-database.service';
 import { AccountService } from 'service/account.service';
 import { LoggingService } from 'service/logging.service';
 import { ScrollorService } from 'service/scrollor.service';
+import { DocumentService } from 'service/document.service';
 import { NoticeService } from 'service/notice.service';
 import { NavButtonService } from 'service/nav-button.service';
+import { URLEscapePipe } from 'urlescape/urlescape.pipe';
 
 import { ArticleData, Category, Options, NavButton } from 'data-struct-definition';
 
@@ -64,7 +66,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     public page_appear = 'active';
     public can_sort = 0;
-    public show_cate_state = 1;
+    public show_cate_state = 0;
     public load_article = 0;
 
     public article_sort_options: SortablejsOptions = {
@@ -96,6 +98,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     constructor(
         private _router: Router,
         private _log: LoggingService,
+        private _doc: DocumentService,
         private _account: AccountService,
         private _article_db: ArticleDatabaseService,
         private _category_db: CategoryDatabaseService,
@@ -150,12 +153,11 @@ export class HomeComponent implements OnInit, OnDestroy {
         },
 
         toggle_sortable(event) {
-            console.log(event.checked);
             this.self.can_sort = event.checked;
-            this.self.article_sort_options = Object.assign(
-                this.self.article_sort_options, { disable: event.checked });
-            this.self.category_sort_options = Object.assign(
-                this.self.category_sort_options, { disable: event.checked });
+            this.self.article_sort_options = Object.assign(Object.create({}),
+                this.self.article_sort_options, { disabled: !event.checked });
+            this.self.category_sort_options = Object.assign(Object.create({}),
+                this.self.category_sort_options, { disabled: !event.checked });
         },
 
         set_current_category(category) {
@@ -206,7 +208,6 @@ export class HomeComponent implements OnInit, OnDestroy {
                     value: category.category_name
                 }]
             }, data => {
-                console.log('input modify');
                 if (!data) { return; }
                 this.self._category_db.modify(category.category_id, data.category_name.value);
             }).subscribe();
@@ -233,12 +234,13 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.action.query_category();
+        this._doc.title = '主页';
 
         document.scrollingElement.scrollTop = 0;
         this._log.send('home', { des: '主页' });
         this.page_appear = 'active';
-        this.article_sort_options = Object.assign(this.article_sort_options, { disable: true });
-        this.category_sort_options = Object.assign(this.category_sort_options, { disable: true });
+        this.article_sort_options = Object.assign(Object.create({}), this.article_sort_options, { disabled: true });
+        this.category_sort_options = Object.assign(Object.create({}), this.category_sort_options, { disabled: true });
         this.load_article = 1;
 
 

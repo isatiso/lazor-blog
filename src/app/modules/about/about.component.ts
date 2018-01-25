@@ -4,6 +4,7 @@ import { trigger, state, style, animate, transition } from '@angular/animations'
 import { AboutContent } from './about.md';
 import { NavButtonService } from 'service/nav-button.service';
 import { LoggingService } from 'service/logging.service';
+import { DocumentService } from 'service/document.service';
 import { NoticeService } from 'service/notice.service';
 
 
@@ -27,11 +28,13 @@ export class AboutComponent implements OnInit {
         private _nav_button: NavButtonService,
         private _notice: NoticeService,
         private _log: LoggingService,
+        private _doc: DocumentService,
     ) { }
 
     ngOnInit() {
         document.scrollingElement.scrollTop = 0;
         this._nav_button.button_list = [];
+        this._doc.title = '关于';
         this._log.send('about', { des: '关于 Lazor Blog 页面' });
     }
 

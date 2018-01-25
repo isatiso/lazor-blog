@@ -7,7 +7,7 @@
     <ul *ngIf="article_list.length">
         <li *ngFor="let article of article_list" class="article-item">
             <div class="helper"></div>
-            <span [@loadArticle]="1" routerLink="/article/{{article.article_id}}" class="article-item-content">
+            <span [@loadArticle]="1" routerLink="/article/{{article.article_id}}/{{article.title | urlescape}}" class="article-item-content">
                 {{ article.title }}
             </span>
         </li>

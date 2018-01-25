@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 
+import { DocumentService } from 'service/document.service';
 import { LoggingService } from 'service/logging.service';
 
 @Component({
@@ -27,11 +28,12 @@ export class ErrorComponent implements OnInit {
 
     constructor(
         private _router: Router,
-        private _log: LoggingService
+        private _log: LoggingService,
+        private _doc: DocumentService,
     ) { }
 
     ngOnInit() {
-
+        this._doc.title = '啊哦, 出问题了';
         this._router.routerState.root.queryParams.subscribe(
             value => {
                 if (value.message) {

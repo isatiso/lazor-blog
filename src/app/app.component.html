@@ -33,6 +33,9 @@
                 <button *ngIf="is_logged()" mat-menu-item (click)="edit_profile()">
                     <span>个人资料</span>
                 </button>
+                <button *ngIf="is_logged()" mat-menu-item (click)="edit_password()">
+                    <span>修改密码</span>
+                </button>
                 <button *ngIf="!is_logged()" mat-menu-item routerLink="/auth">
                     <span>登陆</span>
                 </button>

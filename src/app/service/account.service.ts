@@ -10,6 +10,7 @@ import { Account } from 'public/data-struct-definition';
 @Injectable()
 export class AccountService {
     private account_data = new BehaviorSubject<Account>(null);
+
     public pattern = {
         email: /^([\w-.]+)@([\w-]+)(\.([\w-]+))+$/,
         password: /^[0-9A-Za-z`~!@#$%^&*()_+\-=\{\}\[\]:;"'<>,.\\|?/ ]{6,24}$/,
@@ -170,7 +171,34 @@ export class AccountService {
                         this._notice.bar(data['msg'], 'OK');
                     }
                 });
-        });
+        }).subscribe();
+    }
+
+    modify_password(old_pass, new_pass) {
+        this._http.post(
+            '/middle/user/password',
+            {
+                old_pass: old_pass,
+                new_pass: new_pass,
+            }
+        ).subscribe(
+            res => {
+                if (res['result']) {
+                    this.log_out();
+                    this._notice.bar('Your password has changed, please re-login.');
+                } else {
+                    this._notice.bar(res['msg']);
+                }
+            });
+    }
+
+    log_out() {
+        this._http.delete('/middle/user').subscribe(
+            res => {
+                this.data = null;
+            }
+        );
+        this._router.navigate(['/auth']);
     }
 }
 

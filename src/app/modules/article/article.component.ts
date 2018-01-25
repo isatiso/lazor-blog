@@ -8,6 +8,7 @@ import { ArticleDatabaseService } from 'service/article-database.service';
 import { CategoryDatabaseService } from 'service/category-database.service';
 import { ScrollorService } from 'service/scrollor.service';
 import { LoggingService } from 'service/logging.service';
+import { DocumentService } from 'service/document.service';
 import { NoticeService } from 'service/notice.service';
 import { NavButtonService } from 'service/nav-button.service';
 
@@ -45,6 +46,7 @@ export class ArticleComponent implements OnInit, AfterViewInit {
             return this.self._category_db.next;
         },
         get current_article() {
+            this.self._doc.title = this.self._article_db.current_article.title;
             return this.self._article_db.current_article;
         },
     };
@@ -61,12 +63,14 @@ export class ArticleComponent implements OnInit, AfterViewInit {
         },
         go_last: (event?) => {
             if (this.source.last_article) {
-                this.flip(this.source.last_article.article_id);
+                const article = this.source.last_article;
+                this.flip(article.article_id, article.title);
             }
         },
         go_next: (event?) => {
             if (this.source.next_article) {
-                this.flip(this.source.next_article.article_id);
+                const article = this.source.next_article;
+                this.flip(article.article_id, article.title);
             }
         },
         go_home: (event?) => {
@@ -87,6 +91,7 @@ export class ArticleComponent implements OnInit, AfterViewInit {
         private _router: Router,
         private _activate_route: ActivatedRoute,
         private _log: LoggingService,
+        private _doc: DocumentService,
         private _notice: NoticeService,
         private _article_db: ArticleDatabaseService,
         private _category_db: CategoryDatabaseService,
@@ -140,11 +145,11 @@ export class ArticleComponent implements OnInit, AfterViewInit {
         }
     }
 
-    flip(article_id) {
+    flip(article_id, title?: string) {
         this.page_appear = 0;
         setTimeout(() => {
             this._router.navigate(
-                ['/article/' + article_id]
+                [`/article/${article_id}/${title.split('/').join('%2F')}`]
             ).then(
                 () => {
                     this.ngOnInit();

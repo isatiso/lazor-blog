@@ -4,7 +4,8 @@ import { Routes, RouterModule } from '@angular/router';
 import { ArticleComponent } from './article.component';
 
 const routes: Routes = [
-    { path: ':id', component: ArticleComponent, pathMatch: 'full' }
+    { path: ':id', component: ArticleComponent, pathMatch: 'full' },
+    { path: ':id/:title', component: ArticleComponent, pathMatch: 'full'}
 ];
 
 @NgModule({

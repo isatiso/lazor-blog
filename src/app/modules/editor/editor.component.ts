@@ -8,6 +8,7 @@ import { ArticleDatabaseService } from 'service/article-database.service';
 import { CategoryDatabaseService } from 'service/category-database.service';
 import { NoticeService } from 'service/notice.service';
 import { LoggingService } from 'service/logging.service';
+import { DocumentService } from 'service/document.service';
 import { NavButtonService } from 'service/nav-button.service';
 import { ScrollorService } from 'service/scrollor.service';
 import { ArticleData, Category, Options } from 'public/data-struct-definition';
@@ -44,6 +45,8 @@ export class EditorComponent implements OnInit, OnDestroy {
     public progress_rate = 0;
     public progress_state = 'inactive';
     public tab_select_value = 0;
+    public left_scroll_top = 0;
+    public right_scroll_top = 0;
 
     @ViewChild('imageForm') image_form;
     @ViewChild('imageUpload') image_upload;
@@ -56,6 +59,7 @@ export class EditorComponent implements OnInit, OnDestroy {
         private _router: Router,
         private _activate_route: ActivatedRoute,
         private _log: LoggingService,
+        private _doc: DocumentService,
         private _scrollor: ScrollorService,
         private _article_db: ArticleDatabaseService,
         private _category_db: CategoryDatabaseService,
@@ -68,8 +72,7 @@ export class EditorComponent implements OnInit, OnDestroy {
     public source = {
         self: this,
         last_category_id: '',
-        left_scroll_top: 0,
-        right_scroll_top: 0,
+
 
         get outer_width(): number {
             return window.outerWidth;
@@ -102,9 +105,9 @@ export class EditorComponent implements OnInit, OnDestroy {
         set tab_select(value: number) {
             if (value !== this.self.tab_select_value) {
                 if (value === 1) {
-                    this.left_scroll_top = document.scrollingElement.scrollTop;
+                    this.self.left_scroll_top = document.scrollingElement.scrollTop;
                 } else if (value === 0) {
-                    this.right_scroll_top = document.scrollingElement.scrollTop;
+                    this.self.right_scroll_top = document.scrollingElement.scrollTop;
                 }
                 this.self.tab_select_value = value;
             }
@@ -118,12 +121,12 @@ export class EditorComponent implements OnInit, OnDestroy {
             if (event === 1) {
                 this.self.render_latex = 1;
                 setTimeout(() => {
-                    this.self._scrollor.goto(current_scroll_top, this.right_scroll_top, 30);
+                    this.self._scrollor.goto(current_scroll_top, this.self.right_scroll_top, 30);
                 }, 0);
             } else {
                 this.self.render_latex = 0;
                 setTimeout(() => {
-                    this.self._scrollor.goto(current_scroll_top, this.left_scroll_top, 30);
+                    this.self._scrollor.goto(current_scroll_top, this.self.left_scroll_top, 30);
                 }, 0);
             }
         },
@@ -167,7 +170,8 @@ export class EditorComponent implements OnInit, OnDestroy {
                     const params: NavigationExtras = {
                         queryParams: { 'from': 'editor' },
                     };
-                    this.self._router.navigate(['/article/' + this.self._article_db.current_article.article_id], params);
+                    const article = this.self._article_db.current_article;
+                    this.self._router.navigate([`/article/${article.article_id}/${article.title.split('/').join('%2F')}`], params);
                     break;
             }
         },
@@ -292,6 +296,7 @@ export class EditorComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         window.addEventListener('beforeunload', this._before_unload);
+        this._doc.title = '编辑器';
         this._activate_route.params.subscribe(value => {
             if (!this._category_db.init_status) {
                 this._category_db.pull(new Options({ flush: true }));

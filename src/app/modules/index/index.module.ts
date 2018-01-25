@@ -5,12 +5,14 @@ import { MatCardModule } from '@angular/material';
 
 import { IndexRoutingModule } from './index-routing.module';
 import { IndexComponent, IndexArticleComponent } from './index.component';
+import { URLEscapeModule } from 'urlescape/urlescape.module';
 
 @NgModule({
     imports: [
         FormsModule,
         CommonModule,
         MatCardModule,
+        URLEscapeModule,
         IndexRoutingModule
     ],
     declarations: [

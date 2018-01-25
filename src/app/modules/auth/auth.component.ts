@@ -6,6 +6,7 @@ import { trigger, state, style, animate, transition } from '@angular/animations'
 import { AccountService } from 'service/account.service';
 import { NoticeService } from 'service/notice.service';
 import { LoggingService } from 'service/logging.service';
+import { DocumentService } from 'service/document.service';
 import { NavButtonService } from 'service/nav-button.service';
 
 import { Account } from 'data-struct-definition';
@@ -52,6 +53,7 @@ export class AuthComponent implements OnInit, OnDestroy {
     public action = {
         self: this,
         select_change(event) {
+            this.self._doc.title = event ? '注册' : '登录';
             this.self.tab_select = event;
         },
         go_sign_in(event?) {
@@ -70,6 +72,7 @@ export class AuthComponent implements OnInit, OnDestroy {
     constructor(
         private _active_route: ActivatedRoute,
         private _log: LoggingService,
+        private _doc: DocumentService,
         private _notice: NoticeService,
         private _account: AccountService,
         private _nav_button: NavButtonService,
@@ -84,6 +87,7 @@ export class AuthComponent implements OnInit, OnDestroy {
                 });
             });
         this._account.check_log();
+        this._doc.title = this.tab_select ? '注册' : '登录';
 
         document.scrollingElement.scrollTop = 0;
         this.auth_exists = 'active';

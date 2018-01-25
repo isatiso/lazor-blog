@@ -53,7 +53,7 @@
                     <li *ngFor="let article of source.article_list" class="article-item" [@sortState]="can_sort">
                         <div class="helper"></div>
                         <mat-chip-list [@loadArticle]="load_article">
-                            <mat-chip routerLink="/article/{{article.article_id}}" selected="true" color="primary">
+                            <mat-chip routerLink="/article/{{article.article_id}}/{{article.title | urlescape}}" selected="true" color="primary">
                                 {{ article.title }}
                             </mat-chip>
                         </mat-chip-list>
@@ -113,7 +113,7 @@
                 <ul [sortablejs]="source.article_list" [sortablejsOptions]="article_sort_options" class="sortable">
                     <li *ngFor="let article of source.article_list" class="article-item" [@sortState]="can_sort">
                         <div class="helper"></div>
-                        <span [@loadArticle]="load_article" class="article-item-content" routerLink="/article/{{article.article_id}}" color="primary">
+                        <span [@loadArticle]="load_article" class="article-item-content" routerLink="/article/{{article.article_id}}/{{article.title | urlescape}}" color="primary">
                             {{ article.title }}
                         </span>
                     </li>

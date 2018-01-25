@@ -22,7 +22,8 @@ export class NoticeService {
             message,
             action_name,
             {
-                duration: 2000
+                duration: 2000,
+                verticalPosition: 'top'
             }
         );
         if (action) {

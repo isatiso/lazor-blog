@@ -14,6 +14,7 @@ import { SortablejsModule } from 'angular-sortablejs';
 
 import { HomeComponent } from './home.component';
 import { HomeRoutingModule } from './home-routing.module';
+import { URLEscapeModule } from 'urlescape/urlescape.module';
 
 @NgModule({
     imports: [
@@ -26,10 +27,11 @@ import { HomeRoutingModule } from './home-routing.module';
         MatButtonModule,
         MatSlideToggleModule,
         HomeRoutingModule,
+        URLEscapeModule,
         SortablejsModule.forRoot({})
     ],
     declarations: [
-        HomeComponent
+        HomeComponent,
     ]
 })
 export class HomeModule { }

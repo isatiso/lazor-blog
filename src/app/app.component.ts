@@ -11,6 +11,7 @@ import { ArticleDatabaseService } from 'service/article-database.service';
 import { CategoryDatabaseService } from 'service/category-database.service';
 import { AccountService } from 'service/account.service';
 import { LoggingService } from 'service/logging.service';
+import { DocumentService } from 'service/document.service';
 import { NavButtonService } from 'service/nav-button.service';
 
 import { NavButton } from 'public/data-struct-definition';
@@ -56,6 +57,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         private el: ElementRef,
         private router: Router,
         private _http: HttpClient,
+        private _doc: DocumentService,
         private activatedRoute: ActivatedRoute,
         private _account: AccountService,
         private _log: LoggingService,
@@ -194,12 +196,30 @@ export class AppComponent implements OnInit, AfterViewInit {
         }).subscribe();
     }
 
-    log_out() {
-        this._http.delete('/middle/user').subscribe(
-            res => {
-                this._account.data = null;
+    edit_password() {
+        const rate = window.outerWidth > 1024 ? .5 : .9;
+        const editor_width = (window.outerWidth * rate) + 'px';
+
+        this._notice.input({
+            input_list: [{
+                name: 'old_password',
+                value: '',
+                placeholder: '旧密码',
+                type: 'password'
+            }, {
+                name: 'new_password',
+                value: '',
+                placeholder: '新密码',
+                type: 'password'
+            }]
+        }, res => {
+            if (res) {
+                this._account.modify_password(res.old_password.value, res.new_password.value);
             }
-        );
-        this.router.navigate(['/auth']);
+        }).subscribe();
+    }
+
+    log_out() {
+        this._account.log_out();
     }
 }

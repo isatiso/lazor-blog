@@ -4,8 +4,10 @@ import { trigger, state, style, animate, transition } from '@angular/animations'
 
 import { CategoryDatabaseService } from 'service/category-database.service';
 import { LoggingService } from 'service/logging.service';
+import { DocumentService } from 'service/document.service';
 import { ArticleData, Category } from 'public/data-struct-definition';
 import { NavButtonService } from 'service/nav-button.service';
+import { URLEscapePipe } from 'urlescape/urlescape.pipe';
 
 @Component({
     selector: 'la-index',
@@ -51,6 +53,7 @@ export class IndexComponent implements OnInit, OnDestroy {
 
     constructor(
         private _log: LoggingService,
+        private _doc: DocumentService,
         private _router: Router,
         private _active_route: ActivatedRoute,
         private _category_db: CategoryDatabaseService,
@@ -63,7 +66,9 @@ export class IndexComponent implements OnInit, OnDestroy {
             return this.self._category_db.index_category_list.value;
         },
         get current_category(): Category {
-            return this.self._category_db.current_index_category;
+            const category = this.self._category_db.current_index_category;
+            this.self._doc.title = category.category_name;
+            return category;
         },
     };
 
@@ -77,6 +82,7 @@ export class IndexComponent implements OnInit, OnDestroy {
     ngOnInit() {
 
         this._log.send('index', { des: '索引页' });
+        this._doc.title = '索引页';
 
         if (this._active_route.firstChild) {
             this._category_db.get_index_category_list(this._active_route.firstChild.params['value']['category_id'] || null);

@@ -27,6 +27,7 @@ import { ArticleDatabaseService } from 'service/article-database.service';
 import { NoticeService } from 'service/notice.service';
 import { ScrollorService } from 'service/scrollor.service';
 import { LoggingService } from 'service/logging.service';
+import { DocumentService } from 'service/document.service';
 import { NavButtonService } from 'service/nav-button.service';
 import { AuthGuard } from 'guard/auth.guard';
 import { ArticleOwnerGuard } from 'guard/article-owner.guard';
@@ -72,6 +73,7 @@ import { WarningModule } from 'public/warning/warning.module';
         MatSnackBar,
         ScrollorService,
         NavButtonService,
+        DocumentService,
         AuthGuard,
         LeaveGuard,
         ArticleOwnerGuard],
