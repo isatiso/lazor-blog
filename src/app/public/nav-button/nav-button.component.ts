@@ -3,7 +3,7 @@ import { Component, Input, OnInit, OnChanges, ViewChild, ViewChildren } from '@a
 
 // non-angular module
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import anime from 'animejs';
+import anime = require('animejs');
 
 // local module
 import { NavProfileService } from 'service/nav-profile.service';

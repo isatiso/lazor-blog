@@ -22,7 +22,7 @@ import 'rxjs/add/operator/mergeMap';
 
 import * as platform from 'platform';
 
-import anime from 'animejs';
+declare var anime: any;
 
 @Component({
     selector: 'la-root',
@@ -103,11 +103,11 @@ export class AppComponent implements OnInit, AfterViewInit {
                 'lazor-server.js', {
                     scope: '/'
                 }).then(
-                registration => {
-                    return true;
-                }).catch(
-                error => { }
-                );
+                    registration => {
+                        return true;
+                    }).catch(
+                        error => { }
+                    );
         }
 
         this.router.events.filter(event => event instanceof NavigationEnd)
@@ -137,7 +137,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         const wrapperBg = document.querySelector('#cover-background');
 
         anime.timeline({
-            targets: [wrapperEl, wrapperBg],
+            targets: ['#loading-wrapper', '#cover-background'],
             opacity: 0,
             duration: 1000,
             easing: 'linear'
